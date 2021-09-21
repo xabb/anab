@@ -1,0 +1,61 @@
+.sfull {
+  float: right;
+  margin-right: 20px;
+  width: 50px;
+  height: 40px;
+  z-index: 1024;
+}
+
+.speaker {
+  margin-top: 5px;
+  margin-left: 20px;
+  bottom: 20px;
+  height: 23px;
+  width: 340px;
+  font-size: 16px;
+  z-index: 1024;
+  display: table;
+  clear: both;
+  width: 100%;
+}
+
+.ispeaker {
+  float: left;
+  height: 23px;
+  padding-left: 20px;
+  font-size: 16px;
+  z-index: 1024;
+}
+
+.speech {
+  position: absolute;
+  margin-top: 80px;
+  width: 360px;
+  height: 120px;
+  padding: 0px;
+  z-index: 1024;
+  display: none;
+}
+
+.ispeech {
+  position: relative;
+  margin-left: 0px;
+  margin-bottom: 0px;
+  padding-left: 20px;
+  padding-top: 5px;
+  width: 360px;
+  height: 100px;
+  text-align: left;
+  line-height: 16px;
+  font-size: 14px;
+  background: #ffffff;
+  border: 2px solid #666;
+  -webkit-border-radius: 30px;
+  -moz-border-radius: 30px;
+  border-radius: 30px;
+  -webkit-box-shadow: 2px 2px 4px #888;
+  -moz-box-shadow: 2px 2px 4px #888;
+  box-shadow: 2px 2px 4px #888;
+  overflow: hidden;
+  z-index: 1024;
+}

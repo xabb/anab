@@ -1,0 +1,210 @@
+/* Space out content a bit */
+body {
+    padding-top: 20px;
+    padding-bottom: 5px;
+}
+
+/* Everything but the jumbotron gets side spacing for mobile first views */
+.header,
+.marketing,
+.footer {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Custom page header */
+.header {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+/* Make the masthead heading the same height as the navigation */
+.header h3 {
+    margin-top: 0;
+    margin-bottom: 0;
+    line-height: 40px;
+    padding-bottom: 5px;
+}
+
+/* Custom page footer */
+.footer {
+    padding-top: 19px;
+    color: #777;
+    border-top: 1px solid #e5e5e5;
+}
+
+.container-narrow > hr {
+    margin: 30px 0;
+}
+
+.container {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.upper-toolbar {
+    content: "";
+    display: table;
+    clear: both;
+    height: 30px;
+    width: 100%;
+}
+
+.lower-toolbar {
+    content: "";
+    display: table;
+    clear: both;
+    height: 30px;
+    width: 100%;
+}
+
+.outer-wave {
+    float: left;
+    width: 80%; 
+}
+
+.outer-wave-full {
+    float: left;
+    width: 100%; 
+}
+
+.outer-notes {
+    float: left;
+    width: 18%; 
+    height: 390px; 
+    margin-left: 2%;
+}
+
+.linear-outer-notes {
+    display: table;
+    width: 80%; 
+    height: 800px; 
+    margin-left: 10%; 
+    border: 1px solid #dddddd; 
+}
+
+.linear-bar {
+    display: table;
+    width: 100%; 
+}
+
+.linear-play {
+    float: right;
+    margin-right: 5px; 
+    margin-top: -15px; 
+}
+
+.linear-book {
+    float: right;
+    margin-right: 25px; 
+    margin-top: -15px; 
+}
+
+.linear-subtitle {
+    width: 80%;
+    height: 80px;
+    margin-left: 10%;
+    float: left;
+    background: #ffffaa;
+    overflow-y: auto;
+}
+
+.linear-subtitle-left {
+    width: 10%;
+    float: right;
+    height: 80px;
+}
+
+#export-subtitles {
+    width: 10%;
+    float: right;
+}
+
+#biography-edit {
+    width: 80%;
+    height: 800px;
+    margin-left: 10%;
+}
+
+#description-edit {
+    width: 80%;
+    height: 800px;
+    margin-left: 10%;
+}
+
+.note-textarea {
+    width: 100%; 
+}
+
+.export-notes {
+    float: left;
+    width: 18%; 
+    height: 40px; 
+    margin-left: 2%; 
+    padding-left: 2%; 
+    margin-top: 10px; 
+}
+
+/* Responsive: Portrait tablets and up */
+@media screen and (min-width: 768px) {
+    /* Remove the padding we set earlier */
+    .header,
+    .marketing,
+    .footer {
+        padding-left: 0;
+        padding-right: 0;
+    }
+    /* Space out the masthead */
+    .header {
+        margin-bottom: 10px;
+    }
+}
+
+.controls {
+    padding: 30px 0 15px;
+    text-align: center;
+}
+
+.controls .btn {
+    margin-bottom: 15px;
+}
+
+@media screen and (min-width: 990px) {
+    .controls .mark-controls {
+        display: inline;
+    }
+}
+
+.lead {
+    text-align: center;
+    padding: 20px;
+}
+
+#waveform {
+    position: relative;
+}
+
+#progress-bar {
+    position: absolute;
+    z-index: 10;
+    top: 50%;
+    margin-top: -10px;
+    left: 5%;
+    width: 90%;
+}
+
+#drop {
+    border: 3px dashed #ddd;
+    padding: 30px;
+}
+
+#drop.wavesurfer-dragover {
+    border-color: #333;
+}
+
+p {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
