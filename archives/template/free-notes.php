@@ -56,6 +56,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
         <script type="text/javascript" src="../../js/wavesurfer.timeline.min.js"></script>
         <script type="text/javascript" src="../../js/wavesurfer.regions.min.js"></script>
         <script type="text/javascript" src="../../js/wavesurfer.minimap.min.js"></script>
+        <script type="text/javascript" src="../../js/wavesurfer.markers.min.js"></script>
 
         <script type="text/javascript" src="../../js/trivia.js"></script>
         <script type="text/javascript" src="../../js/alertify.min.js"></script>

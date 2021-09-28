@@ -173,6 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
         backend: 'MediaElement',
         plugins: [
             WaveSurfer.regions.create(),
+            WaveSurfer.markers.create(),
             WaveSurfer.minimap.create({
                  container: '#wave-minimap',
                  height: 50,
@@ -467,6 +468,8 @@ function saveRegions() {
     var counter=0;
     var navigation="<center><b>Navigate</b></center><br/><br/>";
     $("#linear-notes").html('');
+    // redraw markers
+    wavesurfer.clearMarkers();
     localStorage.regions = JSON.stringify(
         Object.keys(wavesurfer.regions.list).map(function(id) {
             var region = wavesurfer.regions.list[id];
@@ -499,6 +502,18 @@ function saveRegions() {
                 var id = $(this).attr('id');
                 wavesurfer.regions.list[id].data.note=evt.target.value;
                 saveRegions();
+            });
+            wavesurfer.addMarker({
+               time : region.start,
+               label : "",
+               color : "#0000ff",
+               position : "top"
+            });
+            wavesurfer.addMarker({
+               time : region.end,
+               label : "",
+               color : "#00ff00",
+               position : "bottom"
             });
             return {
                 order: counter,
@@ -660,6 +675,7 @@ function showNote(region) {
     // showNote.speaker.style.background = region.data.color || '';
     // showNote.sfull.style.background = region.data.color || '';
     // showNote.el.innerHTML = showNote.el.innerHTML.replace(/\n/g,'<br>');
+    console.log( "show note : " + showNote.el.textContent || showNote.el.innerText );
     if ( showNote.el.innerHTML != '' )
        showNote.uel.style.display = 'block';
     else
@@ -670,7 +686,6 @@ function showNote(region) {
  * Delete annotation.
  */
 function deleteNote(region) {
-    // console.log( "delete note");
     if (!deleteNote.el || !deleteNote.uel) {
        deleteNote.el = document.querySelector('#isubtitle');
        deleteNote.uel = document.querySelector('#subtitle');
@@ -682,9 +697,10 @@ function deleteNote(region) {
     var div = document.createElement("div");
     div.innerHTML = region.data.note;
     var textr = div.textContent || div.innerText || "";
-    console.log( textl );
-    console.log( textr );
-    if ( textr === textr )
+    textr = textr.replaceAll("\n","");
+    console.log( "delete note : " + textr );
+    console.log( "delete note : " + textl );
+    if ( textr === textl )
        deleteNote.el.innerHTML = '';
     else
        deleteNote.uel.style.display = 'block';

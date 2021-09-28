@@ -180,6 +180,7 @@ document.addEventListener('DOMContentLoaded', function() {
               progressColor: progressColor,
               plugins: [
                  WaveSurfer.regions.create(),
+                 WaveSurfer.markers.create(),
               ]
            });
 
@@ -457,6 +458,8 @@ document.addEventListener('DOMContentLoaded', function() {
  */
 function saveRegions() {
     var counter=4096;
+    // redraw markers
+    wavesurfer.clearMarkers();
     localStorage.regionsl = JSON.stringify(
         Object.keys(wavesurfer.regions.list).map(function(id) {
             var region = wavesurfer.regions.list[id];
@@ -466,6 +469,18 @@ function saveRegions() {
                burl = burl.substr( 0, burl.indexOf('?') );
             } 
             counter++;
+            wavesurfer.addMarker({
+               time : region.start,
+               label : "",
+               color : "#0000ff",
+               position : "top"
+            });
+            wavesurfer.addMarker({
+               time : region.end,
+               label : "",
+               color : "#00ff00",
+               position : "bottom"
+            });
             // console.log(region.data.note);
             var leyenda = "";
             if ( typeof region.data.note != "undefined" )
