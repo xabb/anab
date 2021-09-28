@@ -210,28 +210,29 @@ document.addEventListener('DOMContentLoaded', function() {
         if (0) {
             loadRegions(JSON.parse(localStorage.regions));
         } else {
-            wavesurfer.util
-                .ajax({
-                    responseType: 'json',
-                    url: 'annotations.json'
-                })
-                .on('success', function(data) {
-                    loadRegions(data);
-                    // zoom is the number of minutes limited to 10
-                    wzoom = Math.floor( wavesurfer.getDuration() / 60.0 )+1;
-                    if ( wzoom > 10 ) wzoom = 10;
-                    $('#zvalue').html(("x"+wzoom).substring(0,4));
-                    wavesurfer.zoom(wzoom);
-                    $('#svalue').html(("x"+wspeed).substring(0,4));
-		    if ( sstart !== null )
+            
+            $.post({
+                 responseType: 'json',
+                 url: 'annotations.json'
+            }, function(data) {
+                 loadRegions(data);
+                 // zoom is the number of minutes limited to 10
+                 wzoom = Math.floor( wavesurfer.getDuration() / 60.0 )+1;
+                 if ( wzoom > 10 ) wzoom = 10;
+                 $('#zvalue').html(("x"+wzoom).substring(0,4));
+                 wavesurfer.zoom(wzoom);
+                 $('#svalue').html(("x"+wspeed).substring(0,4));
+	         if ( sstart !== null )
+                 {
+                    if ( ( wavesurfer.getDuration() > 0 ) && ( sstart >= 0 ) && ( sstart <= wavesurfer.getDuration() ) )
                     {
-                       if ( ( wavesurfer.getDuration() > 0 ) && ( sstart >= 0 ) && ( sstart <= wavesurfer.getDuration() ) )
-                       {
-		          wavesurfer.seekTo( sstart/wavesurfer.getDuration() );
-                       }
+	               wavesurfer.seekTo( sstart/wavesurfer.getDuration() );
                     }
-                    moveSpeech();
-                });
+                 }
+                 moveSpeech();
+            }).fail(function(error) {
+                 console.log( "couldn't load annotations : " + JSON.stringify(error) );
+            });
         }
     });
 
