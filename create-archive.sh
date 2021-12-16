@@ -27,10 +27,10 @@ echo "done." 1>&2
 mimetype=`/usr/bin/mimetype --output-format %m $tmpfile`
 echo $mimetype 1>&2
 echo  ${mimetype#*audio*} 1>&2
-if [ ${mimetype#*audio*} = $mimetype ]
+if [ ${mimetype#*audio*} = $mimetype ] && [ ${mimetype#*video*} = $mimetype ]
 then
   /bin/rm $tmpfile
-  echo "ERR: This url is not an audio archive, please !!!"
+  echo "ERR: This url is not an media archive, please !!!"
   exit -1
 fi
 
