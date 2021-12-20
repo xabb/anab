@@ -12,13 +12,6 @@ It is based on the wavesurfer.js library
 that uses the Web Audio Api
 to process audio within the browser.
 
-This project was created for the [Transglobal Studies](https://blog.transglobal-studies.org/) workgroup
-which aims at fostering reflection and dialog
-on trans-frontiers globalization issues. 
-
 author/ideas : chevil@giss.tv
-
-contributor/ideas : beatrice.rettig@free.fr
-
 
 ![Annotation Screen](screenshot.png)
