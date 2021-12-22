@@ -12,6 +12,6 @@ It is based on the wavesurfer.js library
 that uses the Web Audio Api
 to process audio within the browser.
 
-author/ideas : chevil@giss.tv
+chevil@giss.tv
 
 ![Annotation Screen](screenshot.png)
