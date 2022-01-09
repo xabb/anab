@@ -12,7 +12,7 @@ It is based on the wavesurfer.js library
 that uses the Web Audio Api
 to process audio within the browser.
 
-A showcase video is available here 
+A showcase video is available here :
 http://giss.tv/~chevil/Videos/anab.webm
 
 chevil@giss.tv
