@@ -44,12 +44,12 @@ then
    $cmd
    if [ $? -ne 0 ]
    then
-      #/bin/rm $tmpfile
+      /bin/rm $tmpfile
       echo "ERR: Could not create excerpt : $4"
       exit -1
    fi
 
-   #/bin/rm $tmpfile
+   /bin/rm $tmpfile
 
 fi
 
