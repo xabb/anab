@@ -1,8 +1,8 @@
 <?php
 $config['dbname'] = "wavesurfer";
-$config['dbhost'] = "__host__";
-$config['dbuser'] = "__dbuser__";
-$config['dbpass'] = "__dbpassword__";
+$config['dbhost'] = "127.0.0.1";
+$config['dbuser'] = "giss";
+$config['dbpass'] = "bigotes";
 $config['owner'] = "admin";
 $config['project-name'] = "Audio Notes & Books - A.N.a.B.";
 

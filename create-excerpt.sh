@@ -19,10 +19,15 @@ then
     sed -i "s#__title__#$book#g" "audiobooks/$book/listen.php"
 fi
 
+filename=$(basename -- "$3")
+extension="${filename##*.}"
+echo "extension : $extension"
+
 # generate the excerpt if it doesn't exist
 if [ ! -f $4 ]
 then
    tmpfile=`tempfile`
+   tmpfile=$tmpfile"."$extension
    #echo -n "Downloading to $tmpfile..." 1>&2
    wget -O $tmpfile --no-check-certificate "$3" 2>/dev/null
    if [ $? -ne 0 ]
@@ -34,17 +39,17 @@ then
    fi
    #echo "done." 1>&2
 
-   cmd="ffmpeg -y -ss $1 -t $2 -i $tmpfile $4"
+   cmd="/usr/bin/ffmpeg -f $extension -y -ss $1 -t $2 -i $tmpfile $4"
    echo $cmd 1>&2
    $cmd
    if [ $? -ne 0 ]
    then
-      /bin/rm $tmpfile
+      #/bin/rm $tmpfile
       echo "ERR: Could not create excerpt : $4"
       exit -1
    fi
 
-   /bin/rm $tmpfile
+   #/bin/rm $tmpfile
 
 fi
 

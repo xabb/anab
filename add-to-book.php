@@ -67,7 +67,7 @@ include("config.php");
         $bookrow = mysqli_fetch_row($resulto);
         $border = $bookrow[0]+1;
      }
-     $excerpt = "excerpts/anno_".$annid.".mp3";
+     $excerpt = "excerpts/anno_".$annid.".ogg";
      $sqli = "INSERT INTO audiobook ( title, aoid, norder, excerpt, user ) VALUES ('".addslashes($book)."',".$annid.",".$border.",'".$excerpt."', '".addslashes($user)."' );";
      $resulti = $link->query($sqli);
      if ( $resulti !== true )

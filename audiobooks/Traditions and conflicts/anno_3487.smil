@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE smil PUBLIC "-//W3C//DTD SMIL 1.0//EN" "SMIL10.dtd">
+<smil>
+    <head>
+        <meta name="dc:format" content="Daisy 2.02"/>
+        <meta name="ncc:timeInThisSmil" content="44.399208"/>
+        <meta name="ncc:totalElapsedTime" content="45.999813"/>
+        <layout>
+            <region id="txt-view"/>
+        </layout>
+        <meta name="ncc:generator" content="A.N.a.B."/>
+        <meta name="title" content="team members..."/>
+        <meta name="dc:title" content="team members..."/>
+        <meta name="dc:identifier" content="2021-03-04-zanaan-wanaan.mp3"/>
+    </head>
+    <body>
+        <seq dur="44.399208">
+            <par endsync="last">
+                <text src="ncc.html#anno_3487" id="anno_3487"/>
+                <seq>
+                    <audio src="anno_3487.mp3" clip-begin="npt=0.000s" clip-end="npt=44.399208s" id="anno_3487"/>
+                </seq>
+            </par>
+        </seq>
+    </body>
+</smil>
