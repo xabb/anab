@@ -24,8 +24,9 @@ extension="${filename##*.}"
 echo "extension : $extension"
 
 # generate the excerpt if it doesn't exist
-if [ ! -f $4 ]
-then
+# always regenerate as duration might have changed
+# if [ ! -f $4 ]
+# then
    tmpfile=`tempfile`
    tmpfile=$tmpfile"."$extension
    #echo -n "Downloading to $tmpfile..." 1>&2
@@ -51,6 +52,6 @@ then
 
    /bin/rm $tmpfile
 
-fi
+# fi
 
 echo "OK"

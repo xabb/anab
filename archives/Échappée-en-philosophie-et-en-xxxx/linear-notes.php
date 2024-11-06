@@ -11,6 +11,8 @@ if ( !isset($_SESSION['schtroumpf']) || !isset($_SESSION['papa']) )
     exit();
 }
 
+header('Content-Security-Policy: frame-ancestors '.$_SERVER['HTTP_HOST']);
+
 // reading user's colors
 $waveColor="#000000";
 $progressColor="#000000";
@@ -108,7 +110,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                 <div id="subtitle" class="linear-subtitle"></div>
                 <div id="subtitle-left" class="linear-subtitle-left"></div>
                 <div class="export-notes" id="export-subtitles" onclick="exportSRT()">
-                     <button class="btn btn-info btn-block" data-action="export" title="Export annotations to SRT">
+                     <button class="btn btn-info btn-block btn-export" data-action="export" title="Export annotations to SRT">
                          <i class="glyphicon glyphicon-file"></i>
                          Export 
                      </button>

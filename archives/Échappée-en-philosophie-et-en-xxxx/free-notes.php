@@ -11,6 +11,8 @@ if ( !isset($_SESSION['schtroumpf']) || !isset($_SESSION['papa']) )
     exit();
 }
 
+header('Content-Security-Policy: frame-ancestors '.$_SERVER['HTTP_HOST']);
+
 // reading user's colors
 $waveColor="#000000";
 $progressColor="#000000";
@@ -68,6 +70,11 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
     </head>
 
     <body>
+        <div class="modal fade" id="modal-wait">
+           <div class="modal-sdialog modal-dialog" style="height:100px;">
+             <center><strong><h4>Loading waveform...</h4></strong></center><br/>
+           </div>
+        </div>
 
         <div class="modal fade" id="modal-help" role="dialog">
             <div class="modal-dialog modal-hdialog">

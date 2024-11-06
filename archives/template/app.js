@@ -136,6 +136,8 @@ var addToBook = function(regid) {
  */
 document.addEventListener('DOMContentLoaded', function() {
 
+    $("#modal-wait").modal("show");
+
     var jqxhr = $.post( {
        url: '../../get-title.php',
        data: {
@@ -231,8 +233,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                  }
                  moveSpeech();
+                 $("#modal-wait").modal("hide");
             }).fail(function(error) {
                  console.log( "couldn't load annotations : " + JSON.stringify(error) );
+                 $("#modal-wait").modal("hide");
             });
         }
     });

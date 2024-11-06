@@ -41,8 +41,8 @@ overview {
 }
 
 .btn-export {
-  min-width:160px;
-  width:160px;
+  min-width:120px;
+  width:120px;
   -moz-border-radius: 30px; 
   border-radius: 30px;
   color:#333333; 
@@ -70,6 +70,13 @@ overview {
 .modal-hdialog {
   height:350px;
   padding-top:10px;
+}
+
+.modal-sdialog {
+  height:100px;
+  padding-top:50px;
+  background:#ffffff;
+  border-radius:6px;
 }
 
 .modal-fdialog {
@@ -114,6 +121,12 @@ overview {
 
 .modal-fcontent {
   height:475px;
+  padding:20px;
+  margin:auto;
+}
+
+.modal-scontent {
+  height:100px;
   padding:20px;
   margin:auto;
 }

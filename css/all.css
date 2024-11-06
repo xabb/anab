@@ -6,7 +6,7 @@ body, html {
               line-height: 50px; vertical-align:middle; opacity : 0;
               -moz-border-radius: 15px; border-radius: 15px; background : lightblue }
 
-.bluebutton { height: 40px; width : 200px; text-align: center;
+.bluebutton { height: 40px; width : 250px; text-align: center;
               line-height: 30px; vertical-align:middle; opacity : 1;
               -moz-border-radius: 30px; border-radius: 30px; color:#333; background : #fff; border-color: #333; }
 
