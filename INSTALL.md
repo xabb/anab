@@ -26,8 +26,8 @@ to process audio within the browser.
 
 * clone the repository
 
-> git clone https://github.com/chevil/A.N.a.B..git
-> cd A.N.a.B.
+> git clone https://github.com/chevil/anab.git
+> cd anab
 
 * create the database :
 > cd sql

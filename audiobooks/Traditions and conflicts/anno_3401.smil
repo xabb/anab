@@ -4,21 +4,21 @@
     <head>
         <meta name="dc:format" content="Daisy 2.02"/>
         <meta name="ncc:timeInThisSmil" content="18.599813"/>
-        <meta name="ncc:totalElapsedTime" content="0"/>
+        <meta name="ncc:totalElapsedTime" content="50.299604"/>
         <layout>
             <region id="txt-view"/>
         </layout>
         <meta name="ncc:generator" content="A.N.a.B."/>
         <meta name="title" content="Pratiques artistiques..."/>
         <meta name="dc:title" content="Pratiques artistiques..."/>
-        <meta name="dc:identifier" content="2021-03-18-marie-bardet.mp3"/>
+        <meta name="dc:identifier" content="Pratiques artistiques"/>
     </head>
     <body>
         <seq dur="18.599813">
             <par endsync="last">
                 <text src="ncc.html#anno_3401" id="anno_3401"/>
                 <seq>
-                    <audio src="anno_3401.mp3" clip-begin="npt=0.000s" clip-end="npt=18.599813s" id="anno_3401"/>
+                    <audio src="anno_3401.ogg" clip-begin="npt=0.000s" clip-end="npt=18.599813s" id="anno_3401"/>
                 </seq>
             </par>
         </seq>

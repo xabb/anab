@@ -67,6 +67,7 @@ else
      $excerpt_source=basename(urldecode($row[3]));
      // copy excerpt
      error_log("cp '".$row[4]."' \"audiobooks/".$dirname."\"; echo $?");
+     $excerpt_data = convert_html_to_text($row[1]);
      if ( ( $result=exec("cp '".$row[4]."' \"audiobooks/".$dirname."\"; echo $?") ) != 0 )
      {
        die("ERR: Could not copy samples.");
@@ -86,6 +87,7 @@ else
      $e_excerpt_smil = preg_replace( "/__elapsed_time__/", $ttime, $e_excerpt_smil );
      $e_excerpt_smil = preg_replace( "/__excerpt_id__/", $excerpt_id, $e_excerpt_smil );
      $e_excerpt_smil = preg_replace( "/__excerpt_title__/", $excerpt_title, $e_excerpt_smil );
+     $e_excerpt_smil = preg_replace( "/__excerpt_data__/", $excerpt_data, $e_excerpt_smil );
      $e_excerpt_smil = preg_replace( "/__excerpt_source__/", $excerpt_source, $e_excerpt_smil );
      if (!$result=file_put_contents("audiobooks/".$dirname."/".$excerpt_id.".smil", $e_excerpt_smil))
      {

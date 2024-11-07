@@ -11,14 +11,14 @@
         <meta name="ncc:generator" content="A.N.a.B."/>
         <meta name="title" content="__excerpt_title__"/>
         <meta name="dc:title" content="__excerpt_title__"/>
-        <meta name="dc:identifier" content="__excerpt_source__"/>
+        <meta name="dc:identifier" content="__excerpt_data__"/>
     </head>
     <body>
         <seq dur="__excerpt_duration__">
             <par endsync="last">
                 <text src="ncc.html#__excerpt_id__" id="__excerpt_id__"/>
                 <seq>
-                    <audio src="__excerpt_id__.mp3" clip-begin="npt=0.000s" clip-end="npt=__excerpt_duration__s" id="__excerpt_id__"/>
+                    <audio src="__excerpt_id__.ogg" clip-begin="npt=0.000s" clip-end="npt=__excerpt_duration__s" id="__excerpt_id__"/>
                 </seq>
             </par>
         </seq>

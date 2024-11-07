@@ -4,21 +4,21 @@
     <head>
         <meta name="dc:format" content="Daisy 2.02"/>
         <meta name="ncc:timeInThisSmil" content="27.400000"/>
-        <meta name="ncc:totalElapsedTime" content="18.599813"/>
+        <meta name="ncc:totalElapsedTime" content="22.899604"/>
         <layout>
             <region id="txt-view"/>
         </layout>
         <meta name="ncc:generator" content="A.N.a.B."/>
         <meta name="title" content="très très proche et très contagieux..."/>
         <meta name="dc:title" content="très très proche et très contagieux..."/>
-        <meta name="dc:identifier" content="2021-03-18-marie-bardet.mp3"/>
+        <meta name="dc:identifier" content="très très proche et très contagieux"/>
     </head>
     <body>
         <seq dur="27.400000">
             <par endsync="last">
                 <text src="ncc.html#anno_3404" id="anno_3404"/>
                 <seq>
-                    <audio src="anno_3404.mp3" clip-begin="npt=0.000s" clip-end="npt=27.400000s" id="anno_3404"/>
+                    <audio src="anno_3404.ogg" clip-begin="npt=0.000s" clip-end="npt=27.400000s" id="anno_3404"/>
                 </seq>
             </par>
         </seq>

@@ -3,22 +3,22 @@
 <smil>
     <head>
         <meta name="dc:format" content="Daisy 2.02"/>
-        <meta name="ncc:timeInThisSmil" content="44.399208"/>
-        <meta name="ncc:totalElapsedTime" content="45.999813"/>
+        <meta name="ncc:timeInThisSmil" content="22.899604"/>
+        <meta name="ncc:totalElapsedTime" content="0"/>
         <layout>
             <region id="txt-view"/>
         </layout>
         <meta name="ncc:generator" content="A.N.a.B."/>
-        <meta name="title" content="team members..."/>
-        <meta name="dc:title" content="team members..."/>
-        <meta name="dc:identifier" content="2021-03-04-zanaan-wanaan.mp3"/>
+        <meta name="title" content="my research..."/>
+        <meta name="dc:title" content="my research..."/>
+        <meta name="dc:identifier" content="my research"/>
     </head>
     <body>
-        <seq dur="44.399208">
+        <seq dur="22.899604">
             <par endsync="last">
                 <text src="ncc.html#anno_3487" id="anno_3487"/>
                 <seq>
-                    <audio src="anno_3487.mp3" clip-begin="npt=0.000s" clip-end="npt=44.399208s" id="anno_3487"/>
+                    <audio src="anno_3487.ogg" clip-begin="npt=0.000s" clip-end="npt=22.899604s" id="anno_3487"/>
                 </seq>
             </par>
         </seq>
