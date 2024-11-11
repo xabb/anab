@@ -71,8 +71,9 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
 
     <body>
         <div class="modal fade" id="modal-wait">
-           <div class="modal-sdialog modal-dialog" style="height:100px;">
-             <center><strong><h4>Loading waveform...</h4></strong></center><br/>
+           <div class="modal-bdialog modal-dialog">
+             <center><strong><h4><br/><br/>Loading waveform...</h4></strong></center><br/>
+               <div class="lds-spinner" id="spinner-global"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
            </div>
         </div>
 

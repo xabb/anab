@@ -47,6 +47,7 @@ include("config.php");
      $result = $link->query($sql);
      if ( mysqli_num_rows($result) !== 1 )
      {
+        error_log( 'Annotation not found !');
         header('HTTP/1.1 404 Annotation not found');	  
         exit(-1);
      } else {
@@ -72,6 +73,7 @@ include("config.php");
      $resulti = $link->query($sqli);
      if ( $resulti !== true )
      {
+        error_log( "error insert : ".$sqli );
         header('HTTP/1.1 406 Could not add to audiobook!');	  
         exit(-1);
      }
@@ -82,6 +84,7 @@ include("config.php");
      error_log($cmd);
      if ( strstr( $result=exec($cmd), "ERR:" ) )
      {
+        error_log( __FILE__." : excerpt creation returned : ".$result );
         header('HTTP/1.1 406 '.str_replace("ERR: ","",$result) );	  
         exit(-1);
      }

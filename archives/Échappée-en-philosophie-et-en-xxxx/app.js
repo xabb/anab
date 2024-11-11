@@ -137,6 +137,7 @@ var addToBook = function(regid) {
 document.addEventListener('DOMContentLoaded', function() {
 
     $("#modal-wait").modal("show");
+    $('#spinner-global').css('display','block');
 
     var jqxhr = $.post( {
        url: '../../get-title.php',
@@ -234,9 +235,11 @@ document.addEventListener('DOMContentLoaded', function() {
                  }
                  moveSpeech();
                  $("#modal-wait").modal("hide");
+                 $('#spinner-global').css('display','none');
             }).fail(function(error) {
                  console.log( "couldn't load annotations : " + JSON.stringify(error) );
                  $("#modal-wait").modal("hide");
+                 $('#spinner-global').css('display','none');
             });
         }
     });
@@ -462,7 +465,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
 
-    $('.lds-spinner').css('display','none');
+    // $('.lds-spinner').css('display','none');
 });
 
 /**
