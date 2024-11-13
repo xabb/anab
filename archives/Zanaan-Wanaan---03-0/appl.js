@@ -17,6 +17,7 @@ var wavey=-1;
 var currentRegion;
 var soundfile = 'https://stream.political-studies.net/~tgs1/audio/2021-03-04-zanaan-wanaan.mp3';
 
+
 var strstr = function (haystack, needle) {
   if (needle.length === 0) return 0;
   if (needle === haystack) return 0;
@@ -268,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function() {
                       regions = extractRegions( peaks, wavesurfer.getDuration() );
    
                    $("#linear-notes").html('');
-                   regions.forEach( function( region) {
+                   regions.forEach( function(region) {
                       if ( region.data != undefined && region.data.note != undefined ) {
                           var lines = region.data.note.split("\n");
                           lines.forEach( function(line, index) {
@@ -284,8 +285,8 @@ document.addEventListener('DOMContentLoaded', function() {
                       wregion = wavesurfer.regions.add({
                           start: region.start,
                           end: region.end,
-                          resize: false,
-                          drag: false,
+                          resize: true,
+                          drag: true,
                           data: {
                             note: ( region.data != undefined ) ? region.data.note : '',
                             user: user,
@@ -342,6 +343,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }); // ready
 
         wavesurfer.on('region-click', propagateClick);
+        wavesurfer.on('region-dblclick', splitAnnotations);
+        wavesurfer.on('region-update-end', updateAnnotation);
         wavesurfer.on('region-in', showNote);
         wavesurfer.on('region-out', deleteNote);
     
@@ -452,6 +455,70 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
 });
+
+/**
+ * Split annotations at the given dblclick position
+ */
+function splitAnnotations(region, e) {
+    e.stopPropagation();
+    console.log( "split : split regions at : " + wavesurfer.getCurrentTime() );
+    let counter = 0;
+    Object.keys(wavesurfer.regions.list).map(function(id) {
+            var lregion = wavesurfer.regions.list[id];
+            // console.log( region.id + "<>" + lregion.id );
+            if ( region.id == lregion.id ) {
+                console.log( "split : inserting after annotation : " + counter + " (" + region.id + ")" );
+                let startTime = wavesurfer.getCurrentTime();
+                let endTime = wavesurfer.regions.list[id].end;
+                wavesurfer.regions.list[id].end = wavesurfer.getCurrentTime();
+                let nregion = wavesurfer.regions.add({
+                          start: startTime,
+                          end: endTime,
+                          resize: true,
+                          drag: true,
+                          data: {
+                            note: ( region.data != undefined ) ? region.data.note : '',
+                            user: user,
+                            color: ucolor
+                          }
+                      });
+
+                saveRegions();
+                loadRegions();
+            }
+            counter++;
+    });
+}
+
+/**
+ * Resize annotation
+ */
+function updateAnnotation(region, e) {
+    e.stopPropagation();
+    Object.keys(wavesurfer.regions.list).map(function(id) {
+            var lregion = wavesurfer.regions.list[id];
+            // console.log( region.id + "<>" + lregion.id );
+            if ( region.id == lregion.id ) {
+                console.log( "update : updating annotation : " + region.id );
+                lregion.start = region.start;
+                lregion.end = region.end;
+                saveRegions();
+                loadRegions();
+            }
+    });
+    updateTable();
+}
+
+/**
+ * update times in the table of annotations
+ */
+function updateTable() {
+    Object.keys(wavesurfer.regions.list).map(function(id) {
+      var region = wavesurfer.regions.list[id];
+      let newTime = toHHMMSS(region.start)+' --> '+toHHMMSS(region.end)+'\n';
+      $("#bar-"+id).html(newTime);
+    });
+}
 
 /**
  * Save annotations to the server.
