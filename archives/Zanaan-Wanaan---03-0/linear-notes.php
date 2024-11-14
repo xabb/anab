@@ -68,9 +68,10 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
 
     <body>
 
-        <div class="modal fade" id="modal-wait">
-           <div class="modal-sdialog modal-dialog" style="height:100px;">
-             <center><h3><br/>Loading waveform...</h3></center><br/>
+       <div class="modal fade" id="modal-waitl">
+           <div class="modal-bdialog modal-dialog">
+             <center><strong><h4><br/><br/>Loading waveform...</h4></strong></center><br/>
+               <div class="lds-spinner" id="spinner-global"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
            </div>
         </div>
 
@@ -111,15 +112,14 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                     <i id="splus" class="fa fa-plus-square-o fa-2x" width=20px height=20px ></i>  
                     <i id="sminus" class="fa fa-minus-square-o fa-2x" width=20px height=20px ></i>  
                 </div>
-                <div class="lds-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
                 <div id="waveform"></div>
                 <div id="subtitle" class="linear-subtitle"></div>
                 <div id="subtitle-left" class="linear-subtitle-left"></div>
                 <div class="export-notes" id="export-subtitles" onclick="exportSRT()">
-                     <button class="btn btn-info btn-block btn-export" data-action="export" title="Export annotations to SRT">
-                         <i class="glyphicon glyphicon-file"></i>
-                         Export 
-                     </button>
+                  <button class="btn btn-info btn-block btn-export" data-action="export" title="Export annotations to JSON">
+                   <i class="glyphicon glyphicon-file"></i>
+                   Export
+                  </button>
                 </div>
                 <br/><br/>
 

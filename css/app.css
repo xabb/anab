@@ -150,6 +150,10 @@ overview {
   float:right;
 }
 
+.invisible {
+  display:none;
+}
+
 .alertify-alert {
   border-width:2px;
 }

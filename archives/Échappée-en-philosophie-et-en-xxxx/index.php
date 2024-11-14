@@ -99,6 +99,8 @@ var openTab = function(name) {
   $(".tablinks").removeClass("active");
   $("#"+name).css("display","block");
   $("#"+name.toLowerCase()).addClass("active");
+  if ( name == "Linear" ) 
+        $("#modal-wait").modal("hide");
 } 
 
 var getParameterByName = function(name) {

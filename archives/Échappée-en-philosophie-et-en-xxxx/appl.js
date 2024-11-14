@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
          $("#title").html(data.responseText);
        } else {
           console.log("getting title failed : " + JSON.stringify(data));
-          // alertify.alert("getting biography failed : " + JSON.stringify(data));
+          // alertify.alert("getting title failed : " + JSON.stringify(data));
        }
     });
 
@@ -153,6 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
           $("#waveform").css({top:$(document).scrollTop()-wavey});
     });
 
+    console.log("loading peaks");
     var jqxhr = $.post( {
         responseType: 'json',
         url: 'peaks.json'
@@ -185,7 +186,6 @@ document.addEventListener('DOMContentLoaded', function() {
            });
 
            console.log( "loading with peaks : " + soundfile );
-           $('.lds-spinner').css('display','block');
            wavesurfer.load(
               soundfile,
               data
@@ -215,7 +215,6 @@ document.addEventListener('DOMContentLoaded', function() {
            });
 
            console.log( "loading : " + soundfile );
-           $('.lds-spinner').css('display','block');
            wavesurfer.load(
               soundfile
            );
@@ -231,7 +230,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // this function doesn't work
             wavey = 100;
 
-            $('.lds-spinner').css('display','none');
             if ( !gotPeaks )
             {
                aPeaks = wavesurfer.backend.getPeaks(nbPeaks);
@@ -338,7 +336,7 @@ document.addEventListener('DOMContentLoaded', function() {
                    console.log( "couldn't load annotations : " + JSON.stringify(error) );
                });
             }
-
+        
         }); // ready
 
         wavesurfer.on('region-click', propagateClick);
@@ -426,8 +424,6 @@ document.addEventListener('DOMContentLoaded', function() {
         $("#modal-help").modal("show");
     });
 
-    $('.lds-spinner').css('display','none');
-
     $("#modal-book").on("shown.bs.modal", function() {
         var jqxhr = $.post( {
            url: '../../get-audiobooks.php',
@@ -483,6 +479,7 @@ function splitAnnotations(region, e) {
                       });
 
                 saveRegions();
+                updateTable();
                 loadRegions();
             }
             counter++;
@@ -490,7 +487,7 @@ function splitAnnotations(region, e) {
 }
 
 /**
- * Resize annotation
+ * Update annotation after drag or resize
  */
 function updateAnnotation(region, e) {
     e.stopPropagation();
@@ -509,13 +506,87 @@ function updateAnnotation(region, e) {
 }
 
 /**
- * update times in the table of annotations
+ * Delete annotation after click on the red marker
+ * Strangely, this event is received for each annotation although you only click on at a time
+ */
+let showConfirm = false;
+function deleteAnnotation(marker, e) {
+    e.stopPropagation();
+    if ( marker.color == "#ff0000" && !showConfirm) {
+       showConfirm = true;
+       console.log( "Deleting annotation : " + marker.label + " " + marker.time + " wavesurfer time : " + wavesurfer.getCurrentTime() );
+       alertify.confirm( "Are you sure sure you want to delete annotation : " + marker.label + " ?", function (e) {
+         if (e) {
+           //after clicking OK
+           doDeleteAnnotation(marker.label);
+           showConfirm = false;
+         } else {
+           //after clicking Cancel
+           console.log("deletion cancelled");
+           showConfirm = false;
+         }
+       });
+    }
+    return true;
+}
+
+function doDeleteAnnotation(index) {
+    var counter = 0;
+    Object.keys(wavesurfer.regions.list).map(function(id) {
+        ++counter;
+        if ( counter == index ) {
+           console.log("Deleting region : " + id);
+           var region = wavesurfer.regions.list[id];
+           deleteNote(wavesurfer.regions.list[id]);
+           wavesurfer.regions.list[id].remove();
+           saveRegions();
+
+           console.log("Do delete annotation : " + 4096+counter);
+           var jqxhr = $.post( {
+             url: '../../delete-annotation.php',
+             data: {
+               order: 4096+counter,
+               source: fullEncode(soundfile)
+             },
+             dataType: 'application/json'
+           }, function() {
+             console.log( "deleting annotation succeeded" );
+           })
+           .fail(function(error) {
+             if ( error.status === 200 ) {
+               console.log( "deleting annotation success");
+             } else {
+               console.log( "deleting annotation failed : " + JSON.stringify(error));
+             }
+           });
+        }
+    });
+}
+
+
+/**
+ * Update times in the table of annotations
+ * Recreate all the table from regions
  */
 function updateTable() {
+    $("#linear-notes").html("");
     Object.keys(wavesurfer.regions.list).map(function(id) {
       var region = wavesurfer.regions.list[id];
-      let newTime = toHHMMSS(region.start)+' --> '+toHHMMSS(region.end)+'\n';
-      $("#bar-"+id).html(newTime);
+      var blank = "<br/><br/><div class='linear-bar' id='bar-"+id+"'>";
+      $("#linear-notes").append(blank);
+      var range = "<p>"+toHHMMSS(region.start)+" - "+toHHMMSS(region.end)+" (" + Math.round(region.end-region.start) + " s) : </p>";
+      $("#bar-"+id).append(range);
+      var rbook = "<i class='fa fa-book fa-1x linear-book' id='b"+id+"' onclick='addToBook(\""+id+"\")'></i>";
+      $("#bar-"+id).append(rbook);
+      var rplay = "<i class='fa fa-play fa-1x linear-play' id='r"+id+"' onclick='playRegion(\""+id+"\")'></i>";
+      $("#bar-"+id).append(rplay);
+      var ncontent = "<textarea id='"+id+"' class='note-textarea'>"+region.data.note+"</textarea>";
+      $("#linear-notes").append(ncontent);
+      $("#"+wregion.id).on( 'change', function(evt) {
+          var id = $(this).attr('id');
+          wavesurfer.regions.list[id].data.note=evt.target.value;
+          saveRegions();
+      });
     });
 }
 
@@ -537,7 +608,7 @@ function saveRegions() {
             counter++;
             wavesurfer.addMarker({
                time : region.start,
-               label : "",
+               label : counter-4096,
                color : "#0000ff",
                position : "top"
             });
@@ -547,6 +618,13 @@ function saveRegions() {
                color : "#00ff00",
                position : "bottom"
             });
+            let deathMarker = wavesurfer.addMarker({
+               time : region.end,
+               label : counter-4096,
+               color : "#ff0000",
+               position : "top"
+            });
+            wavesurfer.on("marker-click", deleteAnnotation );
             // console.log(region.data.note);
             var leyenda = "";
             if ( typeof region.data.note != "undefined" )
@@ -584,6 +662,7 @@ function saveRegions() {
           alertify.alert(  "Saving annotations failed : status : " + error.status + " message : " + JSON.stringify(error) );
        }
     });
+    $("#modal-waitl").modal("hide");
 }
 
 /**
@@ -818,11 +897,11 @@ function showNote(region) {
  */
 function deleteNote(region) {
     // console.log( "delete note");
+    if ( !region.data.note ) return;
     if (!deleteNote.el) {
        deleteNote.el = document.querySelector('#subtitle');
     }
-    showNote.el.innerHTML = '';
-    if ( !region.data.note ) return;
+    deleteNote.el.innerHTML = '';
 }
 
 

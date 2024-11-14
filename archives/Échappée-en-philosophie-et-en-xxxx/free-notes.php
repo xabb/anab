@@ -70,6 +70,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
     </head>
 
     <body>
+
         <div class="modal fade" id="modal-wait">
            <div class="modal-bdialog modal-dialog">
              <center><strong><h4><br/><br/>Loading waveform...</h4></strong></center><br/>
