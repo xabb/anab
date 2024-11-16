@@ -6,7 +6,7 @@ var wzoom;
 var wspeed=1.0;
 var evid;
 var svid;
-var currentRegion;
+var currentRegion = null;
 var bRegionId=-1;
 var soundfile = '__file_url__';
 
@@ -128,6 +128,7 @@ var moveSpeech = function() {
 var addToBook = function(regid) {
     bRegionId = regid;
     $("#modal-book").modal("show");
+    $("#spinner-modal"). css("display", "none");
 }
 
 
@@ -252,10 +253,11 @@ document.addEventListener('DOMContentLoaded', function() {
     wavesurfer.on('region-out', deleteNote);
     wavesurfer.on('region-play', function(region) {
         // console.log( 'got region play : ' + region.id );
-        region.on('out', function() {
-            console.log( 'restart playing');
-            wavesurfer.play(region.start);
-        });
+        // do nothing, the loop option on region is enough
+        // region.on('out', function() {
+        //     console.log( 'restart playing');
+        //     wavesurfer.play(region.start);
+        // });
     });
 
     wavesurfer.on('audioprocess', function() {
@@ -267,12 +269,20 @@ document.addEventListener('DOMContentLoaded', function() {
         $("#fplay").removeClass('fa-play');
         $("#fplay").addClass('fa-pause');
         $("#fplay").attr('data-action','pause');
+        if ( currentRegion != null ) {
+           $("#r"+currentRegion).removeClass("fa-play");
+           $("#r"+currentRegion).addClass("fa-pause");
+        }
     });
 
     wavesurfer.on('pause', function() {
         $("#fplay").removeClass('fa-pause');
         $("#fplay").addClass('fa-play');
-        $("#fplay").attr('data-action','play-region');
+        $("#fplay").attr('data-action','play');
+        if ( currentRegion != null ) {
+           $("#r"+currentRegion).removeClass("fa-pause");
+           $("#r"+currentRegion).addClass("fa-play");
+        }
     });
 
     wavesurfer.responsive=true;
@@ -351,9 +361,10 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log( "modal book hide" );
         // stop playing in a loop
         if ( currentRegion != null ) {
+           let mregion = wavesurfer.regions.list[currentRegion];
            console.log( "hide books : stopping loop");
-           currentRegion.setLoop(false);
-           currentRegion.un("out");
+           mregion.setLoop(false);
+           mregion.un("out");
            currentRegion = null;
         }
     });
@@ -436,6 +447,7 @@ document.addEventListener('DOMContentLoaded', function() {
        $("#modal-form").off("hidden.bs.modal");
        $("#modal-form").modal("hide");
        $("#modal-book").modal("show");
+       $("#spinner-modal").css("display", "none");
     });
 
     $('#help').on('click', function() {
@@ -446,6 +458,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     tinymce.init({
       selector: '#note',
+      width: 500,
+      height: 250,
       plugins: 'advlist autolink lists link image charmap hr pagebreak searchreplace wordcount help insertdatetime emoticons charmap ',
       branding: false,
       elementpath: false,
@@ -469,7 +483,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /**
- * Save annotations to the server.
+ * Save annotations to the server and redraw everything
  */
 function saveRegions() {
     var counter=0;
@@ -495,7 +509,7 @@ function saveRegions() {
             $("#linear-notes").append(blank);
             var range = "<p>"+toHHMMSS(region.start)+" - "+toHHMMSS(region.end)+" (" + Math.round(region.end-region.start) + " s) : </p>";
             $("#bar-"+region.id).append(range);
-            var rplay = "<i class='fa fa-play fa-1x linear-play' id='r"+region.id+"' onclick='playRegion(\""+region.id+"\")'></i>";
+            var rplay = "<i class='fa fa-play fa-1x linear-play' id='r"+region.id+"' onclick='playRegion(\""+region.id+"\", \"true\")'></i>";
             $("#bar-"+region.id).append(rplay);
             var rbook = "<i class='fa fa-book fa-1x linear-book' id='b"+region.id+"' onclick='addToBook(\""+region.id+"\")'></i>";
             $("#bar-"+region.id).append(rbook);
@@ -512,7 +526,7 @@ function saveRegions() {
             });
             wavesurfer.addMarker({
                time : region.start,
-               label : "",
+               label : counter,
                color : "#0000ff",
                position : "top"
             });
@@ -522,6 +536,13 @@ function saveRegions() {
                color : "#00ff00",
                position : "bottom"
             });
+            wavesurfer.addMarker({
+               time : region.end,
+               label : counter,
+               color : "#ff0000",
+               position : "top"
+            });
+            wavesurfer.on("marker-click", deleteAnnotation);
             return {
                 order: counter,
                 start: region.start,
@@ -609,20 +630,18 @@ function propagateClick(region, e) {
 function editAnnotation(region, e) {
     e.stopPropagation();
     console.log( "edit : play region" );
-    currentRegion=region;
-    // currentRegion.playLoop();
-    currentRegion.setLoop(true);
+    currentRegion=region.id;
+    playRegion(currentRegion, true);
     var form = document.forms.edit;
-    form.dataset.region = currentRegion.id;
-    tinyMCE.activeEditor.setContent(currentRegion.data.note || '');
-    // showNote(currentRegion);
+    form.dataset.region = region.id;
+    tinyMCE.activeEditor.setContent(region.data.note || '');
     form.onsubmit = function(e) {
         e.preventDefault();
         // console.log( 'saving : ' + form.elements.note.value);
         var newnote = form.elements.note.value;
         newnote = newnote.replaceAll("<p", "<div" );
         newnote = newnote.replaceAll("</p>", "</div>" );
-        currentRegion.update({
+        region.update({
             start: region.start,
             end: region.end,
             data: {
@@ -632,7 +651,6 @@ function editAnnotation(region, e) {
             }
         });
         $("#modal-form").modal("hide");
-        // showNote(currentRegion);
     };
     form.onreset = function() {
         $("#modal-form").modal("hide");
@@ -640,10 +658,10 @@ function editAnnotation(region, e) {
     $("#modal-form").modal("show");
     $("#modal-form").on("hidden.bs.modal", function() {
         if ( currentRegion ) {
-           console.log( "hide annotations : stopping loop");
-           currentRegion.setLoop(false);
-           currentRegion.un("out");
-           currentRegion = null;
+           let mregion = wavesurfer.regions.list[currentRegion];
+           console.log( "hide annotation : stopping loop");
+           mregion.setLoop(false);
+           mregion.un("out");
         }
     });
 }
@@ -652,6 +670,9 @@ function editAnnotation(region, e) {
  * Display annotation.
  */
 function showNote(region) {
+    currentRegion = region.id;
+    $("#r"+currentRegion).removeClass("fa-play");
+    $("#r"+currentRegion).addClass("fa-pause");
     // console.log( "show note");
     if (!showNote.el || !showNote.uel) {
         showNote.uel = document.querySelector('#subtitle');
@@ -693,6 +714,12 @@ function showNote(region) {
  * Delete annotation.
  */
 function deleteNote(region) {
+    // we're out of the region, so playing button must be turned off
+    if ( currentRegion != null ) {
+      $("#r"+currentRegion).removeClass("fa-pause");
+      $("#r"+currentRegion).addClass("fa-play");
+      currentRegion = null;
+    }
     if (!deleteNote.el || !deleteNote.uel) {
        deleteNote.el = document.querySelector('#isubtitle');
        deleteNote.uel = document.querySelector('#subtitle');
@@ -712,6 +739,65 @@ function deleteNote(region) {
     else
        deleteNote.uel.style.display = 'block';
 }
+
+/**
+ * Delete annotation after click on the red marker
+ * Strangely, this event is received for each annotation although you only click on only one at a time
+ */
+let showConfirm = false;
+function deleteAnnotation(marker, e) {
+    e.stopPropagation();
+    if ( marker.color == "#ff0000" && !showConfirm) {
+       showConfirm = true;
+       console.log( "Deleting annotation : " + marker.label + " " + marker.time + " wavesurfer time : " + wavesurfer.getCurrentTime() );
+       alertify.confirm( "Are you sure sure you want to delete annotation : " + marker.label + " ?", function (e) {
+         if (e) {
+           //after clicking OK
+           doDeleteAnnotation(marker.label);
+           showConfirm = false;
+         } else {
+           //after clicking Cancel
+           console.log("deletion cancelled");
+           showConfirm = false;
+         }
+       });
+    }
+    return true;
+}
+
+function doDeleteAnnotation(index) {
+    var counter = 0;
+    Object.keys(wavesurfer.regions.list).map(function(id) {
+        ++counter;
+        if ( counter == index ) {
+           console.log("Deleting region : " + id);
+           var region = wavesurfer.regions.list[id];
+           deleteNote(wavesurfer.regions.list[id]);
+           wavesurfer.regions.list[id].remove();
+           saveRegions();
+
+           console.log("Do delete annotation : " + counter);
+           var jqxhr = $.post( {
+             url: '../../delete-annotation.php',
+             data: {
+               order: counter,
+               source: fullEncode(soundfile)
+             },
+             dataType: 'application/json'
+           }, function() {
+             console.log( "deleting annotation succeeded" );
+           })
+           .fail(function(error) {
+             if ( error.status === 200 ) {
+               console.log( "deleting annotation success");
+             } else {
+               console.log( "deleting annotation failed : " + JSON.stringify(error));
+             }
+           });
+        }
+    });
+}
+
 
 /**
  * Bind controls.
@@ -766,6 +852,11 @@ var sorta = function( notea, noteb ) {
 }
 
 var playAt = function(position) {
+    if ( currentRegion != null ) {
+      $("#r"+currentRegion).removeClass("fa-pause");
+      $("#r"+currentRegion).addClass("fa-play");
+    }
+    console.log("play at : " + position/wavesurfer.getDuration() );
     wavesurfer.seekTo( position/wavesurfer.getDuration() );
     wavesurfer.play();
 }
@@ -803,20 +894,49 @@ window.GLOBAL_ACTIONS['export'] = function() {
     document.body.removeChild(element);
 };
 
-var playRegion = function(regid) {
+var playRegion = function(regid, changeState) {
     var region = wavesurfer.regions.list[regid];
 
-    console.log( "play region" );
+    console.log( "play region : " + regid + " current :  " + currentRegion);
+
+    if ( regid == currentRegion && !changeState ) {
+       return;
+    }
+
+    // really stop
+    if ( regid == currentRegion ) {
+       if ( !wavesurfer.isPlaying() ) {
+          region.setLoop(true);
+          region.playLoop();
+          $("#r"+regid).removeClass("fa-play");
+          $("#r"+regid).addClass("fa-pause");
+          return;
+       } else {
+          wavesurfer.pause();
+          region.setLoop(false);
+          $("#r"+regid).removeClass("fa-pause");
+          $("#r"+regid).addClass("fa-play");
+          return;
+        }
+    }
+
     if ( !wavesurfer.isPlaying() )
     {
        region.setLoop(true);
        region.playLoop();
-       region.setLoop(false);
        $("#r"+regid).removeClass("fa-play");
        $("#r"+regid).addClass("fa-pause");
+       currentRegion = regid;
     } else {
+       if ( currentRegion != null ) {
+          $("#r"+currentRegion).removeClass("fa-pause");
+          $("#r"+currentRegion).addClass("fa-play");
+       }
        wavesurfer.pause();
-       $("#r"+regid).removeClass("fa-pause");
-       $("#r"+regid).addClass("fa-play");
+       region.setLoop(true);
+       region.playLoop();
+       $("#r"+regid).removeClass("fa-play");
+       $("#r"+regid).addClass("fa-pause");
+       currentRegion = regid;
     }
 }

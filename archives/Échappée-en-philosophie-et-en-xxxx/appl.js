@@ -507,7 +507,7 @@ function updateAnnotation(region, e) {
 
 /**
  * Delete annotation after click on the red marker
- * Strangely, this event is received for each annotation although you only click on at a time
+ * Strangely, this event is received for each annotation although you only click on only one at a time
  */
 let showConfirm = false;
 function deleteAnnotation(marker, e) {
@@ -618,7 +618,7 @@ function saveRegions() {
                color : "#00ff00",
                position : "bottom"
             });
-            let deathMarker = wavesurfer.addMarker({
+            wavesurfer.addMarker({
                time : region.end,
                label : counter-4096,
                color : "#ff0000",

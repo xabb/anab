@@ -128,16 +128,18 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                     <div id="audiobook-div"><i id="audiobook" class="fa fa-book fa-2x" width="30px" height="30px" /></i></div>
                     <div class="modal-content">
                       <center>
-                        <i id="fplay" class="fa fa-play fa-2x" data-action="play"></i>  
+                        <i id="fplay" class="fa fa-play fa-2x" data-action="play-region"></i>  
                       </center>
                       <form role="form" id="edit" name="edit" style="transition: opacity 300ms linear; margin: 30px 0;">
                          <div class="form-group">
                              <label for="note">Note</label>
-                             <textarea id="note" class="form-control" rows="10" name="note"></textarea>
+                             <textarea id="note" class="form-control" name="note"></textarea>
                          </div>
                          <button type="submit" class="btn btn-success btn-block">Save</button>
+                         <!--
                          <center><i>or</i></center>
                          <button type="button" class="btn btn-danger btn-block" data-action="delete-region">Delete</button>
+                         -->
                       </form>
                     </div>
                   </div>
