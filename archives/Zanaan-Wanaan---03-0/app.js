@@ -508,7 +508,7 @@ function saveRegions() {
             navigation+="<a href='javascript: playAt("+region.start+")'>"+counter+" - "+leyenda+"<br/></a>";
             var blank = "<br/><br/><div class='linear-bar' id='bar-"+region.id+"'>";
             $("#linear-notes").append(blank);
-            var range = "<p>"+toHHMMSS(region.start)+" - "+toHHMMSS(region.end)+" (" + Math.round(region.end-region.start) + " s) : </p>";
+            var range = "<p>"+counter+" : "+toHHMMSS(region.start)+" - "+toHHMMSS(region.end)+" (" + Math.round(region.end-region.start) + " s) : </p>";
             $("#bar-"+region.id).append(range);
             var rplay = "<i class='fa fa-play fa-1x linear-play' id='r"+region.id+"' onclick='playRegion(\""+region.id+"\", \"true\")'></i>";
             $("#bar-"+region.id).append(rplay);
@@ -674,6 +674,7 @@ function showNote(region) {
     currentRegion = region.id;
     $("#r"+currentRegion).removeClass("fa-play");
     $("#r"+currentRegion).addClass("fa-pause");
+    $("#"+currentRegion).css("border-color","#ff0000");
     // console.log( "show note");
     if (!showNote.el || !showNote.uel) {
         showNote.uel = document.querySelector('#subtitle');
@@ -719,6 +720,7 @@ function deleteNote(region) {
     if ( currentRegion != null ) {
       $("#r"+currentRegion).removeClass("fa-pause");
       $("#r"+currentRegion).addClass("fa-play");
+      $("#"+currentRegion).css("border-color","#000000");
       currentRegion = null;
     }
     if (!deleteNote.el || !deleteNote.uel) {

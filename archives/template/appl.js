@@ -126,6 +126,8 @@ var incSpeed = function() {
  */
 document.addEventListener('DOMContentLoaded', function() {
 
+    $("#modal-waitl").modal("show");
+
     var jqxhr = $.post( {
        url: '../../get-title.php',
        data: {
@@ -259,6 +261,7 @@ document.addEventListener('DOMContentLoaded', function() {
                    url: 'annotations-linear.json'
                }, function(data) {
    
+                   var counter=4096;
                    if (data) console.log( "got linear annotations : " + data.length );
                    if ( data.length > 0 )
                       regions = data;
@@ -279,6 +282,7 @@ document.addEventListener('DOMContentLoaded', function() {
                              } 
                           });
                       }
+                      counter++;
                       wregion = wavesurfer.regions.add({
                           start: region.start,
                           end: region.end,
@@ -293,7 +297,7 @@ document.addEventListener('DOMContentLoaded', function() {
                       // console.log( wregion.id );
                       var blank = "<br/><br/><div class='linear-bar' id='bar-"+wregion.id+"'>";
                       $("#linear-notes").append(blank);
-                      var range = "<p>"+toHHMMSS(region.start)+" - "+toHHMMSS(region.end)+" (" + Math.round(region.end-region.start) + " s) : </p>";
+                      var range = "<p>"+(counter-4096)+" : "+toHHMMSS(region.start)+" - "+toHHMMSS(region.end)+" (" + Math.round(region.end-region.start) + " s) : </p>";
                       $("#bar-"+wregion.id).append(range);
                       var rbook = "<i class='fa fa-book fa-1x linear-book' id='b"+wregion.id+"' onclick='addToBook(\""+wregion.id+"\")'></i>";
                       $("#bar-"+wregion.id).append(rbook);
@@ -305,6 +309,8 @@ document.addEventListener('DOMContentLoaded', function() {
                            var id = $(this).attr('id');
                            wavesurfer.regions.list[id].data.note=evt.target.value;
                            saveRegions();
+                           deleteNote(wavesurfer.regions.list[id]);
+                           showNote(wavesurfer.regions.list[id]);
                       });
                    });
                    saveRegions();
@@ -325,11 +331,12 @@ document.addEventListener('DOMContentLoaded', function() {
                        console.log("language set to : " + language );
                    });
    
+                   $("#modal-waitl").modal("show");
                    // zoom is proportional to the number of minutes limited to 10
                    wzoom = Math.floor( wavesurfer.getDuration() / 60.0 )+1;
                    if ( wzoom > 10 ) wzoom = 10;
                    $('#zvalue').html(("x"+wzoom).substring(0,4));
-                   setTimeout( "wavesurfer.zoom(wzoom);", 5000 );
+                   setTimeout( "setZoom();", 5000 );
                    $('#svalue').html(("x"+wspeed).substring(0,4));
    
                }).fail(function(error) {
@@ -339,7 +346,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         }); // ready
 
-        wavesurfer.on('region-click', propagateClick);
+        wavesurfer.on('region-click', regionClick);
         wavesurfer.on('region-dblclick', splitAnnotations);
         wavesurfer.on('region-update-end', updateAnnotation);
         wavesurfer.on('region-in', showNote);
@@ -450,6 +457,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
 });
+
+/**
+ * Split annotations at the given dblclick position
+ */
+function setZoom() {
+    console.log("set zoom");
+    wavesurfer.zoom(wzoom);
+    $("#modal-waitl").modal("hide");
+}
 
 /**
  * Split annotations at the given dblclick position
@@ -570,11 +586,13 @@ function doDeleteAnnotation(index) {
  */
 function updateTable() {
     $("#linear-notes").html("");
+    let counter=4096;
     Object.keys(wavesurfer.regions.list).map(function(id) {
       var region = wavesurfer.regions.list[id];
+      counter++;
       var blank = "<br/><br/><div class='linear-bar' id='bar-"+id+"'>";
       $("#linear-notes").append(blank);
-      var range = "<p>"+toHHMMSS(region.start)+" - "+toHHMMSS(region.end)+" (" + Math.round(region.end-region.start) + " s) : </p>";
+      var range = "<p>"+(counter-4096)+" : "+toHHMMSS(region.start)+" - "+toHHMMSS(region.end)+" (" + Math.round(region.end-region.start) + " s) : </p>";
       $("#bar-"+id).append(range);
       var rbook = "<i class='fa fa-book fa-1x linear-book' id='b"+id+"' onclick='addToBook(\""+id+"\")'></i>";
       $("#bar-"+id).append(rbook);
@@ -582,14 +600,46 @@ function updateTable() {
       $("#bar-"+id).append(rplay);
       var ncontent = "<textarea id='"+id+"' class='note-textarea'>"+region.data.note+"</textarea>";
       $("#linear-notes").append(ncontent);
-      $("#"+wregion.id).on( 'change', function(evt) {
+      $("#"+id).on( 'change', function(evt) {
           var id = $(this).attr('id');
           wavesurfer.regions.list[id].data.note=evt.target.value;
           saveRegions();
+          deleteNote(wavesurfer.regions.list[id]);
+          showNote(wavesurfer.regions.list[id]);
       });
     });
 }
 
+/**
+ * Update table with only one note for immediate edit
+ */
+function updateTableOne(currentId) {
+    $("#linear-notes").html("");
+    let counter=4096;
+    Object.keys(wavesurfer.regions.list).map(function(id) {
+      var region = wavesurfer.regions.list[id];
+      counter++;
+      if ( id == currentId ) {
+        var blank = "<br/><br/><div class='linear-bar' id='bar-"+id+"'>";
+        $("#linear-notes").append(blank);
+        var range = "<p>"+(counter-4096)+" : "+toHHMMSS(region.start)+" - "+toHHMMSS(region.end)+" (" + Math.round(region.end-region.start) + " s) : </p>";
+        $("#bar-"+id).append(range);
+        var rbook = "<i class='fa fa-book fa-1x linear-book' id='b"+id+"' onclick='addToBook(\""+id+"\")'></i>";
+        $("#bar-"+id).append(rbook);
+        var rplay = "<i class='fa fa-play fa-1x linear-play' id='r"+id+"' onclick='playRegion(\""+id+"\")'></i>";
+        $("#bar-"+id).append(rplay);
+        var ncontent = "<textarea id='"+id+"' class='note-textarea'>"+region.data.note+"</textarea>";
+        $("#linear-notes").append(ncontent);
+        $("#"+id).on( 'change', function(evt) {
+            var id = $(this).attr('id');
+            wavesurfer.regions.list[id].data.note=evt.target.value;
+            saveRegions();
+            deleteNote(wavesurfer.regions.list[id]);
+            showNote(wavesurfer.regions.list[id]);
+        });
+      }
+    });
+}
 /**
  * Save annotations to the server.
  */
@@ -597,6 +647,8 @@ function saveRegions() {
     var counter=4096;
     // redraw markers
     wavesurfer.clearMarkers();
+    wavesurfer.on("marker-click", deleteAnnotation );
+    console.log( "save regions" );
     localStorage.regionsl = JSON.stringify(
         Object.keys(wavesurfer.regions.list).map(function(id) {
             var region = wavesurfer.regions.list[id];
@@ -624,7 +676,6 @@ function saveRegions() {
                color : "#ff0000",
                position : "top"
             });
-            wavesurfer.on("marker-click", deleteAnnotation );
             // console.log(region.data.note);
             var leyenda = "";
             if ( typeof region.data.note != "undefined" )
@@ -662,7 +713,6 @@ function saveRegions() {
           alertify.alert(  "Saving annotations failed : status : " + error.status + " message : " + JSON.stringify(error) );
        }
     });
-    $("#modal-waitl").modal("hide");
 }
 
 /**
@@ -778,9 +828,11 @@ function randomColor(alpha) {
 }
 
 /**
- * When a region is cliked, pass the click to the waveform.
+ * When a region is cliked, show the note and pass the click to the waveform.
  */
-function propagateClick(region, e) {
+function regionClick(region, e) {
+    showNote(region);
+    // propagate the click to the sound wave to set play time
     var clickEvent = new MouseEvent("click", {
         bubbles: true,
         cancelable: true,
@@ -869,7 +921,18 @@ var playRegion = function(regid) {
  * Display annotation.
  */
 function showNote(region) {
+    if ( currentRegion != null ) {
+       $("#r"+currentRegion).removeClass("fa-pause");
+       $("#r"+currentRegion).addClass("fa-play");
+       $("#"+currentRegion).css("border-color","#000000");
+    }
+    currentRegion = region.id;
+    updateTableOne(currentRegion);
+    $("#r"+currentRegion).removeClass("fa-play");
+    $("#r"+currentRegion).addClass("fa-pause");
+    $("#"+currentRegion).css("border-color","#ff0000");
     // console.log( "show note");
+    // hide all notes, except this one
     if (!showNote.el) {
         showNote.el = document.querySelector('#subtitle');
     }
@@ -897,6 +960,16 @@ function showNote(region) {
  */
 function deleteNote(region) {
     // console.log( "delete note");
+    // we're out of the region, so playing button must be turned off
+    // useless, we will redraw all
+    // if ( currentRegion != null ) {
+    //   $("#r"+currentRegion).removeClass("fa-pause");
+    //   $("#r"+currentRegion).addClass("fa-play");
+    //   $("#"+currentRegion).css("border-color","#000000");
+    //   currentRegion = null;
+    // }
+    // show all notes
+    updateTable();
     if ( !region.data.note ) return;
     if (!deleteNote.el) {
        deleteNote.el = document.querySelector('#subtitle');

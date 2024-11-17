@@ -43,8 +43,8 @@ if ( !isset($_SESSION['schtroumpf']) || !isset($_SESSION['papa']) )
         <center>
         <button id="biography" class="tablinks" onclick="openTab('Biography')">Biography</button>
         <button id="description" class="tablinks" onclick="openTab('Description')">Description</button>
-        <button id="free" class="tablinks" onclick="openTab('Free')">Free Notes</button>
-        <button id="linear" class="tablinks" onclick="openTab('Linear')">Linear Notes</button>
+        <button id="free" class="tablinks" onclick="openTab('Free')">Notes || Comments</button>
+        <button id="linear" class="tablinks" onclick="openTab('Linear')">Transcription || Translation</button>
         <button id="documents" class="tablinks" onclick="openTab('Documents')">Documents</button>
         <table width=80%><hr/></table>
         </center>
@@ -99,6 +99,8 @@ var openTab = function(name) {
   $(".tablinks").removeClass("active");
   $("#"+name).css("display","block");
   $("#"+name.toLowerCase()).addClass("active");
+  if ( name == "Linear" ) 
+        $("#modal-wait").modal("hide");
 } 
 
 var getParameterByName = function(name) {

@@ -60,7 +60,6 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
         <script type="text/javascript" src="../../js/trivia.js"></script>
         <script type="text/javascript" src="../../js/alertify.min.js"></script>
         <script type="text/javascript" src="../../js/circular-json.js"></script>
-        <script type="text/javascript" src="https://cdn.tiny.cloud/1/fsisf6nug1vh20mrqte7djkhpu0j1umti1udbihiykd71g9w/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
 
         <!-- App -->
         <script type="text/javascript" src="appl.js"></script>
@@ -115,6 +114,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                 <div id="waveform"></div>
                 <div id="subtitle" class="linear-subtitle"></div>
                 <div id="subtitle-left" class="linear-subtitle-left"></div>
+                <div id="linear-notes" class="linear-outer-notes"></div>
                 <div class="export-notes" id="export-subtitles" onclick="exportSRT()">
                   <button class="btn btn-info btn-block btn-export" data-action="export" title="Export annotations to JSON">
                    <i class="glyphicon glyphicon-file"></i>
@@ -146,8 +146,6 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                     </div>
                   </div>
                 </div>
-            </div>
-            <div id="linear-notes" class="linear-outer-notes">
             </div>
         </div>
         <div id="wavecolor" style="display:none;"><?php echo $waveColor; ?></div>

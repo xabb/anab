@@ -71,14 +71,12 @@ body {
 .outer-notes {
     float: left;
     width: 18%; 
-    height: 390px; 
     margin-left: 2%;
 }
 
 .linear-outer-notes {
     display: table;
     width: 80%; 
-    height: 800px; 
     margin-left: 10%; 
     border: 1px solid #dddddd; 
 }
@@ -137,12 +135,16 @@ body {
 }
 
 .export-notes {
-    float: left;
-    width: 18%; 
+    float: right;
+    width: 20%; 
     height: 40px; 
-    margin-left: 2%; 
-    padding-left: 2%; 
+    margin-left: 0%; 
+    padding-left: 0%; 
     margin-top: 10px; 
+}
+
+.btn-export {
+    float: right;
 }
 
 /* Responsive: Portrait tablets and up */
