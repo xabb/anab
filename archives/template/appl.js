@@ -853,6 +853,7 @@ var sorta = function( notea, noteb ) {
 }
 
 var addToBook = function(regid) {
+    $("#spinner-modal").css("display", "none");
     $("#modal-book").modal("show");
     addbook.onsubmit = function(e) {
        var regionId = regid;

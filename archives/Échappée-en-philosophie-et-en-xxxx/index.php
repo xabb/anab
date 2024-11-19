@@ -43,8 +43,8 @@ if ( !isset($_SESSION['schtroumpf']) || !isset($_SESSION['papa']) )
         <center>
         <button id="biography" class="tablinks" onclick="openTab('Biography')">Biography</button>
         <button id="description" class="tablinks" onclick="openTab('Description')">Description</button>
-        <button id="free" class="tablinks" onclick="openTab('Free')">Notes || Comments</button>
-        <button id="linear" class="tablinks" onclick="openTab('Linear')">Transcription || Translation</button>
+        <button id="free" class="tablinks" onclick="openTab('Free')">Notes</button>
+        <button id="linear" class="tablinks" onclick="openTab('Linear')">Transcription</button>
         <button id="documents" class="tablinks" onclick="openTab('Documents')">Documents</button>
         <table width=80%><hr/></table>
         </center>
@@ -92,7 +92,7 @@ if ( !isset($_SESSION['schtroumpf']) || !isset($_SESSION['papa']) )
 
 <script type="text/javascript">
 
-var soundfile = 'https://stream.political-studies.net/~tgs1/audio/2021-03-18-marie-bardet.mp3';
+var soundfile = 'http://stream.political-studies.net/~tgs1/audio/2021-03-18-marie-bardet.mp3';
 
 var openTab = function(name) {
   $(".tabcontent").css("display","none");

@@ -93,10 +93,10 @@ then
 fi
 
 cp -rf archives/template "archives/$dirname"
-chmod -R 777 "archives/$dirname"
 sed -i "s#__file_url__#$1#g" "archives/$dirname/app.js"
 sed -i "s#__file_url__#$1#g" "archives/$dirname/appl.js"
 sed -i "s#__file_url__#$1#g" "archives/$dirname/index.php"
+chmod -R 777 "archives/$dirname"
 
 echo "archives/$dirname/index.php√$sartist√$title√$collection√$sdate"
 

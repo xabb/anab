@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    wavesurfer.on('region-click', propagateClick);
+    wavesurfer.on('region-click', regionClick);
     wavesurfer.on('region-dblclick', editAnnotation);
     wavesurfer.on('region-updated', saveRegions);
     wavesurfer.on('region-removed', saveRegions);
@@ -614,7 +614,12 @@ function randomColor(alpha) {
 /**
  * When a region is clicked, pass the click to the waveform.
  */
-function propagateClick(region, e) {
+function regionClick(region, e) {
+    if ( currentRegion != null && region.id != currentRegion )
+       deleteNote(region);
+    showNote(region);
+    region.play();
+    // propagate click to the waveform
     var clickEvent = new MouseEvent("click", {
         bubbles: true,
         cancelable: true,

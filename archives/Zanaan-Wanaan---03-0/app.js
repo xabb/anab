@@ -10,7 +10,6 @@ var currentRegion = null;
 var bRegionId=-1;
 var soundfile = 'https://stream.political-studies.net/~tgs1/audio/2021-03-04-zanaan-wanaan.mp3';
 
-
 var strstr = function (haystack, needle) {
   if (needle.length === 0) return 0;
   if (needle === haystack) return 0;
@@ -246,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    wavesurfer.on('region-click', propagateClick);
+    wavesurfer.on('region-click', regionClick);
     wavesurfer.on('region-dblclick', editAnnotation);
     wavesurfer.on('region-updated', saveRegions);
     wavesurfer.on('region-removed', saveRegions);
@@ -615,7 +614,12 @@ function randomColor(alpha) {
 /**
  * When a region is clicked, pass the click to the waveform.
  */
-function propagateClick(region, e) {
+function regionClick(region, e) {
+    if ( currentRegion != null && region.id != currentRegion )
+       deleteNote(region);
+    showNote(region);
+    region.play();
+    // propagate click to the waveform
     var clickEvent = new MouseEvent("click", {
         bubbles: true,
         cancelable: true,

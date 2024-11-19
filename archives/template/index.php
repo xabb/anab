@@ -43,8 +43,8 @@ if ( !isset($_SESSION['schtroumpf']) || !isset($_SESSION['papa']) )
         <center>
         <button id="biography" class="tablinks" onclick="openTab('Biography')">Biography</button>
         <button id="description" class="tablinks" onclick="openTab('Description')">Description</button>
-        <button id="free" class="tablinks" onclick="openTab('Free')">Notes || Comments</button>
-        <button id="linear" class="tablinks" onclick="openTab('Linear')">Transcription || Translation</button>
+        <button id="free" class="tablinks" onclick="openTab('Free')">Notes</button>
+        <button id="linear" class="tablinks" onclick="openTab('Linear')">Transcription</button>
         <button id="documents" class="tablinks" onclick="openTab('Documents')">Documents</button>
         <table width=80%><hr/></table>
         </center>

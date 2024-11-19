@@ -15,7 +15,7 @@ var evid;
 var svid;
 var wavey=-1;
 var currentRegion;
-var soundfile = 'https://stream.political-studies.net/~tgs1/audio/2021-03-18-marie-bardet.mp3';
+var soundfile = 'http://stream.political-studies.net/~tgs1/audio/2021-03-18-marie-bardet.mp3';
 
 var strstr = function (haystack, needle) {
   if (needle.length === 0) return 0;
@@ -853,6 +853,7 @@ var sorta = function( notea, noteb ) {
 }
 
 var addToBook = function(regid) {
+    $("#spinner-modal").css("display", "none");
     $("#modal-book").modal("show");
     addbook.onsubmit = function(e) {
        var regionId = regid;
