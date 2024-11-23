@@ -84,10 +84,12 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                 <div class="modal-content modal-hcontent">
                     <p>
                      Select a part of the file to create a region.<br /><br />
-                     Double Click on a region to play it and enter a transcription or an annotation.<br /><br />
-                     To resume playing the file normally, close the annotation form.<br /><br />
-                     When a region is edited, you can add it to an audio book clicking on the audiobook icon.
-                 </p>
+                     You can then resize it by moving its border, move it with click-and-drag or removing it by clicking on the upper-right red marker.<br /><br />
+                     To create a note, double-click on a region and a pop-up will appear where you can enter a note in rich text format, save it before closing the pop-up.<br /><br />
+                     In edition mode, the region will play in a loop, to resume playing the file normally, close the edition pop-up.<br /><br />
+                     In edition mode, you can also add the region to an audio book by clicking on the audiobook icon.<br /><br />
+                     Enjoy and shout "F*** Elon Musk" each time you save your work !!<br />
+                  </p>                              
                  </div>
              </div>
         </div>

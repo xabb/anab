@@ -90,7 +90,7 @@ var decZoom = function() {
        wzoom=Math.max(wzoom-1,1);
     console.log( "wzoom = " + wzoom );
     $('#zvalue').html(("x"+wzoom).substring(0,4));
-    evid = setTimeout( "decZoom();", 500 );
+    // evid = setTimeout( "decZoom();", 500 );
 }
 
 var incZoom = function() {
@@ -99,19 +99,19 @@ var incZoom = function() {
     else
        wzoom=Math.min(wzoom+1,100);
     $('#zvalue').html(("x"+wzoom).substring(0,4));
-    evid = setTimeout( "incZoom();", 500 );
+    // evid = setTimeout( "incZoom();", 500 );
 }
 
 var decSpeed = function() {
     wspeed=Math.max(wspeed-0.1,0.1);
     $('#svalue').html(("x"+wspeed).substring(0,4));
-    svid = setTimeout( "decSpeed();", 500 );
+    // svid = setTimeout( "decSpeed();", 500 );
 }
 
 var incSpeed = function() {
     wspeed=Math.min(wspeed+0.1,5.0);
     $('#svalue').html(("x"+wspeed).substring(0,4));
-    svid = setTimeout( "incSpeed();", 500 );
+    // svid = setTimeout( "incSpeed();", 500 );
 }
 
 var moveSpeech = function() {

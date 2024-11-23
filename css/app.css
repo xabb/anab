@@ -68,7 +68,7 @@ overview {
 }
 
 .modal-hdialog {
-  height:350px;
+  height:450px;
   padding-top:10px;
 }
 
@@ -107,7 +107,7 @@ overview {
 
 .modal-hcontent {
   padding:30px;
-  height:250px;
+  height:350px;
   overflow-y: auto;
   margin:auto;
 }

@@ -92,7 +92,7 @@ print "
 <form action='javascript:doCreateArchive()' id='createform' name='createform' action=post>
 <table width=50% align=center>
 <tr><td align=center colspan=2>
-<label for='user'>Url</label>
+<label for='user'>Media file URL ( audio or video file ) <br/>If you encounter a problem, write to gissnetwork@giss.tv</label>
 </td></tr>
 <tr><td colspan=2>
 <input type='text' id='url' name='url' style='width:100%;'/>

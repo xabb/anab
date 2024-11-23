@@ -97,7 +97,7 @@ var decZoom = function() {
        wzoom=Math.max(wzoom-1,1);
     console.log( "wzoom = " + wzoom );
     $('#zvalue').html(("x"+wzoom).substring(0,4));
-    evid = setTimeout( "decZoom();", 500 );
+    // evid = setTimeout( "decZoom();", 500 );
 }
 
 var incZoom = function() {
@@ -106,19 +106,19 @@ var incZoom = function() {
     else
        wzoom=Math.min(wzoom+1,100);
     $('#zvalue').html(("x"+wzoom).substring(0,4));
-    evid = setTimeout( "incZoom();", 500 );
+    // evid = setTimeout( "incZoom();", 500 );
 }
 
 var decSpeed = function() {
     wspeed=Math.max(wspeed-0.1,0.1);
     $('#svalue').html(("x"+wspeed).substring(0,4));
-    svid = setTimeout( "decSpeed();", 500 );
+    // svid = setTimeout( "decSpeed();", 500 );
 }
 
 var incSpeed = function() {
     wspeed=Math.min(wspeed+0.1,5.0);
     $('#svalue').html(("x"+wspeed).substring(0,4));
-    svid = setTimeout( "incSpeed();", 500 );
+    // svid = setTimeout( "incSpeed();", 500 );
 }
 
 /**
@@ -307,10 +307,12 @@ document.addEventListener('DOMContentLoaded', function() {
                       $("#linear-notes").append(ncontent);
                       $("#"+wregion.id).on( 'change', function(evt) {
                            var id = $(this).attr('id');
-                           wavesurfer.regions.list[id].data.note=evt.target.value;
+                           let cregion = wavesurfer.regions.list[id];
+                           cregion.data.note=evt.target.value;
                            saveRegions();
-                           deleteNote(wavesurfer.regions.list[id]);
-                           showNote(wavesurfer.regions.list[id]);
+                           cregion.setLoop(false);
+                           deleteNote(cregion);
+                           showNote(cregion);
                       });
                    });
                    saveRegions();
@@ -351,11 +353,7 @@ document.addEventListener('DOMContentLoaded', function() {
         wavesurfer.on('region-update-end', updateAnnotation);
         wavesurfer.on('region-in', showNote);
         wavesurfer.on('region-out', deleteNote);
-    
-        wavesurfer.on('region-updated', function() {
-            wavesurfer.zoom(wzoom);
-        });
-
+        wavesurfer.on('region-updated', saveRegions);
         wavesurfer.on('audioprocess', function() {
             $(".play-time").html( toHHMMSS(wavesurfer.getCurrentTime()) + " / " + toHHMMSS(wavesurfer.getDuration()) );
         });
@@ -602,10 +600,12 @@ function updateTable() {
       $("#linear-notes").append(ncontent);
       $("#"+id).on( 'change', function(evt) {
           var id = $(this).attr('id');
-          wavesurfer.regions.list[id].data.note=evt.target.value;
+          cregion = wavesurfer.regions.list[id];
+          cregion.data.note=evt.target.value;
           saveRegions();
-          deleteNote(wavesurfer.regions.list[id]);
-          showNote(wavesurfer.regions.list[id]);
+          cregion.setLoop(false);
+          deleteNote(cregion);
+          showNote(cregion);
       });
     });
 }
@@ -632,10 +632,12 @@ function updateTableOne(currentId) {
         $("#linear-notes").append(ncontent);
         $("#"+id).on( 'change', function(evt) {
             var id = $(this).attr('id');
-            wavesurfer.regions.list[id].data.note=evt.target.value;
+            cregion = wavesurfer.regions.list[id];
+            cregion.data.note=evt.target.value;
             saveRegions();
-            deleteNote(wavesurfer.regions.list[id]);
-            showNote(wavesurfer.regions.list[id]);
+            cregion.setLoop(false);
+            deleteNote(cregion);
+            showNote(cregion);
         });
       }
     });
@@ -831,8 +833,11 @@ function randomColor(alpha) {
  * When a region is cliked, show the note and pass the click to the waveform.
  */
 function regionClick(region, e) {
-    showNote(region);
+    // play region in a loop, exit the loop when edition is done
     // propagate the click to the sound wave to set play time
+    region.setLoop(true);
+    region.playLoop();
+    deleteNote(region);
     var clickEvent = new MouseEvent("click", {
         bubbles: true,
         cancelable: true,
@@ -840,6 +845,8 @@ function regionClick(region, e) {
         clientY: e.clientY
     });
     document.querySelector('wave').dispatchEvent(clickEvent);
+    currentRegion = region.id;
+    setTimeout( "showCurrentNote();", 500 );
 }
 
 var sorta = function( notea, noteb ) {
@@ -908,7 +915,6 @@ var playRegion = function(regid) {
     {
        region.setLoop(true);
        region.playLoop();
-       region.setLoop(false);
        $("#r"+regid).removeClass("fa-play");
        $("#r"+regid).addClass("fa-pause");
     } else {
@@ -919,14 +925,18 @@ var playRegion = function(regid) {
 }
 
 /**
+ * Display annotation of current region
+ */
+function showCurrentNote() {
+   let cregion = wavesurfer.regions.list[currentRegion];
+   showNote(cregion);
+}
+
+/**
  * Display annotation.
  */
 function showNote(region) {
-    if ( currentRegion != null ) {
-       $("#r"+currentRegion).removeClass("fa-pause");
-       $("#r"+currentRegion).addClass("fa-play");
-       $("#"+currentRegion).css("border-color","#000000");
-    }
+    console.log( "showNote : " + region.id );
     currentRegion = region.id;
     updateTableOne(currentRegion);
     $("#r"+currentRegion).removeClass("fa-play");
@@ -970,8 +980,8 @@ function deleteNote(region) {
     //   currentRegion = null;
     // }
     // show all notes
+    console.log( "deleteNote : " + region.id );
     updateTable();
-    if ( !region.data.note ) return;
     if (!deleteNote.el) {
        deleteNote.el = document.querySelector('#subtitle');
     }

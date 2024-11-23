@@ -75,17 +75,25 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
         </div>
 
         <div class="modal fade" id="modal-help" role="dialog">
-            <div class="modal-dialog modal-hdialog">
+            <div class="modal-dialog modal-dialog">
                 <center><h3>Mini help</h3></center>
-                <div class="modal-content modal-hcontent">
+                <div class="modal-content modal-content">
                     <p>
-                     In this mode, the archive is automatically divided in sections divided by silence.<br /><br />
-                     You can enter a note for each section below. The note will show up when file is played.<br /><br />
-                     If you want to translate to different languages, you have to start your line with the abbreviation of the language. For example : "en: This conference tackles the issue of ..."<br /><br />
-                     You can enter multiple translations this way and the user can choose his language on the right side.<br /><br /> 
-                     You can also export the notes of a specific language to a subtitles file (SRT).<br /><br /> 
-                     As in free mode, you can add a note to an audiobook using the book icon next to it.<br /><br /> 
-                     Note : If the sections created here automatically do not fit your archive, we recommend to use the free mode and create your regions yourself.
+                     In this mode, the archive is automatically divided in sections divided by silence as it is thought to produce transcriptions or translations that you can download with the "Export" button at the bottom of the page.<br /><br />
+                     but, these sections, who can seem to be aleatory can still be modified : <br />
+                     Kein Pank Auf Der Titanik, you can still :<br /><br />
+                     <ul>
+                     <li>Create a new caesura by double-clicking on any point, <br />this will break the current section in two parts.<br />
+                     <li>Resize a section by dragging one of its border.<br />
+                     <li>Move a section with click-and-drag.<br />
+                     <li>Remove a section by clicking on the upper-right red marker.
+                     </ul><br />
+                     When you select a section, a red bordered box appear at the bottom of the screen where you can enter your transcription or translation : <br />
+                     If you want to enter a translation, you have to start your line with the abbreviation of the language. For example : "es: Esta conferencia trata de explicar ..." would be considered as Spanish, if nothing is specified, it is considered as a transcription.<br /><br />
+                     You can enter multiple translations this way and the user can choose his language using the right side "Language" drop-down menu.<br /><br /> 
+                     You can also export the translations to a specific language as a subtitles file (SRT) using the "Export" button at the bottom of the page, after having selected your language before.<br /><br /> 
+                     As in notes mode, you can add a region to an audiobook using the book icon next to its box in the list of transcriptions/translations.<br /><br /> 
+                     Enjoy and shout "F*** Elon Musk" each time you save your work !!<br /><br /> 
                  </p>
                  </div>
              </div>
