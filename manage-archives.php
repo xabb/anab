@@ -28,7 +28,7 @@ else
    $search = "";
 }
 
-$clause = "WHERE ( LOWER(title) LIKE '%".addslashes($search)."%' ) OR ( LOWER(author) LIKE '%".addslashes($search)."%' ) OR ( LOWER(collection) LIKE '%".addslashes($search)."%' ) OR ( LOWER(date) LIKE '%".addslashes($search)."%' )";
+$clause = "WHERE ( LOWER(title) LIKE '%".addslashes($search)."%' ) OR ( LOWER(author) LIKE '%".addslashes($search)."%' ) OR ( LOWER(collection) LIKE '%".addslashes($search)."%' ) OR ( LOWER(date) LIKE '%".addslashes($search)."%' ) ORDER BY ID";
 
 if ( isset( $_GET['start'] ) )
 {

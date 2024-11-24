@@ -349,7 +349,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }); // ready
 
         wavesurfer.on('region-click', regionClick);
-        wavesurfer.on('region-dblclick', splitAnnotations);
+        wavesurfer.on('region-dblclick', launchSplitAnnotation);
         wavesurfer.on('region-update-end', updateAnnotation);
         wavesurfer.on('region-in', showNote);
         wavesurfer.on('region-out', deleteNote);
@@ -468,25 +468,42 @@ function setZoom() {
 /**
  * Split annotations at the given dblclick position
  */
-function splitAnnotations(region, e) {
+function launchSplitAnnotation(region, e) {
+    var clickEvent = new MouseEvent("click", {
+        bubbles: true,
+        cancelable: true,
+        clientX: e.clientX,
+        clientY: e.clientY
+    });
+    document.querySelector('wave').dispatchEvent(clickEvent);
     e.stopPropagation();
+    currentRegion = region.id;
+    setTimeout( "splitAnnotation();", 200 );
+}
+
+/**
+ * Split annotations at the given wavesurfer play time
+ */
+function splitAnnotation() {
     console.log( "split : split regions at : " + wavesurfer.getCurrentTime() );
     let counter = 0;
     Object.keys(wavesurfer.regions.list).map(function(id) {
             var lregion = wavesurfer.regions.list[id];
-            // console.log( region.id + "<>" + lregion.id );
-            if ( region.id == lregion.id ) {
-                console.log( "split : inserting after annotation : " + counter + " (" + region.id + ")" );
+            counter++;
+            console.log( ">" + lregion );
+            if ( currentRegion == lregion.id ) {
+                console.log( "split : inserting after annotation : " + counter + " (" + lregion.id + ")" );
                 let startTime = wavesurfer.getCurrentTime();
                 let endTime = wavesurfer.regions.list[id].end;
                 wavesurfer.regions.list[id].end = wavesurfer.getCurrentTime();
+                lregion.end = wavesurfer.getCurrentTime();
                 let nregion = wavesurfer.regions.add({
-                          start: startTime,
+                          start: startTime + 1.0, // plus one second
                           end: endTime,
                           resize: true,
                           drag: true,
                           data: {
-                            note: ( region.data != undefined ) ? region.data.note : '',
+                            note: ( lregion.data != undefined ) ? lregion.data.note : '',
                             user: user,
                             color: ucolor
                           }
@@ -494,10 +511,10 @@ function splitAnnotations(region, e) {
 
                 saveRegions();
                 updateTable();
-                loadRegions();
+                storeRegions();
             }
-            counter++;
     });
+    wavesurfer.drawer.fireEvent('redraw');
 }
 
 /**
@@ -513,7 +530,7 @@ function updateAnnotation(region, e) {
                 lregion.start = region.start;
                 lregion.end = region.end;
                 saveRegions();
-                loadRegions();
+                storeRegions();
             }
     });
     updateTable();
@@ -576,7 +593,6 @@ function doDeleteAnnotation(index) {
         }
     });
 }
-
 
 /**
  * Update times in the table of annotations
@@ -647,7 +663,7 @@ function updateTableOne(currentId) {
  */
 function saveRegions() {
     var counter=4096;
-    // redraw markers
+    // redraw rons and markers
     wavesurfer.clearMarkers();
     wavesurfer.on("marker-click", deleteAnnotation );
     console.log( "save regions" );
@@ -720,7 +736,7 @@ function saveRegions() {
 /**
  * Load regions from ajax request.
  */
-function loadRegions(regions) {
+function storeRegions(regions) {
     localStorage.regionsl = regions;
     // saveRegions();
 }

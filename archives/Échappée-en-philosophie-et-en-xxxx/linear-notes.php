@@ -79,7 +79,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                 <center><h3>Mini help</h3></center>
                 <div class="modal-content modal-content">
                     <p>
-                     In this mode, the archive is automatically divided in sections divided by silence as it is thought to produce transcriptions or translations that you can download with the "Export" button at the bottom of the page.<br /><br />
+                     In this mode, the archive is automatically divided in sections delimited by silence as it is thought to produce transcriptions or translations that you can download with the "Export" button at the bottom of the page.<br /><br />
                      but, these sections, who can seem to be aleatory can still be modified : <br />
                      Kein Pank Auf Der Titanik, you can still :<br /><br />
                      <ul>
