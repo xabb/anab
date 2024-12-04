@@ -66,29 +66,8 @@ session_start();
      document.location="create-user.php";
    }
 
-   function deleteUser() {
-      $.post( "user-delete-list.php", function(data) {
-        $("#user-delete").html(data); 
-      })
-      .fail(function() {
-        alertify.alert("Couldn't get user list");
-      });
-    }
-
-   function doDeleteUser(id) {
-      $.post( "delete-user.php", { _id: id }, function(data) {
-        if ( data == "OK" )
-        {
-          $("#user-delete").html("The user has been deleted"); 
-        }
-        else
-        {
-          $("#user-delete").html(data.replace("ERR: ","")); 
-        }
-      })
-      .fail(function() {
-        alertify.alert("Couldn't delete user");
-      });
+   function manageUsers() {
+      document.location="manage-users.php";
    }
 
    function createArchive() {
@@ -132,8 +111,7 @@ print "
 <button class='bluebutton' onclick='javascript:createUser()' align=center>Create User</button>
 </td></tr>
 <tr><td align=center>
-<button class='bluebutton' onclick='javascript:deleteUser()' align=center>Delete User</button>
-<div id='user-delete'></div>
+<button class='bluebutton' onclick='javascript:manageUsers()' align=center>Manage Users</button>
 </td></tr>
 <tr><td align=center>
 <button class='bluebutton' onclick='javascript:editSettings()' align=center>Settings</button>

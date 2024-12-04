@@ -233,10 +233,11 @@ else
 <a href="./index.php"><i class="fa fa-home fa-2x" aria-hidden="true" style="color: #999; float:left; margin-left:20px; margin-top:28px;" ></i></a>
 
 <center><table width=90%>
-<tr><td align=right>
-</td><td align=center>
+<tr>
+<td align=center>
 <h1><?php echo $config['project-name']; ?></h1>
-</td</tr>
+</td>
+</tr>
 </table></center>
 
 <center>

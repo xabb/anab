@@ -10,12 +10,13 @@ if ( !isset($_SESSION['schtroumpf']) || !isset($_SESSION['papa']) || ($_SESSION[
     exit();
 }
 
-$id=$_POST['_id'];
 
 if ( !isset( $_POST['_id'] ) || $_POST['_id'] == "" )
 {
-    echo "ERR: The id of the user is unknown.";
-    exit();
+   echo "ERR: The id of the user is unknown.";
+   exit();
+} else {
+   $id=$_POST['_id'];
 }
 
 $query = "DELETE FROM user WHERE _id=".$id.";";
@@ -26,6 +27,6 @@ if ( $delres == '1')
 }
 else
 {
-   echo "ERR: Delete Error";
+   echo "ERR: Database Error";
 }
 ?>
