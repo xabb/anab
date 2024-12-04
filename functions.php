@@ -14,10 +14,15 @@ function db_query($query) {
                 }
                 $result = mysqli_query($link, $query);
                 if (!$result) {
-                    die('ERR: Invalid query: ' . mysqli_error($link));
+                    mysqli_close($link);
+                    die('ERR: Invalid query: '.$query);
                 }
+                $affected = mysqli_affected_rows($link);
                 mysqli_close($link);
-                return($result);
+                if ( strstr( $query, "DELETE" ) )
+                   return($affected);
+                else
+                   return($result);
         } else die('empty query');
 }
 

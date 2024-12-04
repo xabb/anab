@@ -19,7 +19,7 @@ if (!$link) {
    $sqls = "SELECT id FROM archive WHERE url LIKE '%".addslashes($url)."';";
    // error_log( 'Getting uploads : '.$sqls );
    $results = $link->query($sqls);
-   if ( mysqli_num_rows($results) != 1 ) {
+   if ( mysqli_num_rows($results) <= 0 ) {
       header('HTTP/1.1 500 Unknown archive : '.mysqli_num_rows($results));	  
       mysqli_close($link);
       exit(-1);

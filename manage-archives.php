@@ -28,8 +28,6 @@ else
    $search = "";
 }
 
-$clause = "WHERE ( LOWER(title) LIKE '%".addslashes($search)."%' ) OR ( LOWER(author) LIKE '%".addslashes($search)."%' ) OR ( LOWER(collection) LIKE '%".addslashes($search)."%' ) OR ( LOWER(date) LIKE '%".addslashes($search)."%' ) ORDER BY ID";
-
 if ( isset( $_GET['start'] ) )
 {
    $start = $_GET['start'];
@@ -48,9 +46,11 @@ else
    $size = 20;
 }
 
+$clause = "WHERE ( ( LOWER(title) LIKE '%".addslashes($search)."%' ) OR ( LOWER(author) LIKE '%".addslashes($search)."%' ) OR ( LOWER(collection) LIKE '%".addslashes($search)."%' ) OR ( LOWER(date) LIKE '%".addslashes($search)."%' ) ) ORDER BY ID LIMIT ".$size." OFFSET ".$start;
+
 if (isset($_SESSION['schtroumpf']) && isset($_SESSION['papa']) )
 {
-   $resallarchives = db_query( "SELECT id FROM archive ".$clause );
+   $resallarchives = db_query( "SELECT id FROM archive" );
    $allcount = mysqli_num_rows( $resallarchives );
    $nbpages = intval( $allcount / $size );
    if ( $nbpages*$size < $allcount )

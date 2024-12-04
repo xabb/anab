@@ -19,7 +19,7 @@ if (!$link) {
    $sqls = "SELECT description FROM archive WHERE url LIKE '%".addslashes($url)."';";
    // error_log( 'Getting description : '.$sqls );
    $results = $link->query($sqls);
-   if ( mysqli_num_rows($results) != 1 ) {
+   if ( mysqli_num_rows($results) <= 0 ) {
       header('HTTP/1.1 500 Error getting description : '.mysqli_num_rows($results));	  
       mysqli_close($link);
       exit(-1);
