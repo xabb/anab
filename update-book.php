@@ -39,10 +39,11 @@ else
 
 if ( $title != $otitle )
 {
-    $updres=db_query( "UPDATE audiobook SET title='".addslashes($title)."' WHERE title='".addslashes($otitle)."'" );
+    $query = "UPDATE audiobook SET title='".addslashes($title)."' WHERE title='".addslashes($otitle)."'";
+    $updres=db_query($query );
     if ( $updres != true )
     {
-       die("ERR: Could not update book.");
+       die("ERR: Could not update book. Update title : ".$query);
     }
     error_log("mv \"audiobooks/".urldecode($otitle)."\" \"audiobooks/".urldecode($title))."\"";
     if ( $result=exec("mv \"audiobooks/".urldecode($otitle)."\" \"audiobooks/".urldecode($title)."\"; echo $?") != 0 )
@@ -60,20 +61,14 @@ if ( $title != $otitle )
 if ( $order != "" )
 {
    // error_log( "DELETE FROM audiobook WHERE norder NOT IN (".$order.") AND title='".addslashes($title)."'" );
-   $delres=db_query( "DELETE FROM audiobook WHERE norder NOT IN (".$order.") AND title='".addslashes($title)."'" );
-   if ( $delres != true )
-   {
-      die("ERR: Could not update book.");
-   }
+   $query = "DELETE FROM audiobook WHERE norder NOT IN (".$order.") AND title='".addslashes($title)."'";
+   $delres=db_query($query);
 } 
 else 
 {
    // error_log( "DELETE FROM audiobook WHERE title='".addslashes($title)."'" );
-   $delres=db_query( "DELETE FROM audiobook WHERE title='".addslashes($title)."'" );
-   if ( $delres != true )
-   {
-      die("ERR: Could not update book.");
-   }
+   $query = "DELETE FROM audiobook WHERE title='".addslashes($title)."'";
+   $delres=db_query($query);
 }
 
 // error_log( "order : ".$order );

@@ -32,12 +32,12 @@ include("config.php");
         error_log( "annotation id : " + $annid );
         $sqld = "DELETE FROM audiobook WHERE aoid=".$annid.";";
         $resultdd = $link->query($sqld);
-        if ( $resultdd !== true ) {
+        if ( $resultdd <= 0 ) {
            error_log( __FILE__." : Could not delete annotation from audiobooks" );
         }
         $sql = "DELETE FROM annotation WHERE id=".$annid.";";
         $resultd = $link->query($sql);
-        if ( $resultd !== true )
+        if ( $resultd <= 0 )
         {
            header('HTTP/1.1 500 Error deleting annotation');	  
            mysqli_close($link);

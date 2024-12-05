@@ -27,7 +27,7 @@ $user=$_POST['user'];
 $query = "DELETE FROM audiobook WHERE title='".addslashes($title)."' AND user='".addslashes($user)."';";
 error_log($query);
 $delres=db_query($query);
-if ( $delres == true)
+if ( $delres > 0)
 {
    print "OK";
 }

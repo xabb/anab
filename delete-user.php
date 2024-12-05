@@ -21,7 +21,7 @@ if ( !isset( $_POST['_id'] ) || $_POST['_id'] == "" )
 
 $query = "DELETE FROM user WHERE _id=".$id.";";
 $delres=db_query($query);
-if ( $delres == '1')
+if ( $delres > 0 )
 {
    echo "OK";
 }
