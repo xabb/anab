@@ -25,49 +25,8 @@ then
 fi
 #echo "done." 1>&2
 
-mimetype=`/usr/bin/mimetype --output-format %m $tmpfile`
-#echo $mimetype 1>&2
-#echo  ${mimetype#*audio*} 1>&2
-if [ ${mimetype#*audio*} = $mimetype ] && [ ${mimetype#*video*} = $mimetype ]
-then
-  /bin/rm $tmpfile
-  echo "ERR: This url is not an media archive, please !!!"
-  exit -1
-fi
-
-artist=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 artist | cut -f2 -d':' | sed 's/ //g' -`
-sartist=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 artist | cut -f2 -d':'`
-echo "artist : $artist" 1>&2
-date=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 date | cut -f2 -d':' | xargs | sed 's/ //g' - | sed 's/\//-/g' -`
-echo "date : $date" 1>&2
-title=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 title | cut -f2-3 -d':' | sed 's/^ //g'`
-dtitle=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 title | cut -f2 -d':' | awk '{print $1 " " $2 " " $3 " " $4 " " $5}' | sed 's/ /-/g' | sed 's/--/-/g'`
-echo "title : $title" 1>&2
-collection=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 album | grep -v replaygain | cut -f2 -d':' | awk '{print $1 $2 $3}'`
-echo "collection : $collection" 1>&2
-
-if [ "x"$dtitle == "x" ]
-then
-   title='Unknown'
-   dtitle='Unknown'
-fi
-
-if [ "x"$date == "x" ]
-then
-   date='xxxx'
-   sdate='Unknown'
-else
-   sdate=$date
-fi
-
-if [ "x"$artist != "x" ]
-then
-   dirname=$dtitle"-"$date
-else
-   sartist='Unknown'
-   dirname=`grep -rl "$1" archives/*/index.php | cut -f2 -d'/'`
-   dirname=`echo $dirname | cut -f1 -d' '`
-fi
+dirname=`grep -rl "$1" archives/*/index.php | cut -f2 -d'/'`
+dirname=`echo $dirname | cut -f1 -d' '`
 
 echo "Directory : $dirname"
 #if [ -d "archives/$dirname" ]
@@ -97,7 +56,5 @@ sed -i "s#__file_url__#$1#g" "archives/$dirname/app.js"
 sed -i "s#__file_url__#$1#g" "archives/$dirname/appl.js"
 sed -i "s#__file_url__#$1#g" "archives/$dirname/index.php"
 chmod -R 777 "archives/$dirname"
-
-echo "archives/$dirname/index.php√$sartist√$title√$collection√$sdate"
 
 /bin/rm $tmpfile
