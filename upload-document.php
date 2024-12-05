@@ -26,7 +26,7 @@ if ( $_FILES['file']['error'] != UPLOAD_ERR_OK )
 if ( !isset($_POST['url']) || $_POST['url'] == "" )
 {
    header("HTTP/1.1 500 Internal Server Error");
-   print("Unknown archive.");
+   print("Unknown archive :: no url.");
    exit(-1);
 }
 $url = $_POST['url'];
@@ -34,10 +34,10 @@ $url = $_POST['url'];
 $query="SELECT id FROM archive WHERE url='".htmlentities($url)."'";
 error_log("Uploading document : ".$query );
 $resan = db_query($query);
-if ( mysqli_num_rows($resan) != 1 )
+if ( mysqli_num_rows($resan) <= 0 )
 {
    header("HTTP/1.1 500 Internal Server Error");
-   print("Unknown archive.");
+   print("Unknown archive : not found in database : ".$url);
    exit(-1);
 }
 else

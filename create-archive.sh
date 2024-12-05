@@ -34,47 +34,55 @@ then
   exit -1
 fi
 
-artist=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 artist | cut -f2 -d':' | sed 's/ //g' -`
-sartist=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 artist | cut -f2 -d':'`
+hour=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 duration | cut -f2 -d':'`
+echo "hour :"$hour 1>&2
+min=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 duration | cut -f3 -d':'`
+echo "min : "$min 1>&2
+#less than one minute (approx) cannot be analyzed
+if [ $hour = "00" ] && [ $min = "00" ]
+then
+  /bin/rm $tmpfile
+  echo "ERR: This file is too short to be analyzed !!!"
+  exit -1
+fi
+
+artist=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 artist | cut -f2 -d':' | sed 's/ /-/g' -`
+fartist=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 artist | cut -f2 -d':'`
 echo "artist : $artist" 1>&2
 date=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 date | cut -f2 -d':' | xargs | sed 's/ //g' - | sed 's/\//-/g' -`
 echo "date : $date" 1>&2
-title=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 title | cut -f2-3 -d':' | sed 's/^ //g'`
-dtitle=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 title | cut -f2 -d':' | awk '{print $1 " " $2 " " $3 " " $4 " " $5}' | sed 's/ /-/g' | sed 's/--/-/g'`
+title=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 title | cut -f2 -d':' | awk '{print $1 " " $2 " " $3 " " $4 " " $5}' | sed 's/ /-/g' | sed 's/--/-/g'`
+ftitle=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 title | cut -f2-3 -d':' | sed 's/^ //g'`
 echo "title : $title" 1>&2
 collection=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 album | grep -v replaygain | cut -f2 -d':' | awk '{print $1 $2 $3}'`
 echo "collection : $collection" 1>&2
 
-if [ "x"$dtitle == "x" ]
+if [ "x"$ftitle == "x" ]
 then
    title='Unknown'
-   dtitle='Unknown'
+   ftitle='Unknown'
 fi
 
 if [ "x"$date == "x" ]
 then
-   date='xxxx'
-   sdate='Unknown'
+   date='xx:xx:xx'
+   fdate='Unknown'
 else
-   sdate=$date
+   fdate=$date
 fi
 
 if [ "x"$artist != "x" ]
 then
-   dirname=$artist"-"$dtitle"-"$date
+   dirname=$artist"-"$title"-"$date
 else
    dirname=`echo $1 | rev | cut -d'/' -f 1 | rev | sed 's/.mp3//g' - | sed 's/.ogg//g' - | sed 's/.wav//g' - | sed 's/.webm//g' - | sed 's/.aiff//g' - | sed 's/.mp4//g' -`
-   #nbfiles=`ls -1d archives/* | wc -l`
-   #nbfiles=$((nbfiles+1))
-   #dirname="archive-$nbfiles"
 fi
-
 
 echo "New directory : $dirname"
 if [ -d "archives/$dirname" ]
 then
    echo "Directory exists!! : $dirname : redirecting..." 1>&2
-   echo "archives/$dirname/index.php√$sartist√$title√$collection√$sdate"
+   echo "archives/$dirname/index.php√$fartist√$title√$collection√$sdate"
    exit 0
    #notok=1
    #num=0
@@ -97,6 +105,6 @@ sed -i "s#__file_url__#$1#g" "archives/$dirname/appl.js"
 sed -i "s#__file_url__#$1#g" "archives/$dirname/index.php"
 chmod -R 777 "archives/$dirname"
 
-echo "archives/$dirname/index.php√$sartist√$title√$collection√$sdate"
+echo "archives/$dirname/index.php√$fartist√$ftitle√$collection√$fdate"
 
 /bin/rm $tmpfile

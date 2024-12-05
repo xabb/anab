@@ -41,7 +41,7 @@ else
    $size = 20;
 }
 
-$clause = "WHERE ( ( LOWER(title) LIKE '%".addslashes($search)."%' ) OR ( LOWER(user) LIKE '%".addslashes($search)."%' ) ) GROUP BY title LIMIT ".$size." OFFSET ".$start;
+$clause = " WHERE ( ( LOWER(title) LIKE '%".addslashes($search)."%' ) OR ( LOWER(user) LIKE '%".addslashes($search)."%' ) ) GROUP BY title ";
 
 if (isset($_SESSION['schtroumpf']) && isset($_SESSION['papa']) )
 {
@@ -53,7 +53,7 @@ if (isset($_SESSION['schtroumpf']) && isset($_SESSION['papa']) )
       $nbpages += 1;
    }
 
-   $respagebooks = db_query( "SELECT title, id, user FROM audiobook ".$clause );
+   $respagebooks = db_query( "SELECT title, id, user FROM audiobook ".$clause."LIMIT ".$size." OFFSET ".$start  );
 }
 else
 {
@@ -326,5 +326,6 @@ $(document).ready( function(){
 });
 </script>
 
+<br/><br/><br/>
 </body>
 </html>

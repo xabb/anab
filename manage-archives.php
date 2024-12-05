@@ -46,11 +46,11 @@ else
    $size = 20;
 }
 
-$clause = "WHERE ( ( LOWER(title) LIKE '%".addslashes($search)."%' ) OR ( LOWER(author) LIKE '%".addslashes($search)."%' ) OR ( LOWER(collection) LIKE '%".addslashes($search)."%' ) OR ( LOWER(date) LIKE '%".addslashes($search)."%' ) ) ORDER BY ID LIMIT ".$size." OFFSET ".$start;
+$clause = " WHERE ( ( LOWER(title) LIKE '%".addslashes($search)."%' ) OR ( LOWER(author) LIKE '%".addslashes($search)."%' ) OR ( LOWER(collection) LIKE '%".addslashes($search)."%' ) OR ( LOWER(date) LIKE '%".addslashes($search)."%' ) ) ORDER BY ID ";
 
 if (isset($_SESSION['schtroumpf']) && isset($_SESSION['papa']) )
 {
-   $resallarchives = db_query( "SELECT id FROM archive" );
+   $resallarchives = db_query( "SELECT id FROM archive".$clause );
    $allcount = mysqli_num_rows( $resallarchives );
    $nbpages = intval( $allcount / $size );
    if ( $nbpages*$size < $allcount )
@@ -58,7 +58,7 @@ if (isset($_SESSION['schtroumpf']) && isset($_SESSION['papa']) )
       $nbpages += 1;
    }
 
-   $respageusers = db_query( "SELECT id, uri, url, author, title, collection, date, creator FROM archive ".$clause );
+   $respageusers = db_query( "SELECT id, uri, url, author, title, collection, date, creator FROM archive ".$clause."LIMIT ".$size." OFFSET ".$start );
 }
 else
 {
@@ -193,5 +193,6 @@ $(document).ready( function(){
 });
 </script>
 
+<br/><br/><br/>
 </body>
 </html>

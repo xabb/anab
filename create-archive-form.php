@@ -44,6 +44,7 @@ if ( !isset($_SESSION['schtroumpf']) || !isset($_SESSION['papa']) )
         if ( data.indexOf("ERR:")>=0 )
         {
           $('#error-zone').css({background:'red'});
+          $('#error-zone').css({color:'white'});
           $('#error-zone').html(data.replace("ERR: ",""));
           $('#error-zone').animate({ opacity : 1.0 },{queue:false,duration:1000});
           $('#create').prop('disabled', false);
@@ -55,6 +56,7 @@ if ( !isset($_SESSION['schtroumpf']) || !isset($_SESSION['papa']) )
        })
        .fail(function() {
           $('#error-zone').css({background:'red'});
+          $('#error-zone').css({color:'white'});
           $('#error-zone').html("Archive creation error");
           $('#error-zone').animate({ opacity : 1.0 },{queue:false,duration:1000});
           $('#create').prop('disabled', false);
