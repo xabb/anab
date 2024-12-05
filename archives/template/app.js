@@ -509,10 +509,15 @@ function saveRegions() {
             $("#linear-notes").append(blank);
             var range = "<p>"+counter+" : "+toHHMMSS(region.start)+" - "+toHHMMSS(region.end)+" (" + Math.round(region.end-region.start) + " s) : </p>";
             $("#bar-"+region.id).append(range);
-            var rplay = "<i class='fa fa-play fa-1x linear-play' id='r"+region.id+"' onclick='playRegion(\""+region.id+"\", \"true\")'></i>";
+            var rplay = "<i class='fa fa-play fa-1x linear-play' title='Play this Part' id='r"+region.id+"' onclick='playRegion(\""+region.id+"\", \"true\")'></i>";
             $("#bar-"+region.id).append(rplay);
-            var rbook = "<i class='fa fa-book fa-1x linear-book' id='b"+region.id+"' onclick='addToBook(\""+region.id+"\")'></i>";
+            var rbook = "<i class='fa fa-book fa-1x linear-book' title='Add to Book' id='b"+region.id+"' onclick='addToBook(\""+region.id+"\")'></i>";
             $("#bar-"+region.id).append(rbook);
+            // console.log("whisper : "+whisper);
+            if ( whisper == 1 ) {
+               var rwhisper = "<img src='../../img/whisper-logo.png' title='Call Whisper AI' class='whisper-logo' id='w"+region.id+"' onclick='whisperStart(\""+region.id+"\")' />";
+               $("#bar-"+region.id).append(rwhisper);
+            }
             var wnote = '';
             if ( region.data != undefined && region.data.note != undefined ) {
                wnote = region.data.note.replaceAll("<div>","").replaceAll("</div>","");

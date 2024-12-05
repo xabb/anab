@@ -207,6 +207,8 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
 
 <script type="text/javascript" >
 
+let whisper = <?php echo $_SESSION['whisper']; ?>;
+
 function getParameterByName(name) {
     var url = window.location.href;
     name = name.replace(/[\[\]]/g, '\\$&');

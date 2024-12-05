@@ -80,7 +80,7 @@ if ( !isset($_SESSION['schtroumpf']) || !isset($_SESSION['papa']) )
                         <center><b>Upload Documents</b></center>
                         <div class="modal-content modal-ucontent">
                            <form id="upload-zone" class="dropzone">
-                              <input name="url" id="formurl" type="hidden" value=""/>
+                              <input name="url" id="upurl" type="hidden" value=""/>
                            </form>
                         </div>
                     </div>
@@ -212,7 +212,7 @@ var deleteUpload = function(uri) {
 
 $(document).ready( function(){
 
-    $("#formurl").val(encodeURIComponent(soundfile));
+    $("#upurl").val(encodeURIComponent(soundfile));
 
     var jqxhr = $.post( {
        url: '../../get-title.php',

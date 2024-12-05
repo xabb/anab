@@ -44,9 +44,9 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
         <!-- Bootstrap -->
         <link rel="stylesheet" href="../../css/bootstrap.min.css">
         <link rel="stylesheet" href="../../css/style.css" />
+        <link rel="stylesheet" href="../../css/app.css" />
         <link rel="stylesheet" href="../../css/alertify.core.css" />
         <link rel="stylesheet" href="../../css/alertify.default.css" />
-        <link rel="stylesheet" href="../../css/app.css" />
         <link rel="stylesheet" href="../../css/speech.css" />
         <link rel="stylesheet" href="../../css/spinner.css" />
         <link rel="stylesheet" href="../../css/font-awesome.min.css" />
@@ -163,6 +163,8 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
     </body>
 
 <script type="text/javascript" >
+
+let whisper = <?php echo $_SESSION['whisper']; ?>;
 
 function getParameterByName(name) {
     var url = window.location.href;

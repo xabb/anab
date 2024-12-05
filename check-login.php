@@ -23,7 +23,7 @@ else
     $password=$_POST['password'];
 }
 
-$result=db_query( "SELECT user, password, color FROM user" );
+$result=db_query( "SELECT user, password, color, dark FROM user" );
 while ($row = mysqli_fetch_row($result))
 {
   if ( $user == $row[0] &&
@@ -32,6 +32,7 @@ while ($row = mysqli_fetch_row($result))
      $_SESSION['schtroumpf']=$user;
      $_SESSION['papa']=$password;
      $_SESSION['color']=$row[2];
+     $_SESSION['whisper']=$row[3];
      print "OK";
      exit;
   }

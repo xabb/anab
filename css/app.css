@@ -47,7 +47,8 @@ overview {
   border-radius: 30px;
   color:#333333; 
   background : #ffffff; 
-  border-color: #333333; }
+  border-color: #333333; 
+}
 
 .btn-fplay {
 }
@@ -56,6 +57,14 @@ overview {
   min-width:80px;
   width:80px;
 } 
+
+.whisper-logo {
+    width: 15px;
+    height: 15px;
+    float: right;
+    margin-right: 45px;
+    margin-top: -17px;
+}
 
 .modal-dialog {
   background:#ffffff;

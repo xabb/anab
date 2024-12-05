@@ -299,10 +299,14 @@ document.addEventListener('DOMContentLoaded', function() {
                       $("#linear-notes").append(blank);
                       var range = "<p>"+(counter-4096)+" : "+toHHMMSS(region.start)+" - "+toHHMMSS(region.end)+" (" + Math.round(region.end-region.start) + " s) : </p>";
                       $("#bar-"+wregion.id).append(range);
-                      var rbook = "<i class='fa fa-book fa-1x linear-book' id='b"+wregion.id+"' onclick='addToBook(\""+wregion.id+"\")'></i>";
+                      var rbook = "<i class='fa fa-book fa-1x linear-book' title='Add to Book' id='b"+wregion.id+"' onclick='addToBook(\""+wregion.id+"\")'></i>";
                       $("#bar-"+wregion.id).append(rbook);
-                      var rplay = "<i class='fa fa-play fa-1x linear-play' id='r"+wregion.id+"' onclick='playRegion(\""+wregion.id+"\")'></i>";
+                      var rplay = "<i class='fa fa-play fa-1x linear-play' title='Play this Part' id='r"+wregion.id+"' onclick='playRegion(\""+wregion.id+"\")'></i>";
                       $("#bar-"+wregion.id).append(rplay);
+                      if ( whisper == 1 ) {
+                         var rwhisper = "<img src='../../img/whisper-logo.png' title='Call Whisper AI' class='whisper-logo' id='w"+wregion.id+"' onclick='whisperStart(\""+wregion.id+"\")' />";
+                         $("#bar-"+wregion.id).append(rwhisper);
+                      }
                       var ncontent = "<textarea id='"+wregion.id+"' class='note-textarea'>"+wregion.data.note+"</textarea>";
                       $("#linear-notes").append(ncontent);
                       $("#"+wregion.id).on( 'change', function(evt) {
@@ -608,9 +612,13 @@ function updateTable() {
       $("#linear-notes").append(blank);
       var range = "<p>"+(counter-4096)+" : "+toHHMMSS(region.start)+" - "+toHHMMSS(region.end)+" (" + Math.round(region.end-region.start) + " s) : </p>";
       $("#bar-"+id).append(range);
-      var rbook = "<i class='fa fa-book fa-1x linear-book' id='b"+id+"' onclick='addToBook(\""+id+"\")'></i>";
+      if ( whisper == 1 ) {
+        var rwhisper = "<img src='../../img/whisper-logo.png' title='Call Whisper AI' class='whisper-logo' id='w"+id+"' onclick='whisperStart(\""+id+"\")' />";
+        $("#bar-"+id).append(rwhisper);
+      }
+      var rbook = "<i class='fa fa-book fa-1x linear-book' title='Add to Book' id='b"+id+"' onclick='addToBook(\""+id+"\")'></i>";
       $("#bar-"+id).append(rbook);
-      var rplay = "<i class='fa fa-play fa-1x linear-play' id='r"+id+"' onclick='playRegion(\""+id+"\")'></i>";
+      var rplay = "<i class='fa fa-play fa-1x linear-play' title='Play this Part' id='r"+id+"' onclick='playRegion(\""+id+"\")'></i>";
       $("#bar-"+id).append(rplay);
       var ncontent = "<textarea id='"+id+"' class='note-textarea'>"+region.data.note+"</textarea>";
       $("#linear-notes").append(ncontent);
@@ -640,9 +648,13 @@ function updateTableOne(currentId) {
         $("#linear-notes").append(blank);
         var range = "<p>"+(counter-4096)+" : "+toHHMMSS(region.start)+" - "+toHHMMSS(region.end)+" (" + Math.round(region.end-region.start) + " s) : </p>";
         $("#bar-"+id).append(range);
-        var rbook = "<i class='fa fa-book fa-1x linear-book' id='b"+id+"' onclick='addToBook(\""+id+"\")'></i>";
+        if ( whisper == 1 ) {
+           var rwhisper = "<img src='../../img/whisper-logo.png' title='Call Whisper AI' class='whisper-logo' id='w"+id+"' onclick='whisperStart(\""+id+"\")' />";
+           $("#bar-"+id).append(rwhisper);
+        }
+        var rbook = "<i class='fa fa-book fa-1x linear-book' title='Add to Book' id='b"+id+"' onclick='addToBook(\""+id+"\")'></i>";
         $("#bar-"+id).append(rbook);
-        var rplay = "<i class='fa fa-play fa-1x linear-play' id='r"+id+"' onclick='playRegion(\""+id+"\")'></i>";
+        var rplay = "<i class='fa fa-play fa-1x linear-play' title='Play this Part' id='r"+id+"' onclick='playRegion(\""+id+"\")'></i>";
         $("#bar-"+id).append(rplay);
         var ncontent = "<textarea id='"+id+"' class='note-textarea'>"+region.data.note+"</textarea>";
         $("#linear-notes").append(ncontent);
