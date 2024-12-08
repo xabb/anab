@@ -5,5 +5,6 @@ $config['dbuser'] = "giss";
 $config['dbpass'] = "bigotes";
 $config['owner'] = "admin";
 $config['project-name'] = "A.N.a.B.";
+$config['project-long-name'] = "Audio Notes and Books";
 
 ?>

@@ -458,6 +458,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    let langselect = document.getElementById('wlang');
+    for (const lang of wlangs)  {
+       langselect.options[langselect.options.length] = new Option(lang, lang);
+    }
+
 });
 
 /**
@@ -933,6 +938,13 @@ var addToBook = function(regid) {
           }
         });
     };
+}
+
+var whisperStart = function(regid) {
+    currentRegion = regid;
+    $("#modal-whisper").modal("show");
+    // window.scrollTo({ top: 0, behavior: 'smooth' });
+    // $("html, body").animate({ scrollTop: 0 }, "slow");
 }
 
 var playRegion = function(regid) {

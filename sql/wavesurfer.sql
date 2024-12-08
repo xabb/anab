@@ -144,7 +144,7 @@ CREATE TABLE `user` (
   `user` longtext COLLATE utf8mb4_bin NOT NULL,
   `password` longtext COLLATE utf8mb4_bin NOT NULL,
   `color` longtext COLLATE utf8mb4_bin NOT NULL,
-  `dark` int(11) DEFAULT '0',
+  `dark` int(11) DEFAULT '1',
   `nbt` int(11) DEFAULT '0',
   `tts` time DEFAULT '00:00:00',
   `pin` text COLLATE utf8mb4_bin,

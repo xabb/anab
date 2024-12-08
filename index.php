@@ -94,7 +94,7 @@ session_start();
 <center><table width=90%>
 <tr><td align=right>
 </td><td align=center>
-<h1><?php echo $config['project-name']; ?></h1>
+<h1><?php echo $config['project-long-name']; ?></h1>
 </td</tr>
 </table></center>
 

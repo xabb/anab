@@ -66,6 +66,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
         <script src="https://cdn.tiny.cloud/1/0orygvha5i2si28tph78ofrylieupbj5ta9hvqkhdagcao6v/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
 
         <!-- App -->
+        <script type="text/javascript" src="wlangs.js"></script>
         <script type="text/javascript" src="app.js"></script>
     </head>
 
@@ -75,6 +76,34 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
            <div class="modal-bdialog modal-dialog">
              <center><strong><h4><br/><br/>Loading waveform...</h4></strong></center><br/>
                <div class="lds-spinner" id="spinner-global"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+           </div>
+        </div>
+
+        <div class="modal fade" id="modal-whisper">
+           <div class="modal-bdialog modal-dialog">
+            <br/><center><strong><h4>Calling OpenAI whisper</h4></strong></center>
+            <div class="modal-content modal-bcontent">
+             <div class='whisper-help'>
+             You will call OpenAI whisper for an automatic transcription...<br/>
+             Your job will be queued and you can come back a few minutes later<br/> 
+             to check the result by reloading this page.<br/>
+             </div>
+             <form role="form" id="callAI" name="callAI" style="transition: opacity 300ms linear; margin: 10px 0;">
+             <center>
+             <strong>Language</strong>
+             <select id='wlang'>
+                <option val='guess'>Guess</option>
+             </select>
+             <strong>Model</strong>
+             <select id='wmodel'>
+                <option val='turbo'>Turbo (default)</option>
+                <option val='small'>Small</option>
+                <option val='large'>Large</option>
+             </select><br/><br/>
+             <button type="submit" class="btn btn-success btn-block btn-whisper">Call and Pray</button>
+             </center>
+             </form>
+            </div>
            </div>
         </div>
 

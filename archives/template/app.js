@@ -21,6 +21,14 @@ var strstr = function (haystack, needle) {
   return 0;
 };
 
+var smoothscroll = function(){
+    var currentScroll = document.documentElement.scrollTop;
+    if (currentScroll > 0) {
+         window.requestAnimationFrame(smoothscroll);
+         window.scrollTo (0,currentScroll - (currentScroll/5));
+    }
+};
+
 var fullEncode = function(w)
 {
  var map=
@@ -129,6 +137,14 @@ var addToBook = function(regid) {
     bRegionId = regid;
     $("#modal-book").modal("show");
     $("#spinner-modal"). css("display", "none");
+}
+
+var whisperStart = function(regid) {
+    currentRegion = regid;
+    $("#modal-whisper").modal("show");
+    smoothScroll();
+    // window.scrollTo({ top: 0, behavior: 'smooth' });
+    // $("html, body").animate({ scrollTop: 0 }, "slow");
 }
 
 
@@ -479,6 +495,10 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
 
+    let langselect = document.getElementById('wlang');
+    for (const lang of wlangs)  {
+       langselect.options[langselect.options.length] = new Option(lang, lang);
+    }
     // $('.lds-spinner').css('display','none');
 });
 
