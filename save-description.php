@@ -2,12 +2,12 @@
 
 include("config.php");
 
-if ( empty($_POST['title']) )
+if ( empty($_POST['url']) )
 {
-   header('HTTP/1.1 406 Title is Mandatory');	  
+   header('HTTP/1.1 406 Url is Mandatory');	  
    exit(-1);
 }
-$title = $_POST['title'];
+$url = $_POST['url'];
 
 if ( !isset($_POST['description']) )
 {
@@ -23,8 +23,8 @@ if (!$link) {
    exit(-1);
 } else {
    $link->query('SET NAMES utf8');
-   // error_log( 'Updating description : '.$title );
-   $sqlu = "UPDATE archive SET description='".addslashes($description)."' WHERE title LIKE '%".addslashes($title)."';";
+   // error_log( 'Updating description : '.$url );
+   $sqlu = "UPDATE archive SET description='".addslashes($description)."' WHERE url LIKE '%".addslashes($url)."';";
    error_log($sqlu);
    $resultu = $link->query($sqlu);
    if ( $resultu != 1 ) {

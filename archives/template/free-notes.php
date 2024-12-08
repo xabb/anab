@@ -222,7 +222,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
             </div>
             <div id="linear-notes" class="linear-outer-notes"></div>
             <div class="export-notes">
-               <button class="btn btn-info btn-block btn-export" data-action="export" title="Export annotations to JSON">
+               <button class="btn btn-info btn-block btn-export" data-action="export" title="Export annotations to SRT">
                    <i class="glyphicon glyphicon-file"></i>
                    Export
                 </button>

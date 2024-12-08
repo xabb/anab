@@ -34,6 +34,7 @@ CREATE TABLE `annotation` (
   `title` longtext COLLATE utf8mb4_bin,
   `user` longtext COLLATE utf8mb4_bin,
   `color` longtext COLLATE utf8mb4_bin,
+  `whispered` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=5751 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
