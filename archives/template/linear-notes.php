@@ -62,7 +62,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
         <script type="text/javascript" src="../../js/circular-json.js"></script>
 
         <!-- App -->
-        <script type="text/javascript" src="wlangs.js"></script>
+        <script type="text/javascript" src="../../js/wlangs.js"></script>
         <script type="text/javascript" src="appl.js"></script>
     </head>
 

@@ -26,6 +26,12 @@ include("../../config.php");
      $link->query("LOCK TABLES `annotation`");
      $annotes = json_decode( $annotations, true );
      // error_log( __FILE__." got : ".count($annotes)." notes" );
+
+     // delete all free annotations
+     $dsql = "DELETE FROM annotation WHERE source='".$note["source"]."' AND norder<4096";";
+     $delete = $link->query($dsql);
+     error_log('deleted '.$delete.' free annotations');
+
      foreach( $annotes as $note )
      {
          if ( count($note["data"]) > 0 ) {

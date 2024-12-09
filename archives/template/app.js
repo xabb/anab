@@ -472,27 +472,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // $('#subtitle').css('display','block');
 
-    tinymce.init({
-      selector: '#note',
-      width: 500,
-      height: 250,
-      plugins: 'advlist autolink lists link image charmap hr pagebreak searchreplace wordcount help insertdatetime emoticons charmap ',
-      branding: false,
-      elementpath: false,
-      toolbar: false,
-      statusbar: false,
-      placeholder: 'Type here...',
-      contextmenu: 'link image',
-      entity_encoding : 'raw',
-      menu: {
-        file: { title: '', items: '' },
-        edit: { title: 'Edit', items: 'undo redo | cut copy paste | selectall | searchreplace' },
-        view: { title: '', items: '' },
-        insert: { title: 'Insert', items: 'image link media charmap | hr nonbreaking | insertdatetime' },
-        format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript | forecolor backcolor | fontformats fontsizes align | removeformat' },
-        tools: { title: 'Tools', items: 'wordcount' },
-        help: { title: 'Help', items: 'help' }
-      }
+    $('#note').trumbowyg({
+        // btns: [['strong', 'em',], ['insertImage']],
+        // autogrow: true
+    })
+    .on('tbwchange', function(e){
+        //  save as soon as you type? not recommended
+        // let wregion = wavesurfer.regions.list[currentRegion];
+        // var newnote = $('#note').trumbowyg('html');
+        // newnote = newnote.replaceAll("<p", "<div" );
+        // newnote = newnote.replaceAll("</p>", "</div>" );
+        // wregion.update({
+        //     start: wregion.start,
+        //     end: wregion.end,
+        //     data: {
+        //         note: newnote,
+        //         user: user,
+        //         color: ucolor
+        //     }
+        // });
+        // saveRegions();
     });
 
     let langselect = document.getElementById('wlang');
@@ -506,6 +505,9 @@ document.addEventListener('DOMContentLoaded', function() {
  * Save annotations to the server and redraw everything
  */
 function saveRegions() {
+
+    // redraw and save to the server
+    console.log('saving to the server')
     var counter=0;
     var navigation="<center><b>Navigate</b></center><br/><br/>";
     $("#linear-notes").html('');
@@ -664,7 +666,7 @@ function editAnnotation(region, e) {
     playRegion(currentRegion, true);
     var form = document.forms.edit;
     form.dataset.region = region.id;
-    tinyMCE.activeEditor.setContent(region.data.note || '');
+    $('#note').trumbowyg('html', region.data.note || '');
     form.onsubmit = function(e) {
         e.preventDefault();
         // console.log( 'saving : ' + form.elements.note.value);

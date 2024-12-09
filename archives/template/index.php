@@ -25,6 +25,7 @@ if ( !isset($_SESSION['schtroumpf']) || !isset($_SESSION['papa']) )
         <link rel="stylesheet" href="../../css/app.css" />
         <link rel="stylesheet" href="../../css/font-awesome.min.css" />
         <link rel="stylesheet" href="../../css/dropzone.css" />
+        <link rel="stylesheet" href="../../js/trumbowyg/dist/ui/trumbowyg.css">
 
         <script type="text/javascript" src="../../js/jquery.min.js"></script>
         <script type="text/javascript" src="../../js/bootstrap.min.js"></script> 
@@ -33,7 +34,7 @@ if ( !isset($_SESSION['schtroumpf']) || !isset($_SESSION['papa']) )
         <script type="text/javascript" src="../../js/alertify.min.js"></script>
         <script type="text/javascript" src="../../js/circular-json.js"></script>
         <script type="text/javascript" src="../../js/dropzone.min.js"></script>
-        <script type="text/javascript" src="https://cdn.tiny.cloud/1/fsisf6nug1vh20mrqte7djkhpu0j1umti1udbihiykd71g9w/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+        <script type="text/javascript" src="../../js/trumbowyg/dist/trumbowyg.min.js"></script>
 
     </head>
 
@@ -235,19 +236,19 @@ $(document).ready( function(){
           url: encodeURIComponent(soundfile),
        },
        dataType: "text/html" 
-    }).fail(function(data) {
+    }).always(function(data) {
        if ( data.status === 200 ) {
           // console.log( "getting biography success : " + data.responseText );
           $('#biography-edit').html(data.responseText);
-          tinymce.init({
-            setup:function(ed) {
-               ed.on('change', function(e) {
-                 // console.log('tinymce changed : ', ed.getContent());
-                 var jqxhr = $.post( {
-                   url: '../../save-biography.php',
-                   data: {
-                     title: $(document).attr('title'),
-                     biography: ed.getContent().replaceAll("<p>","<div>").replaceAll("</p>","</div>")
+          $('#biography-edit').trumbowyg({
+             autogrow: true
+          })
+          .on('tbwchange', function(e){
+             var jqxhr = $.post( {
+                 url: '../../save-biography.php',
+                 data: {
+                     url: encodeURIComponent(soundfile),
+                     biography: $('#biography-edit').trumbowyg('html').replaceAll("<p>","<div>").replaceAll("</p>","</div>")
                    },
                    dataType: 'text/plain'
                  }, function() {
@@ -260,28 +261,8 @@ $(document).ready( function(){
                       alertify.alert("saving biography failed : " + JSON.stringify(error));
                    }
                  });
-               });
-            },
-            selector: '#biography-edit',
-            plugins: 'advlist autolink lists link image charmap hr pagebreak searchreplace wordcount help insertdatetime emoticons charmap ',
-            branding: false,
-            elementpath: false,
-            toolbar: true,
-            height: 750,
-            statusbar: false,
-            placeholder: 'Type here...',
-            contextmenu: 'link image',
-            entity_encoding : 'raw',
-            menu: {
-              file: { title: '', items: '' },
-              edit: { title: 'Edit', items: 'undo redo | cut copy paste | selectall | searchreplace' },
-              view: { title: '', items: '' },
-              insert: { title: 'Insert', items: 'image link media charmap | hr nonbreaking | insertdatetime' },
-              format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript | forecolor backcolor | fontformats fontsizes align | removeformat' },
-              tools: { title: 'Tools', items: 'wordcount' },
-              help: { title: 'Help', items: 'help' }
-            }
           });
+
        } else {
           console.log("getting biography failed : " + JSON.stringify(data));
           alertify.alert("getting biography failed : " + JSON.stringify(data));
@@ -294,19 +275,19 @@ $(document).ready( function(){
           url: encodeURIComponent(soundfile),
        },
        dataType: "text/html" 
-    }).fail(function(data) {
+    }).always(function(data) {
        if ( data.status === 200 ) {
           // console.log( "getting description success : " + data.responseText );
           $('#description-edit').html(data.responseText);
-          tinymce.init({
-            setup:function(ed) {
-               ed.on('change', function(e) {
-                 // console.log('tinymce changed : ', ed.getContent());
-                 var jqxhr = $.post( {
-                   url: '../../save-description.php',
-                   data: {
-                     title: $(document).attr('title'),
-                     description: ed.getContent().replaceAll("<p>","<div>").replaceAll("</p>","</div>")
+          $('#description-edit').trumbowyg({
+             autogrow: true
+          })
+          .on('tbwchange', function(e){
+             var jqxhr = $.post( {
+                 url: '../../save-description.php',
+                 data: {
+                     url: encodeURIComponent(soundfile),
+                     description: $('#description-edit').trumbowyg('html').replaceAll("<p>","<div>").replaceAll("</p>","</div>")
                    },
                    dataType: 'text/plain'
                  }, function() {
@@ -319,27 +300,6 @@ $(document).ready( function(){
                       alertify.alert("saving description failed : " + JSON.stringify(error));
                    }
                  });
-               });
-            },
-            selector: '#description-edit',
-            plugins: 'advlist autolink lists link image charmap hr pagebreak searchreplace wordcount help insertdatetime emoticons charmap ',
-            branding: false,
-            elementpath: false,
-            toolbar: true,
-            height: 750,
-            statusbar: false,
-            placeholder: 'Type here...',
-            contextmenu: 'link image',
-            entity_encoding : 'raw',
-            menu: {
-              file: { title: '', items: '' },
-              edit: { title: 'Edit', items: 'undo redo | cut copy paste | selectall | searchreplace' },
-              view: { title: '', items: '' },
-              insert: { title: 'Insert', items: 'image link media charmap | hr nonbreaking | insertdatetime' },
-              format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript | forecolor backcolor | fontformats fontsizes align | removeformat' },
-              tools: { title: 'Tools', items: 'wordcount' },
-              help: { title: 'Help', items: 'help' }
-            }
           });
 
        } else {

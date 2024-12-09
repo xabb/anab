@@ -50,6 +50,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
         <link rel="stylesheet" href="../../css/speech.css" />
         <link rel="stylesheet" href="../../css/spinner.css" />
         <link rel="stylesheet" href="../../css/font-awesome.min.css" />
+        <link rel="stylesheet" href="../../js/trumbowyg/dist/ui/trumbowyg.css">
 
         <script type="text/javascript" src="../../js/jquery.min.js"></script>
         <script type="text/javascript" src="../../js/bootstrap.min.js"></script> 
@@ -63,10 +64,10 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
         <script type="text/javascript" src="../../js/trivia.js"></script>
         <script type="text/javascript" src="../../js/alertify.min.js"></script>
         <script type="text/javascript" src="../../js/circular-json.js"></script>
-        <script src="https://cdn.tiny.cloud/1/0orygvha5i2si28tph78ofrylieupbj5ta9hvqkhdagcao6v/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+        <script type="text/javascript" src="../../js/trumbowyg/dist/trumbowyg.min.js"></script>
 
         <!-- App -->
-        <script type="text/javascript" src="wlangs.js"></script>
+        <script type="text/javascript" src="../../js/wlangs.js"></script>
         <script type="text/javascript" src="app.js"></script>
     </head>
 
