@@ -313,13 +313,13 @@ document.addEventListener('DOMContentLoaded', function() {
                            var id = $(this).attr('id');
                            let cregion = wavesurfer.regions.list[id];
                            cregion.data.note=evt.target.value;
-                           saveRegions();
+                           saveAndDrawRegions();
                            cregion.setLoop(false);
                            deleteNote(cregion);
                            showNote(cregion);
                       });
                    });
-                   saveRegions();
+                   drawRegions();
                    console.log( "we have : " + languages );
                    var header = "<center><div>Language</div></select>";
                    $("#subtitle-left").append(header);
@@ -357,7 +357,7 @@ document.addEventListener('DOMContentLoaded', function() {
         wavesurfer.on('region-update-end', updateAnnotation);
         wavesurfer.on('region-in', showNote);
         wavesurfer.on('region-out', deleteNote);
-        wavesurfer.on('region-updated', saveRegions);
+        wavesurfer.on('region-updated', saveAndDrawRegions);
         wavesurfer.on('audioprocess', function() {
             $(".play-time").html( toHHMMSS(wavesurfer.getCurrentTime()) + " / " + toHHMMSS(wavesurfer.getDuration()) );
         });
@@ -518,9 +518,7 @@ function splitAnnotation() {
                           }
                       });
 
-                saveRegions();
-                updateTable();
-                storeRegions();
+                saveAndDrawRegions();
             }
     });
     wavesurfer.drawer.fireEvent('redraw');
@@ -538,8 +536,7 @@ function updateAnnotation(region, e) {
                 console.log( "update : updating annotation : " + region.id );
                 lregion.start = region.start;
                 lregion.end = region.end;
-                saveRegions();
-                storeRegions();
+                saveAndDrawRegions();
             }
     });
     updateTable();
@@ -579,7 +576,7 @@ function doDeleteAnnotation(index) {
            var region = wavesurfer.regions.list[id];
            deleteNote(wavesurfer.regions.list[id]);
            wavesurfer.regions.list[id].remove();
-           saveRegions();
+           saveAndDrawRegions();
 
            console.log("Do delete annotation : " + 4096+counter);
            var jqxhr = $.post( {
@@ -631,7 +628,7 @@ function updateTable() {
           var id = $(this).attr('id');
           cregion = wavesurfer.regions.list[id];
           cregion.data.note=evt.target.value;
-          saveRegions();
+          saveAndDrawRegions();
           cregion.setLoop(false);
           deleteNote(cregion);
           showNote(cregion);
@@ -667,7 +664,7 @@ function updateTableOne(currentId) {
             var id = $(this).attr('id');
             cregion = wavesurfer.regions.list[id];
             cregion.data.note=evt.target.value;
-            saveRegions();
+            saveAndDrawRegions();
             cregion.setLoop(false);
             deleteNote(cregion);
             showNote(cregion);
@@ -675,15 +672,25 @@ function updateTableOne(currentId) {
       }
     });
 }
+
 /**
- * Save annotations to the server.
+ * Save to the server and draw notes
+ * Called after every modification
  */
-function saveRegions() {
+function saveAndDrawRegions() {
+    saveRegions();
+    drawRegions();
+}
+
+/**
+ * Draw markers
+ */
+function drawRegions() {
     var counter=4096;
     // redraw rons and markers
     wavesurfer.clearMarkers();
     wavesurfer.on("marker-click", deleteAnnotation );
-    console.log( "save regions" );
+    console.log( "save regions to the storage" );
     localStorage.regionsl = JSON.stringify(
         Object.keys(wavesurfer.regions.list).map(function(id) {
             var region = wavesurfer.regions.list[id];
@@ -728,8 +735,12 @@ function saveRegions() {
             };
         })
     );
-    console.log( "saving : " + (counter-4096) + " linear annotations" );
+}
 
+/**
+ * Save regions to the server
+ */
+function saveRegions() {
     anotes = JSON.parse(localStorage.regionsl);
     var jqxhr = $.post( {
       url: 'save-annotations-linear.php',
@@ -748,14 +759,6 @@ function saveRegions() {
           alertify.alert(  "Saving annotations failed : status : " + error.status + " message : " + JSON.stringify(error) );
        }
     });
-}
-
-/**
- * Load regions from ajax request.
- */
-function storeRegions(regions) {
-    localStorage.regionsl = regions;
-    // saveRegions();
 }
 
 /**

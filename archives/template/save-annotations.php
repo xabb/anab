@@ -28,9 +28,11 @@ include("../../config.php");
      // error_log( __FILE__." got : ".count($annotes)." notes" );
 
      // delete all free annotations
-     $dsql = "DELETE FROM annotation WHERE source='".$note["source"]."' AND norder<4096";";
-     $delete = $link->query($dsql);
-     error_log('deleted '.$delete.' free annotations');
+     if ( count($annotes) > 0 ){
+        $dsql = "DELETE FROM annotation WHERE source='".$annotes[0]["source"]."' AND norder<4096";
+        $delete = $link->query($dsql);
+        // error_log('deleted free annotations for '.$annotes[0]["source"]);
+     }
 
      foreach( $annotes as $note )
      {

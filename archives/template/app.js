@@ -228,15 +228,12 @@ document.addEventListener('DOMContentLoaded', function() {
             color: randomColor(0.1)
         });
 
-        if (0) {
-            loadRegions(JSON.parse(localStorage.regions));
-        } else {
-            
-            $.post({
-                 responseType: 'json',
-                 url: 'annotations.json'
-            }, function(data) {
+        $.post({
+             responseType: 'json',
+             url: 'annotations.json'
+        }, function(data) {
                  loadRegions(data);
+                 drawRegions();
                  // zoom is the number of minutes limited to 10
                  wzoom = Math.floor( wavesurfer.getDuration() / 60.0 )+1;
                  if ( wzoom > 10 ) wzoom = 10;
@@ -258,13 +255,12 @@ document.addEventListener('DOMContentLoaded', function() {
                  $("#modal-wait").modal("hide");
                  $('#spinner-global').css('display','none');
             });
-        }
     });
 
     wavesurfer.on('region-click', regionClick);
     wavesurfer.on('region-dblclick', editAnnotation);
-    wavesurfer.on('region-updated', saveRegions);
-    wavesurfer.on('region-removed', saveRegions);
+    wavesurfer.on('region-updated', saveAndDrawRegions);
+    wavesurfer.on('region-removed', saveAndDrawRegions);
     wavesurfer.on('region-in', showNote);
     wavesurfer.on('region-out', deleteNote);
     wavesurfer.on('region-play', function(region) {
@@ -491,7 +487,7 @@ document.addEventListener('DOMContentLoaded', function() {
         //         color: ucolor
         //     }
         // });
-        // saveRegions();
+        // saveAndDrawRegions();
     });
 
     let langselect = document.getElementById('wlang');
@@ -502,9 +498,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /**
- * Save annotations to the server and redraw everything
+ * Draw markers, table of notes and navigation
  */
-function saveRegions() {
+function drawRegions() {
 
     // redraw and save to the server
     console.log('saving to the server')
@@ -549,7 +545,7 @@ function saveRegions() {
             $("#"+region.id).on( 'change', function(evt) {
                 var id = $(this).attr('id');
                 wavesurfer.regions.list[id].data.note=evt.target.value;
-                saveRegions();
+                saveAndDrawRegions();
             });
             wavesurfer.addMarker({
                time : region.start,
@@ -583,8 +579,22 @@ function saveRegions() {
             };
         })
     );
-    // console.log( "saving : " + counter + " annotations" );
+    console.log( "saving : " + counter + " annotations" );
     $("#notes").html(navigation);
+}
+
+/**
+ * Called every time a region is modified
+ */
+function saveAndDrawRegions() {
+    saveRegions();
+    drawRegions();
+}
+
+/**
+ * Save annotations to the server and redraw everything
+ */
+function saveRegions() {
 
     anotes = JSON.parse(localStorage.regions);
     var jqxhr = $.post( {
@@ -617,9 +627,9 @@ function loadRegions(regions) {
         region.color = randomColor(0.1);
         wavesurfer.addRegion(region);
     });
-    wavesurfer.on('region-updated', saveRegions);
-    wavesurfer.on('region-removed', saveRegions);
-    saveRegions();
+    wavesurfer.on('region-updated', saveAndDrawRegions);
+    wavesurfer.on('region-removed', saveAndDrawRegions);
+    drawRegions();
 }
 
 /**
@@ -808,7 +818,7 @@ function doDeleteAnnotation(index) {
            var region = wavesurfer.regions.list[id];
            deleteNote(wavesurfer.regions.list[id]);
            wavesurfer.regions.list[id].remove();
-           saveRegions();
+           saveAndDrawRegions();
 
            console.log("Do delete annotation : " + counter);
            var jqxhr = $.post( {
@@ -852,7 +862,7 @@ window.GLOBAL_ACTIONS['delete-region'] = function() {
     if (regionId) {
         deleteNote(wavesurfer.regions.list[regionId]);
         wavesurfer.regions.list[regionId].remove();
-        saveRegions();
+        saveAndDrawRegions();
         form.reset();
 
         var jqxhr = $.post( {

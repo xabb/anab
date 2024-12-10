@@ -68,6 +68,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
 
         <!-- App -->
         <script type="text/javascript" src="../../js/wlangs.js"></script>
+        <script type="text/javascript" src="../../js/sclangs.js"></script>
         <script type="text/javascript" src="app.js"></script>
     </head>
 

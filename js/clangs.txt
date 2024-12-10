@@ -21,6 +21,7 @@ Tibetan	bo	tib	tibétain
 Breton	br	bre	breton
 Bosnian	bs	bos	bosniaque
 Catalan	ca	cat	catalan; valencien
+Valencian	ca	cat	catalan; valencien
 Chechen	ce	che	tchétchène
 Chamorro	ch	cha	chamorro
 Corsican	co	cos	corse
@@ -58,6 +59,7 @@ Hindi	hi	hin	hindi
 Hiri Motu	ho	hmo	hiri motu
 Croatian	hr	hrv	croate
 Haitian	ht	hat	haïtien; créole haïtien
+Creole	ht	hat	haïtien; créole haïtien
 Hungarian	hu	hun	hongrois
 Armenian	hy	arm	arménien
 Herero	hz	her	herero
@@ -89,6 +91,7 @@ Komi	kv	kom	kom
 Cornish	kw	cor	cornique
 Kirghiz; Kyrgyz	ky	kir	kirghiz
 Latin	la	lat	latin
+Letzeburgesch	lb	ltz	luxembourgeois
 Luxembourgish	lb	ltz	luxembourgeois
 Ganda	lg	lug	ganda
 Limburgan; Limburger; Limburgish	li	lim	limbourgeois
@@ -106,31 +109,38 @@ Mongolian	mn	mon	mongol
 Marathi	mr	mar	marathe
 Malay	ms	may	malais
 Maltese	mt	mlt	maltais
+Myanmar	mm	mmr	myanmar
 Burmese	my	bur	birman
 Nauru	na	nau	nauruan
-Norwegian nb	nob	norvégien bokmål
-Ndebele, North; North Ndebele	nd	nde	ndébélé du Nord
+Norwegian no	nob	norvégien bokmål
+Nynorsk nn	nob	norvégien bokmål
 Nepali	ne	nep	népalais
 Ndonga	ng	ndo	ndonga
+Dutch	nl	dut	néerlandais; flamand
 Flemish	nl	dut	néerlandais; flamand
 Norwegian	no	nor	norvégien
-Ndebele, South; South Ndebele	nr	nbl	ndébélé du Sud
-Navajo; Navaho	nv	nav	navaho
-Chichewa; Chewa; Nyanja	ny	nya	chichewa; chewa; nyanja
+Ndebel	nr	nbl	ndébélé du Sud
+Navajo	nv	nav	navaho
+Chichewa	ny	nya	chichewa; chewa; nyanja
 Occitan	oc	oci	occitan (après 1500)
 Ojibwa	oj	oji	ojibwa
 Oromo	om	orm	galla
 Oriya	or	ori	oriya
-Ossetian; Ossetic	os	oss	ossète
+Ossetian	os	oss	ossète
+Panjabi	pa	pan	pendjabi
 Punjabi	pa	pan	pendjabi
 Pali	pi	pli	pali
 Polish	pl	pol	polonais
+Pashto	ps	pus	pachto
 Pushto	ps	pus	pachto
 Portuguese	pt	por	portugais
 Quechua	qu	que	quechua
 Romansh	rm	roh	romanche
 Rundi	rn	run	rundi
 Romanian	ro	rum	roumain; moldave
+Moldavian	ro	rum	roumain; moldave
+Moldavian	ro	rum	roumain; moldave
+Moldovan	ro	rum	roumain; moldave
 Russian	ru	rus	russe
 Kinyarwanda	rw	kin	rwanda
 Sanskrit	sa	san	sanskrit
@@ -138,11 +148,13 @@ Sardinian	sc	srd	sarde
 Sindhi	sd	snd	sindhi
 Northern Sami	se	sme	sami du Nord
 Sango	sg	sag	sango
+Sinhalese	si	sin	singhalais
 Sinhala	si	sin	singhalais
 Slovak	sk	slo	slovaque
 Slovenian	sl	slv	slovène
 Samoan	sm	smo	samoan
 Shona	sn	sna	shona
+Spanish	es	es	spanish
 Somali	so	som	somali
 Albanian	sq	alb	albanais
 Serbian	sr	srp	serbe
@@ -159,13 +171,13 @@ Tigrinya	ti	tir	tigrigna
 Turkmen	tk	tuk	turkmène
 Tagalog	tl	tgl	tagalog
 Tswana	tn	tsn	tswana
-Tonga (Tonga Islands)	to	ton	tongan (Îles Tonga)
+Tonga   to	ton	tongan (Îles Tonga)
 Turkish	tr	tur	turc
 Tsonga	ts	tso	tsonga
 Tatar	tt	tat	tatar
 Twi	tw	twi	twi
 Tahitian	ty	tah	tahitien
-Uighur; Uyghur	ug	uig	ouïgour
+Uighur	ug	uig	ouïgour
 Ukrainian	uk	ukr	ukrainien
 Urdu	ur	urd	ourdou
 Uzbek	uz	uzb	ouszbek
@@ -177,6 +189,8 @@ Wolof	wo	wol	wolof
 Xhosa	xh	xho	xhosa
 Yiddish	yi	yid	yiddish
 Yoruba	yo	yor	yoruba
-Zhuang; Chuang	za	zha	zhuang; chuang
+Zhuang	za	zha	zhuang; chuang
 Chinese	zh	chi	chinois
+Mandarin	zh	chi	chinois
+Cantonese	zh	chi	chinois
 Zulu	zu	zul	zoulou
