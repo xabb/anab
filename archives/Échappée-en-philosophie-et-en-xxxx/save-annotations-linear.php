@@ -8,7 +8,7 @@ include("../../config.php");
      exit(-1);
   }
   $annotations = $_POST['json'];
-  if ( !file_put_contents( "./annotations-linear.json", $annotations ) )
+  if ( !file_put_contents( "./annotations.json", $annotations ) )
   {
      $error = error_get_last();
      header('HTTP/1.1 500 Could not store annotations : '.$error['message']);	  
@@ -27,27 +27,16 @@ include("../../config.php");
      $annotes = json_decode( $annotations, true );
      // error_log( __FILE__." got : ".count($annotes)." notes" );
 
-     // delete all linear annotations
-     if ( count($annotes) > 0 ) {
+     // delete all free annotations
+     if ( count($annotes) > 0 ){
         $dsql = "DELETE FROM annotation WHERE source='".$annotes[0]["source"]."' AND norder>=4096";
         $delete = $link->query($dsql);
-        // error_log('deleted linear annotations for '.$annotes[0]['source']);
+        // error_log('deleted free annotations for '.$annotes[0]["source"]);
      }
 
      foreach( $annotes as $note )
      {
-         if ( count($note["data"]) > 0 ) {
-            $ndata = $note["data"]["note"];
-            $nuser = $note["data"]["user"];
-            $ncolor = $note["data"]["color"];
-         } else
-            $ndata = '';
-         $data = json_decode( $annotations, true );
-         $sql = "SELECT url FROM annotation WHERE source='".$note["source"]."' AND norder=".$note["order"].";"; 
-         // error_log($sql);
-         $result = $link->query($sql);
-         if ( $result && mysqli_num_rows($result) === 0) {
-           $isql = "INSERT INTO annotation ( norder, start, end, url, source, title, attributes, data, user, color ) VALUES ( ".$note["order"].",".$note["start"].",".$note["end"].",'".addslashes($note["url"])."','".addslashes($note["source"])."','".addslashes($note["title"])."','".json_encode($note["attributes"])."','".addslashes($ndata)."','".addslashes($nuser)."','".addslashes($ncolor)."' )";
+           $isql = "INSERT INTO annotation ( norder, start, end, url, source, title, attributes, data, user, color, whispered ) VALUES ( ".$note["order"].",".$note["start"].",".$note["end"].",'".addslashes($note["url"])."','".addslashes($note["source"])."','".addslashes($note["title"])."','".json_encode($note["attributes"])."','".addslashes($note["data"])."','".addslashes($note["user"])."','".addslashes($note["color"])."', ".$note["whispered"]." )";
            $insert = $link->query($isql);
            if ( $insert !== true ) {
               error_log( "ERROR : ".__FILE__." : could not create annotation : ".$note["order"]." : ".mysqli_error($link) );
@@ -56,33 +45,10 @@ include("../../config.php");
               mysqli_close($link);
               exit(-1);
            }
-         } else if ( $result && mysqli_num_rows($result) === 1)  {
-           $usql = "UPDATE annotation SET norder=".$note["order"].", start=".$note["start"].", end=".$note["end"].", url='".addslashes($note["url"])."', source='".addslashes($note["source"])."', title='".addslashes($note["title"])."', attributes='".json_encode($note["attributes"])."', data='".addslashes($ndata)."' , user='".addslashes($nuser)."' , color='".addslashes($ncolor)."' WHERE source='".$note["source"]."' AND norder=".$note["order"];
-           $update = $link->query($usql);
-           if ( $update !== true ) {
-              error_log( "ERROR : ".__FILE__." : could not update annotation : ".$note["order"]." : ".mysqli_error($link) );
-              header('HTTP/1.1 500 Error updating annotation');	  
-              $link->query("UNLOCK TABLES `annotation`");
-              mysqli_close($link);
-              exit(-1);
-           }
-         } else {
-           $dsql = "DELETE FROM annotation WHERE source='".$note["source"]."' AND norder=".$note["order"].";";
-           $delete = $link->query($dsql);
-           $isql = "INSERT INTO annotation ( norder, start, end, url, source, title, attributes, data, user, color ) VALUES ( ".$note["order"].",".$note["start"].",".$note["end"].",'".addslashes($note["url"])."','".addslashes($note["source"])."','".addslashes($note["title"])."','".json_encode($note["attributes"])."','".addslashes($ndata)."','".addslashes($nuser)."','".addslashes($ncolor)."' )";
-           $insert = $link->query($isql);
-           if ( $insert !== true ) {
-              error_log( "ERROR : ".__FILE__." : could not create annotation : ".$note["order"]." : ".mysqli_error($link) );
-              header('HTTP/1.1 500 Error creating annotation');
-              $link->query("UNLOCK TABLES `annotation`");
-              mysqli_close($link);
-              exit(-1);
-           }
-         }
      }
   }
 
-  header('HTTP/1.1 200 OK');
+  header('HTTP/1.1 200 OK');	  
   $link->query("UNLOCK TABLES `annotations`");
   mysqli_close($link);
   exit(0);

@@ -17,7 +17,7 @@ if (!$link) {
 } else {
    $link->query('SET NAMES utf8');
    $sqls = "SELECT title, date FROM archive WHERE url LIKE '%".addslashes($url)."';";
-   error_log( 'Getting title : '.$sqls );
+   // error_log( 'Getting title : '.$sqls );
    $results = $link->query($sqls);
    if ( mysqli_num_rows($results) <= 0 ) {
       header('HTTP/1.1 500 Error getting title : '.mysqli_num_rows($results));	  

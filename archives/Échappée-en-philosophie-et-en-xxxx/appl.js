@@ -258,7 +258,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
                var jqxhr = $.post( {
                    responseType: 'json',
-                   url: 'annotations-linear.json'
+                   url: 'get-annotations-linear.php',
+                   data: {
+                      source: fullEncode(soundfile)
+                   }
                }, function(data) {
    
                    var counter=4096;
@@ -289,9 +292,10 @@ document.addEventListener('DOMContentLoaded', function() {
                           resize: true,
                           drag: true,
                           data: {
-                            note: ( region.data != undefined ) ? region.data.note : '',
+                            note: ( region.data != undefined ) ? region.data : '',
                             user: user,
-                            color: ucolor
+                            color: ucolor,
+                            whispered : ( region.whispered != undefined ) ? region.whisppered : 0 
                           }
                       });
                       // console.log( wregion.id );
@@ -514,7 +518,8 @@ function splitAnnotation() {
                           data: {
                             note: ( lregion.data != undefined ) ? lregion.data.note : '',
                             user: user,
-                            color: ucolor
+                            color: ucolor,
+                            whispered : ( lregion.data.whispered != undefined ) ? lregion.data.whisppered : 0
                           }
                       });
 
@@ -678,8 +683,8 @@ function updateTableOne(currentId) {
  * Called after every modification
  */
 function saveAndDrawRegions() {
-    saveRegions();
     drawRegions();
+    saveRegions();
 }
 
 /**
@@ -690,7 +695,7 @@ function drawRegions() {
     // redraw rons and markers
     wavesurfer.clearMarkers();
     wavesurfer.on("marker-click", deleteAnnotation );
-    console.log( "save regions to the storage" );
+    console.log( "draw and store regions" );
     localStorage.regionsl = JSON.stringify(
         Object.keys(wavesurfer.regions.list).map(function(id) {
             var region = wavesurfer.regions.list[id];
@@ -722,6 +727,9 @@ function drawRegions() {
             var leyenda = "";
             if ( typeof region.data.note != "undefined" )
                leyenda = region.data.note.replaceAll("<div>","").replaceAll("</div>","").substring(0,20)+"...";
+            var whispered = 0;
+            if ( typeof region.data.whispered != "undefined" )
+                whispered = region.data.whispered;
             return {
                 order: counter,
                 start: region.start,
@@ -731,7 +739,10 @@ function drawRegions() {
                 title: fullEncode(document.querySelector('#title').innerHTML.toString().substr(8)),
                 url: fullEncode(burl+'?start='+region.start),
                 attributes: region.attributes,
-                data: region.data
+                data: region.data.note,
+                user: user,
+                color: ucolor,
+                whispered: whispered
             };
         })
     );
@@ -741,6 +752,11 @@ function drawRegions() {
  * Save regions to the server
  */
 function saveRegions() {
+
+    // console.log(localStorage.regionsl);
+
+    console.log( "save to the server" );
+
     anotes = JSON.parse(localStorage.regionsl);
     var jqxhr = $.post( {
       url: 'save-annotations-linear.php',
