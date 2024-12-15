@@ -104,6 +104,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
         <div class="modal fade" id="modal-whisper">
            <div class="modal-bdialog modal-dialog">
             <br/><center><strong><h4>Calling OpenAI whisper</h4></strong></center>
+             <div class="lds-spinner" id="spinner-whisper" ><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
             <div class="modal-content modal-bcontent">
              <div class='whisper-help'>
              You will call OpenAI whisper for an automatic transcription...<br/>
@@ -113,11 +114,11 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
              <form role="form" id="callAI" name="callAI" style="transition: opacity 300ms linear; margin: 10px 0;">
              <center>
              <strong>Language</strong>
-             <select id='wlang'>
+             <select id='AIlang'>
                 <option val='guess'>Guess</option>
              </select>
              <strong>Model</strong>
-             <select id='wmodel'>
+             <select id='AImodel'>
                 <option val='turbo'>Turbo (default)</option>
                 <option val='small'>Small</option>
                 <option val='large'>Large</option>

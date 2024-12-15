@@ -8,6 +8,9 @@ var evid;
 var svid;
 var currentRegion = null;
 var bRegionId=-1;
+var frozen=false;
+var maxFrozen = 20;
+var showFrozen = 0;
 var soundfile = '__file_url__';
 
 var strstr = function (haystack, needle) {
@@ -21,12 +24,13 @@ var strstr = function (haystack, needle) {
   return 0;
 };
 
-var smoothscroll = function(){
-    var currentScroll = document.documentElement.scrollTop;
-    if (currentScroll > 0) {
-         window.requestAnimationFrame(smoothscroll);
-         window.scrollTo (0,currentScroll - (currentScroll/5));
-    }
+var alertAndScroll = function(message){
+    parent.window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth"
+    });
+    alertify.alert(message+"<br/><br/>");
 };
 
 var fullEncode = function(w)
@@ -136,15 +140,22 @@ var moveSpeech = function() {
 var addToBook = function(regid) {
     bRegionId = regid;
     $("#modal-book").modal("show");
-    $("#spinner-modal"). css("display", "none");
+    $("#spinner-book"). css("display", "none");
 }
 
 var whisperStart = function(regid) {
-    currentRegion = regid;
+    $("#modal-edit").off("hidden.bs.modal");
+    $("#modal-edit").modal("hide");
+    if ( regid != '' ) {
+       currentRegion = regid;
+    }
+    parent.window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth"
+    });
     $("#modal-whisper").modal("show");
-    smoothScroll();
-    // window.scrollTo({ top: 0, behavior: 'smooth' });
-    // $("html, body").animate({ scrollTop: 0 }, "slow");
+    $("#spinner-whisper").css("display", "none");
 }
 
 
@@ -167,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
          $("#title").html(data.responseText);
        } else {
           console.log("getting title failed : " + JSON.stringify(data));
-          // alertify.alert("getting biography failed : " + JSON.stringify(data));
+          // alertAndScroll("getting biography failed : " + JSON.stringify(data));
        }
     });
 
@@ -410,6 +421,52 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    callAI.onsubmit = function(e) {
+        var model = $('#AImodel').val();
+        var language = $('#AIlang').val();
+        var counter = 0;
+        var order = -1;
+        e.preventDefault();
+	if ( currentRegion == null ) {
+           alertAndScroll( "Don't know what you are talking about ( unknown note )" );
+           return -1;
+        }
+        Object.keys(wavesurfer.regions.list).map(function(id) {
+           ++counter;
+           if ( id === currentRegion ) { 
+              order=counter;
+              wavesurfer.regions.list[id].data.whispered = 1;
+              frozen=true;
+           }
+        });
+        drawRegions();
+        console.log("whisper request on : " + soundfile + " : " + order);
+        $('#spinner-whisper').css('display','block');
+        var jqxhr = $.post( {
+           url: '../../submit-whisper.php',
+           data: {
+             model: fullEncode(model),
+             lang: fullEncode(language),
+             source: fullEncode(soundfile),
+             order: order,
+             user: user,
+             color: ucolor
+           },
+           dataType: 'application/json'
+        })
+        .fail(function(error) {
+           $('#spinner-whisper').css('display','none');
+           $("#modal-whisper").modal("hide");
+           if ( error.status == 200 ) {
+              console.log( "Whisper job created suuccessfully" );
+              alertAndScroll( "Calling whisper succeeded : Now the document is frozen until the job complete, so go play your favorite game and come back later !");
+           } else {
+              console.log( "Calling whisper failed : " + JSON.stringify(error));
+              alertAndScroll( "Calling whisper failed : " + error.statusText );
+           }
+        });
+    }
+
     addbook.onsubmit = function(e) {
         var regionId = bRegionId;
         var order = -1;
@@ -423,10 +480,10 @@ document.addEventListener('DOMContentLoaded', function() {
         var newbook = $('#newbook').val();
         if ( newbook === '' && oldbook === 'none' )
         {
-           alertify.alert( "Please, choose an existing book or create a new one!" );
+           alertAndScroll( "Please, choose an existing book or create a new one!" );
            return;
         }
-        $('#spinner-modal').css('display','block');
+        $('#spinner-book').css('display','block');
         var jqxhr = $.post( {
            url: '../../add-to-book.php',
            data: {
@@ -439,17 +496,17 @@ document.addEventListener('DOMContentLoaded', function() {
            dataType: 'application/json'
         }, function() {
            console.log( "add to book succeeded" );
-           $('#spinner-modal').css('display','none');
+           $('#spinner-book').css('display','none');
            $("#modal-book").modal("hide");
         })
-        .fail(function(error) {
-           $('#spinner-modal').css('display','none');
+        .always(function(error) {
+           $('#spinner-book').css('display','none');
            $("#modal-book").modal("hide");
-           if ( error.status === 200 ) {
+           if ( error.status == 200 ) {
               console.log( "add to book success");
            } else {
               console.log( "adding to book failed : " + JSON.stringify(error));
-              alertify.alert( "Adding to book failed : " + error.statusText );
+              alertAndScroll( "Adding to book failed : " + error.statusText );
            }
         });
     };
@@ -459,10 +516,10 @@ document.addEventListener('DOMContentLoaded', function() {
        bRegionId = form.dataset.region;
        // console.log( "audio book click : pause" );
        // wavesurfer.pause();
-       $("#modal-form").off("hidden.bs.modal");
-       $("#modal-form").modal("hide");
+       $("#modal-edit").off("hidden.bs.modal");
+       $("#modal-edit").modal("hide");
        $("#modal-book").modal("show");
-       $("#spinner-modal").css("display", "none");
+       $("#spinner-book").css("display", "none");
     });
 
     $('#help').on('click', function() {
@@ -493,7 +550,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // saveAndDrawRegions();
     });
 
-    let langselect = document.getElementById('wlang');
+    let langselect = document.getElementById('AIlang');
     for (const lang of wlangs)  {
        langselect.options[langselect.options.length] = new Option(lang, lang);
     }
@@ -603,11 +660,21 @@ function saveAndDrawRegions() {
  */
 function saveRegions() {
 
-    // console.log(localStorage.regions);
+    // console.log( "stored regions : " + localStorage.regions);
+    if ( strstr(localStorage.regions.replaceAll('\"',''), 'whispered:1') ) {
+       if ( showFrozen <= maxFrozen  ) {
+          alertAndScroll("Document is frozen until AI job completes, so your changes will not be saved\n until the automatic transcription completes!");
+          showFrozen++;
+       }
+       frozen=true;
+       return;
+    } else {
+       frozen=false;
+    }
 
     anotes = JSON.parse(localStorage.regions);
     console.log( "saving : " + anotes.length + " annotations to the server" );
-
+    // a little bit simplified
     var jqxhr = $.post( {
       url: 'save-annotations.php',
       data: {
@@ -618,11 +685,11 @@ function saveRegions() {
        // console.log( "Saving annotations succeeded" );
     })
     .fail(function(error) {
-       if ( error.status === 200 ) {
+       if ( error.status == 200 ) {
           // console.log( "saving annotations success");
        } else {
           console.log( "Saving annotations failed : status : " + error.status + " message : " + JSON.stringify(error));
-          alertify.alert(  "Saving annotations failed : status : " + error.status + " message : " + JSON.stringify(error) );
+          alertAndScroll(  "Saving annotations failed : status : " + error.status + " message : " + JSON.stringify(error) );
        }
     });
 }
@@ -693,6 +760,11 @@ function regionClick(region, e) {
 function editAnnotation(region, e) {
     e.stopPropagation();
     console.log( "edit : play region" );
+    if ( frozen && showFrozen <= maxFrozen ) {
+       alertAndScroll("Document is frozen until AI job completes, so your changes will not be saved\n until the automatic transcription completes!");
+       showFrozen++;
+       return;
+    }
     currentRegion=region.id;
     playRegion(currentRegion, true);
     var form = document.forms.edit;
@@ -713,13 +785,13 @@ function editAnnotation(region, e) {
                 color: ucolor
             }
         });
-        $("#modal-form").modal("hide");
+        $("#modal-edit").modal("hide");
     };
     form.onreset = function() {
-        $("#modal-form").modal("hide");
+        $("#modal-edit").modal("hide");
     };
-    $("#modal-form").modal("show");
-    $("#modal-form").on("hidden.bs.modal", function() {
+    $("#modal-edit").modal("show");
+    $("#modal-edit").on("hidden.bs.modal", function() {
         if ( currentRegion ) {
            let mregion = wavesurfer.regions.list[currentRegion];
            console.log( "hide annotation : stopping loop");
@@ -825,7 +897,7 @@ function deleteAnnotation(marker, e) {
        if ( currentRegion != null )
           deleteNote(wavesurfer.regions.list[currentRegion]);
        console.log( "Deleting annotation : " + marker.label + " " + marker.time + " wavesurfer time : " + wavesurfer.getCurrentTime() );
-       alertify.confirm( "Are you sure sure you want to delete annotation : " + marker.label + " ?", function (e) {
+       alertify.confirm( "Are you sure sure you want to delete annotation : " + marker.label + " ?<br/>", function (e) {
          if (e) {
            //after clicking OK
            doDeleteAnnotation(marker.label);
@@ -863,7 +935,7 @@ function doDeleteAnnotation(index) {
              console.log( "deleting annotation succeeded" );
            })
            .fail(function(error) {
-             if ( error.status === 200 ) {
+             if ( error.status == 200 ) {
                console.log( "deleting annotation success");
              } else {
                console.log( "deleting annotation failed : " + JSON.stringify(error));
@@ -907,7 +979,7 @@ window.GLOBAL_ACTIONS['delete-region'] = function() {
           console.log( "deleting annotation succeeded" );
         })
         .fail(function(error) {
-          if ( error.status === 200 ) {
+          if ( error.status == 200 ) {
              console.log( "deleting annotation success");
           } else {
              console.log( "deleting annotation failed : " + JSON.stringify(error));
@@ -942,7 +1014,7 @@ window.GLOBAL_ACTIONS['export'] = function() {
     anotes = anotes.sort(sorta);
     if ( anotes.length === 0 )
     {
-       alertify.alert( "There is nothing to export!" );
+       alertAndScroll( "There is nothing to export!" );
        return;
     }
     var subtitles = '';

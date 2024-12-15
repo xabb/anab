@@ -63,11 +63,11 @@ if ( !isset($_SESSION['schtroumpf']) || !isset($_SESSION['papa']) )
             </div>
 
             <div id="Free" class="tabcontent">
-                <iframe src="free-notes.php" width=100% height=800px></iframe>
+                <iframe id="free-frame" src="free-notes.php" width=100% height=800px></iframe>
             </div>
 
             <div id="Linear" class="tabcontent">
-                <iframe src="linear-notes.php" width=100% height=800px></iframe>
+                <iframe id="linear-frame" src="linear-notes.php" width=100% height=800px></iframe>
             </div>
 
             <div id="Documents" class="tabcontent">

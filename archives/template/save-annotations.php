@@ -8,14 +8,14 @@ include("../../config.php");
      exit(-1);
   }
   $annotations = $_POST['json'];
-  if ( !file_put_contents( "./annotations.json", $annotations ) )
-  {
-     $error = error_get_last();
-     header('HTTP/1.1 500 Could not store annotations : '.$error['message']);	  
-     exit(-1);
-  }
+  // if ( !file_put_contents( "./annotations.json", $annotations ) )
+  // {
+  //    $error = error_get_last();
+  //    header('HTTP/1.1 500 Could not store annotations : '.$error['message']);	  
+  //    exit(-1);
+  // }
 
-  // saving in the database also for setting bookmarks over the collection
+  // saving in the database 
   $link = mysqli_connect($config['dbhost'], $config['dbuser'], $config['dbpass'], $config['dbname']);
   if (!$link) {
      error_log( "Couldn't connect to the database : ".$config['dbname']);

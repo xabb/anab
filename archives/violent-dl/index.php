@@ -63,11 +63,11 @@ if ( !isset($_SESSION['schtroumpf']) || !isset($_SESSION['papa']) )
             </div>
 
             <div id="Free" class="tabcontent">
-                <iframe src="free-notes.php" width=100% height=800px></iframe>
+                <iframe id="free-frame" src="free-notes.php" width=100% height=800px></iframe>
             </div>
 
             <div id="Linear" class="tabcontent">
-                <iframe src="linear-notes.php" width=100% height=800px></iframe>
+                <iframe id="linear-frame" src="linear-notes.php" width=100% height=800px></iframe>
             </div>
 
             <div id="Documents" class="tabcontent">
@@ -93,7 +93,7 @@ if ( !isset($_SESSION['schtroumpf']) || !isset($_SESSION['papa']) )
 
 <script type="text/javascript">
 
-var soundfile = 'http://stream.political-studies.net/~tgs1/audio/2021-03-18-marie-bardet.mp3';
+var soundfile = 'https://giss.tv/dmmdb/contents/violent-dl.webm';
 
 var openTab = function(name) {
   $(".tabcontent").css("display","none");

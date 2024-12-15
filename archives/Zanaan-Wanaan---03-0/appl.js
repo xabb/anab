@@ -14,6 +14,9 @@ var regions;
 var evid;
 var svid;
 var wavey=-1;
+var frozenl=false;
+var maxFrozenl = 20;
+var showFrozenl = 0;
 var currentRegion;
 var soundfile = 'https://stream.political-studies.net/~tgs1/audio/2021-03-04-zanaan-wanaan.mp3';
 
@@ -26,6 +29,15 @@ var strstr = function (haystack, needle) {
     }
   }
   return 0;
+};
+
+var alertAndScroll = function(message){
+    parent.window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth"
+    });
+    alertify.alert(message+"<br/><br/>");
 };
 
 var fullEncode = function(w)
@@ -139,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
          $("#title").html(data.responseText);
        } else {
           console.log("getting title failed : " + JSON.stringify(data));
-          // alertify.alert("getting title failed : " + JSON.stringify(data));
+          // alertAndScroll("getting title failed : " + JSON.stringify(data));
        }
     });
 
@@ -295,7 +307,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             note: ( region.data != undefined ) ? region.data : '',
                             user: user,
                             color: ucolor,
-                            whispered : ( region.whispered != undefined ) ? region.whisppered : 0 
+                            whispered : ( region.whispered != undefined ) ? region.whispered : 0 
                           }
                       });
                       // console.log( wregion.id );
@@ -462,7 +474,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    let langselect = document.getElementById('wlang');
+    let langselect = document.getElementById('AIlang');
     for (const lang of wlangs)  {
        langselect.options[langselect.options.length] = new Option(lang, lang);
     }
@@ -519,7 +531,7 @@ function splitAnnotation() {
                             note: ( lregion.data != undefined ) ? lregion.data.note : '',
                             user: user,
                             color: ucolor,
-                            whispered : ( lregion.data.whispered != undefined ) ? lregion.data.whisppered : 0
+                            whispered : ( lregion.data.whispered != undefined ) ? lregion.data.whispered : 0
                           }
                       });
 
@@ -557,7 +569,7 @@ function deleteAnnotation(marker, e) {
     if ( marker.color == "#ff0000" && !showConfirm) {
        showConfirm = true;
        console.log( "Deleting annotation : " + marker.label + " " + marker.time + " wavesurfer time : " + wavesurfer.getCurrentTime() );
-       alertify.confirm( "Are you sure sure you want to delete annotation : " + marker.label + " ?", function (e) {
+       alertify.confirm( "Are you sure sure you want to delete annotation : " + marker.label + " ?<br/>", function (e) {
          if (e) {
            //after clicking OK
            doDeleteAnnotation(marker.label);
@@ -753,11 +765,22 @@ function drawRegions() {
  */
 function saveRegions() {
 
-    // console.log(localStorage.regionsl);
-
-    console.log( "save to the server" );
-
     anotes = JSON.parse(localStorage.regionsl);
+    console.log( "save : " + anotes.length + " regions to the server" );
+    // console.log( "storage : " +  localStorage.regionsl);
+
+    // don't really know when there are quotes
+    if ( strstr(localStorage.regionsl.replaceAll('\"',''), 'whispered:1') ) {
+       if ( showFrozenl <= maxFrozenl  ) {
+          alertAndScroll("Document is frozen until AI job completes, so your changes will not be saved\n until the automatic transcription completes!");
+          showFrozenl++;
+       }
+       frozenl=true;
+       return;
+    } else {
+       frozenl=false;
+    }
+
     var jqxhr = $.post( {
       url: 'save-annotations-linear.php',
       data: {
@@ -772,7 +795,7 @@ function saveRegions() {
           // console.log( "saving annotations success");
        } else {
           console.log( "Saving annotations failed : status : " + error.status + " message : " + JSON.stringify(error));
-          alertify.alert(  "Saving annotations failed : status : " + error.status + " message : " + JSON.stringify(error) );
+          alertAndScroll(  "Saving annotations failed : status : " + error.status + " message : " + JSON.stringify(error) );
        }
     });
 }
@@ -928,7 +951,7 @@ var addToBook = function(regid) {
        var newbook = $('#newbook').val();
        if ( newbook === '' && oldbook === 'none' )
        {
-          alertify.alert( "Please, choose an existing book or create a new one!" );
+          alertAndScroll( "Please, choose an existing book or create a new one!" );
           return;
        }
        $('#spinner-modal').css('display','block');
@@ -953,7 +976,7 @@ var addToBook = function(regid) {
              console.log( "add to book success");
           } else {
              console.log( "adding to book failed : " + JSON.stringify(error));
-             alertify.alert( "Adding to book failed : " + error.statusText );
+             alertAndScroll( "Adding to book failed : " + error.statusText );
           }
         });
     };
@@ -961,9 +984,58 @@ var addToBook = function(regid) {
 
 var whisperStart = function(regid) {
     currentRegion = regid;
+    parent.window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth"
+    });
     $("#modal-whisper").modal("show");
-    // window.scrollTo({ top: 0, behavior: 'smooth' });
-    // $("html, body").animate({ scrollTop: 0 }, "slow");
+    $("#spinner-whisper").css("display", "none");
+    callAI.onsubmit = function(e) {
+        var model = $('#AImodel').val();
+        var language = $('#AIlang').val();
+        var counter = 4096;
+        var order = -1;
+        e.preventDefault();
+        if ( currentRegion == null ) {
+           alertAndScroll( "Don't know what you are talking about ( unknown note )" );
+           return -1;
+        }
+        Object.keys(wavesurfer.regions.list).map(function(id) {
+           ++counter;
+           if ( id === currentRegion ) {
+              order=counter;
+              wavesurfer.regions.list[id].data.whispered = 1;
+              frozenl=true;
+           }
+        });
+        drawRegions();
+        console.log("whisper request on : " + soundfile + " : " + order);
+        $('#spinner-whisper').css('display','block');
+        var jqxhr = $.post( {
+           url: '../../submit-whisper.php',
+           data: {
+             model: fullEncode(model),
+             lang: fullEncode(language),
+             source: fullEncode(soundfile),
+             order: order,
+             user: user,
+             color: ucolor
+           },
+           dataType: 'application/json'
+        })
+        .fail(function(error) {
+           $('#spinner-whisper').css('display','none');
+           $("#modal-whisper").modal("hide");
+           if ( error.status == 200 ) {
+              console.log( "Whisper job created suuccessfully" );
+              alertAndScroll( "Calling whisper succeeded : Now the document is frozen until the job complete, so go play your favorite game and come back later !");
+           } else {
+              console.log( "Calling whisper failed : " + JSON.stringify(error));
+              alertAndScroll( "Calling whisper failed : " + error.statusText );
+           }
+        });
+    }
 }
 
 var playRegion = function(regid) {
@@ -1058,7 +1130,7 @@ var exportSRT = function() {
     anotes = anotes.sort(sorta);
     if ( anotes.length === 0 )
     {
-       alertify.alert( "There is nothing to export!" );
+       alertAndScroll( "There is nothing to export!" );
        return;
     }
     var subtitles = '';

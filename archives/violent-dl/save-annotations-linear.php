@@ -8,12 +8,12 @@ include("../../config.php");
      exit(-1);
   }
   $annotations = $_POST['json'];
-  if ( !file_put_contents( "./annotations.json", $annotations ) )
-  {
-     $error = error_get_last();
-     header('HTTP/1.1 500 Could not store annotations : '.$error['message']);	  
-     exit(-1);
-  }
+  // if ( !file_put_contents( "./annotations.json", $annotations ) )
+  // {
+  //    $error = error_get_last();
+  //    header('HTTP/1.1 500 Could not store annotations : '.$error['message']);	  
+  //    exit(-1);
+  // }
 
   // saving in the database also for setting bookmarks over the collection
   $link = mysqli_connect($config['dbhost'], $config['dbuser'], $config['dbpass'], $config['dbname']);
@@ -29,7 +29,7 @@ include("../../config.php");
 
      // delete all free annotations
      if ( count($annotes) > 0 ){
-        $dsql = "DELETE FROM annotation WHERE source='".$annotes[0]["source"]."' AND norder<4096";
+        $dsql = "DELETE FROM annotation WHERE source='".$annotes[0]["source"]."' AND norder>=4096";
         $delete = $link->query($dsql);
         // error_log('deleted free annotations for '.$annotes[0]["source"]);
      }

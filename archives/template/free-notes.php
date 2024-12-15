@@ -74,9 +74,11 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
 
     <body>
 
+      <div id="free-contents">
+
         <div class="modal fade" id="modal-wait">
            <div class="modal-bdialog modal-dialog">
-             <center><strong><h4><br/><br/>Loading waveform...</h4></strong></center><br/>
+             <center><strong><h4><br/><br/><div id="message-wait">Loading waveform...<div></h4></strong></center><br/>
                <div class="lds-spinner" id="spinner-global"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
            </div>
         </div>
@@ -84,6 +86,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
         <div class="modal fade" id="modal-whisper">
            <div class="modal-bdialog modal-dialog">
             <br/><center><strong><h4>Calling OpenAI whisper</h4></strong></center>
+             <div class="lds-spinner" id="spinner-whisper" ><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
             <div class="modal-content modal-bcontent">
              <div class='whisper-help'>
              You will call OpenAI whisper for an automatic transcription...<br/>
@@ -93,11 +96,11 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
              <form role="form" id="callAI" name="callAI" style="transition: opacity 300ms linear; margin: 10px 0;">
              <center>
              <strong>Language</strong>
-             <select id='wlang'>
+             <select id='AIlang'>
                 <option val='guess'>Guess</option>
              </select>
              <strong>Model</strong>
-             <select id='wmodel'>
+             <select id='AImodel'>
                 <option val='turbo'>Turbo (default)</option>
                 <option val='small'>Small</option>
                 <option val='large'>Large</option>
@@ -125,13 +128,13 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
              </div>
         </div>
 
-        <div class="container">
+        <div class="container" id="container">
             <div class="header">
                 <h3 itemprop="title" id="title"></h3>
                 <i id="help" class="fa fa-question-circle fa-2x" aria-hidden="true" ></i>
             </div>
 
-            <div id="demo" class="outer-wave">
+            <div id="container-wave" class="outer-wave">
 		<div id="subtitle" class="speech">
 		    <div id="isubtitle" class="ispeech"></div>
                     <div id="speaker" class="speaker">
@@ -155,10 +158,11 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                 <div id="waveform"></div>
                 <div id="wave-timeline"></div>
                 <div id="wave-minimap"></div>
-                <div class="modal fade" id="modal-form" role="dialog">
+                <div class="modal fade" id="modal-edit" role="dialog">
                   <div class="modal-dialog">
                     <center><h3>Edit Note</h3>
                     <div id="audiobook-div"><i id="audiobook" class="fa fa-book fa-2x" width="30px" height="30px" /></i></div>
+                    <div id="whisper-div"><img src="../../img/whisper-logo.png" width="30px" height="30px" onclick="whisperStart('')" /></div>
                     <div class="modal-content">
                       <center>
                         <i id="fplay" class="fa fa-play fa-2x" data-action="play-region"></i>  
@@ -183,7 +187,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                     <center><h3>Add to audiobook</h3></center><br/>
                     <div class="modal-content modal-bcontent">
                       <center>
-                         <div class="lds-spinner" id="spinner-modal" ><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+                         <div class="lds-spinner" id="spinner-book" ><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
                       </center>
                       <form role="form" id="addbook" name="addbook" style="transition: opacity 300ms linear; margin: 30px 0;">
                          <div class="form-group">
@@ -198,13 +202,6 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                          </div>
                          <button type="submit" class="btn btn-success btn-block">Add</button>
                       </form>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="modal fade" id="modal-sfull" role="dialog">
-                  <div class="modal-dialog modal-fdialog">
-                    <div id="content-fs" class="modal-content modal-fcontent">
                     </div>
                   </div>
                 </div>
@@ -234,11 +231,12 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
         <div id="progresscolor" style="display:none;"><?php echo $progressColor; ?></div>
         <div id="mapwavecolor" style="display:none;"><?php echo $mapWaveColor; ?></div>
         <div id="mapprogresscolor" style="display:none;"><?php echo $mapProgressColor; ?></div>
+
+      </div> 
+
     </body>
 
 <script type="text/javascript" >
-
-let whisper = <?php echo $_SESSION['whisper']; ?>;
 
 function getParameterByName(name) {
     var url = window.location.href;
@@ -253,6 +251,7 @@ function getParameterByName(name) {
 var sstart = getParameterByName( "start" );
 var user = '<?php echo $_SESSION['schtroumpf']; ?>';
 var ucolor = '<?php echo $_SESSION['color']; ?>';
+let whisper = <?php echo $_SESSION['whisper']; ?>;
 
 </script>
 
