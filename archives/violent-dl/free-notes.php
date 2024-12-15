@@ -97,13 +97,13 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
              <center>
              <strong>Language</strong>
              <select id='AIlang'>
-                <option val='guess'>Guess</option>
+                <option value='guess'>Guess</option>
              </select>
              <strong>Model</strong>
              <select id='AImodel'>
-                <option val='turbo'>Turbo (default)</option>
-                <option val='small'>Small</option>
-                <option val='large'>Large</option>
+                <option value='turbo'>Turbo</option>
+                <option value='small'>Small</option>
+                <option value='large'>Large</option>
              </select><br/><br/>
              <button type="submit" class="btn btn-success btn-block btn-whisper">Call and Pray</button>
              </center>
@@ -131,6 +131,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
         <div class="container" id="container">
             <div class="header">
                 <h3 itemprop="title" id="title"></h3>
+                <div id='frozen' class='frozen'>Frozen</div>
                 <i id="help" class="fa fa-question-circle fa-2x" aria-hidden="true" ></i>
             </div>
 

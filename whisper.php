@@ -9,4 +9,9 @@ if ( count($argv) != 7 ) {
    exit(-1);
 }
 
+while (TRUE) {
+   echo("whisper alive...");
+   sleep(10);
+}
+
 ?>

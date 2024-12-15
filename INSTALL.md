@@ -15,14 +15,8 @@ to process audio within the browser.
 ===== PREREQUISITES =====
 
 * A LAMP server
-  with a php with pcntl ( process control ) enabled : 
-  also with php-mbstring and php-xml
-  unfortunately on ubuntu, you have to compile it from source
-  with the options that you can find in configure-php.sh
-  it require a few packages along the way,
-  but you can find answers on users' forums.
-  the php will be installed in /usr/local/bin/php
-  and you should use this one in your scripts.
+  with a php with 
+  php-mbstring and php-xml
 
 * ffmpeg, ffprobe, mimetype from libfile-mimeinfo-perl
 

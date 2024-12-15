@@ -28,6 +28,7 @@ if (!$link) {
       $counter=0;
       $sqlu = "SELECT uri, type, size FROM upload WHERE aid = ".$row['id'].";";
       $resultsu = $link->query($sqlu);
+      $uploads=null;
       while ($rowu = mysqli_fetch_array($resultsu))
       {
          $uploads[$counter]['uri'] = $rowu['uri'];

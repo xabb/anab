@@ -310,6 +310,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             whispered : ( region.whispered != undefined ) ? region.whispered : 0 
                           }
                       });
+                      if ( region.whispered != undefined && region.whispered == 1 ) {
+                         console.log("show frozen");
+                         $("#frozenl").css('display', 'block');
+                      }
                       // console.log( wregion.id );
                       var blank = "<br/><br/><div class='linear-bar' id='bar-"+wregion.id+"'>";
                       $("#linear-notes").append(blank);
@@ -992,8 +996,8 @@ var whisperStart = function(regid) {
     $("#modal-whisper").modal("show");
     $("#spinner-whisper").css("display", "none");
     callAI.onsubmit = function(e) {
-        var model = $('#AImodel').val();
-        var language = $('#AIlang').val();
+        var model = $('#AImodel').find(":selected").val();
+        var language = $('#AIlang').find(":selected").val();
         var counter = 4096;
         var order = -1;
         e.preventDefault();
@@ -1030,6 +1034,7 @@ var whisperStart = function(regid) {
            if ( error.status == 200 ) {
               console.log( "Whisper job created suuccessfully" );
               alertAndScroll( "Calling whisper succeeded : Now the document is frozen until the job complete, so go play your favorite game and come back later !");
+              $("#frozenl").css("display","block");
            } else {
               console.log( "Calling whisper failed : " + JSON.stringify(error));
               alertAndScroll( "Calling whisper failed : " + error.statusText );

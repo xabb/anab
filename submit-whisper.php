@@ -5,7 +5,7 @@ include("config.php");
 function detached_exec($cmd) {
     $pid = pcntl_fork();
     switch($pid) {
-         // fork errror
+         // fork error
          case -1 : return false;
 
          // this code runs in child process
@@ -13,11 +13,13 @@ function detached_exec($cmd) {
              // obtain a new process group
              posix_setsid();
              // exec the command
+             error_log($cmd);
              exec($cmd);
              break;
 
          // return the child pid in father
          default: 
+             error_log("new process : ".$pid);
              return $pid;
     }
 }
@@ -83,12 +85,14 @@ function detached_exec($cmd) {
      {
         error_log( 'Annotation not found !');
         header('HTTP/1.1 404 Annotation not found');	  
+        mysqli_close($link);
         exit(-1);
      } else {
         $annrow = mysqli_fetch_row($result);
         if ( $annrow[4] != 0 ) {
            error_log( 'Annotation already transcripted by Open-AI!');
            header('HTTP/1.1 404 Annotation already transcripted by Open-AI!');	  
+           mysqli_close($link);
            exit(-1);
         }
         $annid = $annrow[0];
@@ -107,29 +111,36 @@ function detached_exec($cmd) {
      {
         error_log( __FILE__." : excerpt creation returned : ".$result );
         header('HTTP/1.1 406 '.str_replace("ERR: ","",$result) );	  
+        mysqli_close($link);
         exit(-1);
      }
      error_log( __FILE__." : excerpt creation returned : ".$result );
   }
 
+  // call whisper in background and detach it from process
+  $cmd = "nohup /usr/local/bin/php whisper.php $annid $source $user $color $lang $model 2>&1 &";
+  // $pid = detached_exec($cmd);
+  error_log($cmd);
+  $result = ($cmd);
+  if($result === FALSE) {
+    error_log( __FILE__." : launching whisper.php failed");
+    header("HTTP/1.1 406  : launching whisper.php failed");	  
+    mysqli_close($link);
+    exit(-1);
+  } else {
+    error_log("launched whisper.php in background" );
+  }
+
   // update annotation set the whispered state to 1 until job finishes, then state will be 2 : processed
-  $sql = "UPDATE annotation SET whispered=1 WHERE source='".addslashes($source)."' AND norder=".$order.";";
+  $sql = "UPDATE annotation SET whispered=1 WHERE id='".$annid."';";
   $uresult = $link->query($sql);
   if ( !$uresult ) {
         error_log( __FILE__." : update annotation failed : ".$sql );
         header("HTTP/1.1 406  : update annotation failed : ".$sql);	  
+        mysqli_close($link);
         exit(-1);
-  }
-
-  // call whisper in background and detach it from process
-  $cmd = "nohup /usr/local/bin/php whisper.php $annid $source $user $color $lang $model 2>&1 &";
-  error_log($cmd);
-  $pid = detached_exec($cmd);
-  if($pid === FALSE) {
-    error_log( __FILE__." : launching whisper.php failed");
-    header("HTTP/1.1 406  : launching whisper.php failed");	  
   } else {
-    error_log("launched whisper.php in background : ".$pid );
+        error_log( __FILE__." : updated annotation ".$sql );
   }
 
   header('HTTP/1.1 200 OK');	  

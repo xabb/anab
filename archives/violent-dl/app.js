@@ -140,7 +140,7 @@ var moveSpeech = function() {
 var addToBook = function(regid) {
     bRegionId = regid;
     $("#modal-book").modal("show");
-    $("#spinner-book"). css("display", "none");
+    $("#spinner-book").css("display", "none");
 }
 
 var whisperStart = function(regid) {
@@ -422,8 +422,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     callAI.onsubmit = function(e) {
-        var model = $('#AImodel').val();
-        var language = $('#AIlang').val();
+        var model = $('#AImodel').find(":selected").val();
+        var language = $('#AIlang').find(":selected").val();
         var counter = 0;
         var order = -1;
         e.preventDefault();
@@ -460,6 +460,7 @@ document.addEventListener('DOMContentLoaded', function() {
            if ( error.status == 200 ) {
               console.log( "Whisper job created suuccessfully" );
               alertAndScroll( "Calling whisper succeeded : Now the document is frozen until the job complete, so go play your favorite game and come back later !");
+              $("#frozen").css("display","block");
            } else {
               console.log( "Calling whisper failed : " + JSON.stringify(error));
               alertAndScroll( "Calling whisper failed : " + error.statusText );
@@ -702,6 +703,10 @@ function loadRegions(regions) {
     wavesurfer.un('region-removed');
     wavesurfer.clearRegions();
     regions.forEach(function(region) {
+        if ( region.whispered != undefined && region.whispered == 1 ) {
+           console.log("show free frozen");
+           $("#frozen").css("display", "block");
+        }
         wregion = wavesurfer.regions.add({
              start: region.start,
              end: region.end,
