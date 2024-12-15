@@ -14,9 +14,15 @@ to process audio within the browser.
 
 ===== PREREQUISITES =====
 
-* A classical LAMP server
-  with php modules : 
-  php-mbstring and php-xml
+* A LAMP server
+  with a php with pcntl ( process control ) enabled : 
+  also with php-mbstring and php-xml
+  unfortunately on ubuntu, you have to compile it from source
+  with the options that you can find in configure-php.sh
+  it require a few packages along the way,
+  but you can find answers on users' forums.
+  the php will be installed in /usr/local/bin/php
+  and you should use this one in your scripts.
 
 * ffmpeg, ffprobe, mimetype from libfile-mimeinfo-perl
 
@@ -54,4 +60,6 @@ $config['owner'] = "admin";
 You're set, log in to the system as admin
 and create users, archives and books.
 
-author : chevil@giss.tv
+concept and programming : chevil@giss.tv
+initial concept & design : beatrice.rettig@gmail.com
+testing and advices : jaume@nualart.cat

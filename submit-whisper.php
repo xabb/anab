@@ -2,6 +2,26 @@
 
 include("config.php");
 
+function detached_exec($cmd) {
+    $pid = pcntl_fork();
+    switch($pid) {
+         // fork errror
+         case -1 : return false;
+
+         // this code runs in child process
+         case 0 :
+             // obtain a new process group
+             posix_setsid();
+             // exec the command
+             exec($cmd);
+             break;
+
+         // return the child pid in father
+         default: 
+             return $pid;
+    }
+}
+
   if ( empty($_POST['user']) )
   {
      header('HTTP/1.1 406 User is Mandatory');	  
@@ -101,7 +121,16 @@ include("config.php");
         exit(-1);
   }
 
-  // call whisper in background and wait for result
+  // call whisper in background and detach it from process
+  $cmd = "nohup /usr/local/bin/php whisper.php $annid $source $user $color $lang $model 2>&1 &";
+  error_log($cmd);
+  $pid = detached_exec($cmd);
+  if($pid === FALSE) {
+    error_log( __FILE__." : launching whisper.php failed");
+    header("HTTP/1.1 406  : launching whisper.php failed");	  
+  } else {
+    error_log("launched whisper.php in background : ".$pid );
+  }
 
   header('HTTP/1.1 200 OK');	  
   mysqli_close($link);
