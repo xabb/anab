@@ -995,6 +995,7 @@ var whisperStart = function(regid) {
     });
     $("#modal-whisper").modal("show");
     $("#spinner-whisper").css("display", "none");
+    $("#help-whisper").css("display", "block");
     callAI.onsubmit = function(e) {
         var model = $('#AImodel').find(":selected").val();
         var language = $('#AIlang').find(":selected").val();
@@ -1015,6 +1016,7 @@ var whisperStart = function(regid) {
         });
         drawRegions();
         console.log("whisper request on : " + soundfile + " : " + order);
+        $("#help-whisper").css("display", "none");
         $('#spinner-whisper').css('display','block');
         var jqxhr = $.post( {
            url: '../../submit-whisper.php',
@@ -1030,6 +1032,7 @@ var whisperStart = function(regid) {
         })
         .fail(function(error) {
            $('#spinner-whisper').css('display','none');
+           $("#help-whisper").css("display", "block");
            $("#modal-whisper").modal("hide");
            if ( error.status == 200 ) {
               console.log( "Whisper job created suuccessfully" );

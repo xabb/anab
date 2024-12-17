@@ -156,6 +156,7 @@ var whisperStart = function(regid) {
     });
     $("#modal-whisper").modal("show");
     $("#spinner-whisper").css("display", "none");
+    $("#help-whisper").css("display", "block");
 }
 
 
@@ -441,6 +442,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         drawRegions();
         console.log("whisper request on : " + soundfile + " : " + order);
+        $('#help-whisper').css('display','none');
         $('#spinner-whisper').css('display','block');
         var jqxhr = $.post( {
            url: '../../submit-whisper.php',
@@ -456,6 +458,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .fail(function(error) {
            $('#spinner-whisper').css('display','none');
+           $('#help-whisper').css('display','block');
            $("#modal-whisper").modal("hide");
            if ( error.status == 200 ) {
               console.log( "Whisper job created suuccessfully" );

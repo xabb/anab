@@ -36,7 +36,7 @@ include("../../config.php");
 
      foreach( $annotes as $note )
      {
-           $isql = "INSERT INTO annotation ( norder, start, end, url, source, title, attributes, data, user, color, whispered ) VALUES ( ".$note["order"].",".$note["start"].",".$note["end"].",'".addslashes($note["url"])."','".addslashes($note["source"])."','".addslashes($note["title"])."','".json_encode($note["attributes"])."','".addslashes($note["data"])."','".addslashes($note["user"])."','".addslashes($note["color"])."', ".$note["whispered"]." )";
+           $isql = "INSERT INTO annotation ( norder, start, end, url, source, data, user, color, whispered ) VALUES ( ".$note["order"].",".$note["start"].",".$note["end"].",'".addslashes($note["url"])."','".addslashes($note["source"])."','".addslashes($note["data"])."','".addslashes($note["user"])."','".addslashes($note["color"])."', ".$note["whispered"]." )";
            $insert = $link->query($isql);
            if ( $insert !== true ) {
               error_log( "ERROR : ".__FILE__." : could not create annotation : ".$note["order"]." : ".mysqli_error($link) );

@@ -86,9 +86,9 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
         <div class="modal fade" id="modal-whisper">
            <div class="modal-bdialog modal-dialog">
             <br/><center><strong><h4>Calling OpenAI whisper</h4></strong></center>
-             <div class="lds-spinner" id="spinner-whisper" ><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
             <div class="modal-content modal-bcontent">
-             <div class='whisper-help'>
+             <div class="lds-spinner" id="spinner-whisper" ><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+             <div class='help-whisper' id='help-whisper'>
              You will call OpenAI whisper for an automatic transcription...<br/>
              Your job will be queued and you can come back a few minutes later<br/> 
              to check the result by reloading this page.<br/>
@@ -101,8 +101,8 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
              </select>
              <strong>Model</strong>
              <select id='AImodel'>
-                <option value='turbo'>Turbo</option>
                 <option value='small'>Small</option>
+                <option value='turbo'>Turbo</option>
                 <option value='large'>Large</option>
              </select><br/><br/>
              <button type="submit" class="btn btn-success btn-block btn-whisper">Call and Pray</button>

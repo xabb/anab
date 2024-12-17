@@ -118,17 +118,22 @@ function detached_exec($cmd) {
   }
 
   // call whisper in background and detach it from process
-  $cmd = "nohup /usr/local/bin/php whisper.php $annid $source $user $color $lang $model 2>&1 &";
+  $cmd = "php whisper.php $annid $source $user $lang $model >/dev/null 2>&1 &";
   // $pid = detached_exec($cmd);
+  $cmdoutput = array();
+  $cmdresult = 0;
   error_log($cmd);
-  $result = ($cmd);
-  if($result === FALSE) {
-    error_log( __FILE__." : launching whisper.php failed");
-    header("HTTP/1.1 406  : launching whisper.php failed");	  
+  $result = exec($cmd, $cmdoutput, $cmdresult);
+  if($cmdresult !== 0) {
+    error_log( __FILE__." : launching whisper.php failed : ".$cmdresult);
+    header("HTTP/1.1 406  : launching whisper.php failed!");	  
+    foreach($cmdoutput as $output ) {
+        error_log("output : ".$output );
+    }
     mysqli_close($link);
     exit(-1);
   } else {
-    error_log("launched whisper.php in background" );
+    error_log("launched whisper.php in background : ".$cmdresult );
   }
 
   // update annotation set the whispered state to 1 until job finishes, then state will be 2 : processed

@@ -29,9 +29,7 @@ CREATE TABLE `annotation` (
   `end` float NOT NULL DEFAULT '-1',
   `url` longtext COLLATE utf8mb4_bin,
   `source` longtext COLLATE utf8mb4_bin,
-  `attributes` longtext COLLATE utf8mb4_bin,
   `data` longtext COLLATE utf8mb4_bin,
-  `title` longtext COLLATE utf8mb4_bin,
   `user` longtext COLLATE utf8mb4_bin,
   `color` longtext COLLATE utf8mb4_bin,
   `whispered` int NOT NULL DEFAULT '0',
@@ -148,8 +146,6 @@ CREATE TABLE `user` (
   `dark` int(11) DEFAULT '1',
   `nbt` int(11) DEFAULT '0',
   `tts` time DEFAULT '00:00:00',
-  `pin` text COLLATE utf8mb4_bin,
-  `pout` text COLLATE utf8mb4_bin,
   PRIMARY KEY (`_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
