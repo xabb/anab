@@ -307,6 +307,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             note: ( region.data != undefined ) ? region.data : '',
                             user: user,
                             color: ucolor,
+                            id: region.id,
+                            norder: region.norder,
                             whispered : ( region.whispered != undefined ) ? region.whispered : 0 
                           }
                       });
@@ -534,11 +536,12 @@ function splitAnnotation() {
                           data: {
                             note: ( lregion.data != undefined ) ? lregion.data.note : '',
                             user: user,
+                            id: -1,
+                            norder: 4096,
                             color: ucolor,
                             whispered : ( lregion.data.whispered != undefined ) ? lregion.data.whispered : 0
                           }
                       });
-
                 saveAndDrawRegions();
             }
     });
@@ -723,7 +726,7 @@ function drawRegions() {
             counter++;
             wavesurfer.addMarker({
                time : region.start,
-               label : counter-4096,
+               label : region.data.norder-4096,
                color : "#0000ff",
                position : "top"
             });
@@ -733,12 +736,13 @@ function drawRegions() {
                color : "#00ff00",
                position : "bottom"
             });
-            wavesurfer.addMarker({
-               time : region.end,
-               label : counter-4096,
-               color : "#ff0000",
-               position : "top"
-            });
+            if ((region.data.norder-4096)>0)
+               wavesurfer.addMarker({
+                  time : region.end,
+                  label : region.data.norder-4096,
+                  color : "#ff0000",
+                  position : "top"
+               });
             // console.log(region.data.note);
             var leyenda = "";
             if ( typeof region.data.note != "undefined" )
@@ -756,6 +760,7 @@ function drawRegions() {
                 url: fullEncode(burl+'?start='+region.start),
                 attributes: region.attributes,
                 data: region.data.note,
+                id: region.data.id,
                 user: user,
                 color: ucolor,
                 whispered: whispered
@@ -786,7 +791,7 @@ function saveRegions() {
     }
 
     var jqxhr = $.post( {
-      url: 'save-annotations-linear.php',
+      url: 'save-annotations.php',
       data: {
 	'json': JSON.stringify(anotes.sort(sorta))
       },
@@ -1026,7 +1031,8 @@ var whisperStart = function(regid) {
              source: fullEncode(soundfile),
              order: order,
              user: user,
-             color: ucolor
+             color: ucolor,
+             linear: true
            },
            dataType: 'application/json'
         })

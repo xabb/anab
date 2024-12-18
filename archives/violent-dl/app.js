@@ -240,36 +240,24 @@ document.addEventListener('DOMContentLoaded', function() {
             color: randomColor(0.1)
         });
 
-        $.post({
-             responseType: 'json',
-             url: 'get-annotations.php',
-             data: {
-                 source: fullEncode(soundfile)
-             }
-        }, function(data) {
-                 loadRegions(data);
-                 drawRegions();
-                 // zoom is the number of minutes limited to 10
-                 wzoom = Math.floor( wavesurfer.getDuration() / 60.0 )+1;
-                 if ( wzoom > 10 ) wzoom = 10;
-                 $('#zvalue').html(("x"+wzoom).substring(0,4));
-                 wavesurfer.zoom(wzoom);
-                 $('#svalue').html(("x"+wspeed).substring(0,4));
-	         if ( sstart !== null )
-                 {
-                    if ( ( wavesurfer.getDuration() > 0 ) && ( sstart >= 0 ) && ( sstart <= wavesurfer.getDuration() ) )
-                    {
-	               wavesurfer.seekTo( sstart/wavesurfer.getDuration() );
-                    }
-                 }
-                 moveSpeech();
-                 $("#modal-wait").modal("hide");
-                 $('#spinner-global').css('display','none');
-            }).fail(function(error) {
-                 console.log( "couldn't load annotations : " + JSON.stringify(error) );
-                 $("#modal-wait").modal("hide");
-                 $('#spinner-global').css('display','none');
-            });
+        loadRegions();
+        drawRegions();
+        // zoom is the number of minutes limited to 10
+        wzoom = Math.floor( wavesurfer.getDuration() / 60.0 )+1;
+        if ( wzoom > 10 ) wzoom = 10;
+        $('#zvalue').html(("x"+wzoom).substring(0,4));
+        wavesurfer.zoom(wzoom);
+        $('#svalue').html(("x"+wspeed).substring(0,4));
+	if ( sstart !== null )
+        {
+           if ( ( wavesurfer.getDuration() > 0 ) && ( sstart >= 0 ) && ( sstart <= wavesurfer.getDuration() ) )
+           {
+	       wavesurfer.seekTo( sstart/wavesurfer.getDuration() );
+           }
+        }
+        moveSpeech();
+        $("#modal-wait").modal("hide");
+        $('#spinner-global').css('display','none');
     });
 
     wavesurfer.on('region-click', regionClick);
@@ -452,7 +440,8 @@ document.addEventListener('DOMContentLoaded', function() {
              source: fullEncode(soundfile),
              order: order,
              user: user,
-             color: ucolor
+             color: ucolor,
+             linear: false
            },
            dataType: 'application/json'
         })
@@ -566,6 +555,7 @@ document.addEventListener('DOMContentLoaded', function() {
  */
 function drawRegions() {
 
+    console.log( "draw regions : " + localStorage.regions.length);
     // redraw and save to the server
     var counter=0;
     var navigation="<center><b>Navigate</b></center><br/><br/>";
@@ -634,15 +624,16 @@ function drawRegions() {
                 whispered = wregion.data.whispered;
             return {
                 order: counter,
+                norder: counter,
                 start: wregion.start,
                 end: wregion.end,
                 baseurl: fullEncode(burl),
                 source: fullEncode(soundfile),
                 title: fullEncode(document.querySelector('#title').innerHTML.toString().substr(8)),
                 url: fullEncode(burl+'?start='+wregion.start),
-                attributes: wregion.attributes,
                 data: ( typeof wregion.data.note != "undefined" )?wregion.data.note : "",
                 color: ( typeof wregion.data.color != "undefined" )?wregion.data.color : "",
+                id: ( typeof wregion.data.id != "undefined" )?wregion.data.id : "-1",
                 user: user,
                 whispered: whispered
             };
@@ -650,6 +641,7 @@ function drawRegions() {
     );
     $("#notes").html(navigation);
 }
+
 
 /**
  * Called every time a region is modified
@@ -664,7 +656,7 @@ function saveAndDrawRegions() {
  */
 function saveRegions() {
 
-    // console.log( "stored regions : " + localStorage.regions);
+    console.log( "save regions : " + localStorage.regions.length);
     if ( strstr(localStorage.regions.replaceAll('\"',''), 'whispered:1') ) {
        if ( showFrozen <= maxFrozen  ) {
           alertAndScroll("Document is frozen until AI job completes, so your changes will not be saved\n until the automatic transcription completes!");
@@ -686,6 +678,8 @@ function saveRegions() {
       },
       dataType: 'application/json'
     }, function() {
+       // reload regions from the server with ids
+       loadRegions();
        // console.log( "Saving annotations succeeded" );
     })
     .fail(function(error) {
@@ -701,11 +695,20 @@ function saveRegions() {
 /**
  * Load regions from ajax request.
  */
-function loadRegions(regions) {
+function loadRegions() {
+ 
+    console.log( "load regions : " + localStorage.regions.length);
     wavesurfer.un('region-updated');
     wavesurfer.un('region-removed');
     wavesurfer.clearRegions();
-    regions.forEach(function(region) {
+    $.post({
+        responseType: 'json',
+        url: 'get-annotations.php',
+        data: {
+            source: fullEncode(soundfile)
+        }
+    }, function(regions) {
+      regions.forEach(function(region) {
         if ( region.whispered != undefined && region.whispered == 1 ) {
            console.log("show free frozen");
            $("#frozen").css("display", "block");
@@ -719,13 +722,22 @@ function loadRegions(regions) {
                 note: ( region.data != undefined ) ? region.data : '',
                 user: user,
                 color: randomColor(0.1),
+                norder: region.norder,
+                id: region.id,
                 whispered : ( region.whispered != undefined ) ? region.whispered : 0
              }
         });
+      });
+      drawRegions();
+      creationPending=false;
+      console.log("creationPending = false");
+    }).fail(function(error) {
+       console.log( "couldn't load annotations : " + JSON.stringify(error) );
+       $("#modal-wait").modal("hide");
+       $('#spinner-global').css('display','none');
     });
     wavesurfer.on('region-updated', saveAndDrawRegions);
     wavesurfer.on('region-removed', saveAndDrawRegions);
-    drawRegions();
 }
 
 /**
@@ -884,7 +896,7 @@ function deleteNote(region) {
     textr = textr.replaceAll("\n","");
     console.log( "delete note : " + textr );
     console.log( "delete note : " + textl );
-    if ( textr === textl ) {
+    if ( (textr === textl) || (textr=="") || (textl=="") ) {
        deleteNote.el.innerHTML = '';
        deleteNote.el.style.display = 'none';
        deleteNote.uel.style.display = 'none';
@@ -929,7 +941,6 @@ function doDeleteAnnotation(index) {
            var region = wavesurfer.regions.list[id];
            deleteNote(wavesurfer.regions.list[id]);
            wavesurfer.regions.list[id].remove();
-           saveAndDrawRegions();
 
            console.log("Do delete annotation : " + counter);
            var jqxhr = $.post( {
@@ -944,6 +955,7 @@ function doDeleteAnnotation(index) {
            })
            .fail(function(error) {
              if ( error.status == 200 ) {
+               saveAndDrawRegions();
                console.log( "deleting annotation success");
              } else {
                console.log( "deleting annotation failed : " + JSON.stringify(error));

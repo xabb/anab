@@ -14,6 +14,7 @@ include("config.php");
      exit(-1);
   }
   $source = $_POST['source'];
+  error_log("Deleting annotation #".$order." for : ".$source );
 
   $link = mysqli_connect($config['dbhost'], $config['dbuser'], $config['dbpass'], $config['dbname']);
   if (!$link) {
@@ -29,7 +30,7 @@ include("config.php");
      if ( mysqli_num_rows( $results ) === 1 ) {
         $annrow = mysqli_fetch_row( $results );
         $annid = $annrow[0];
-        error_log( "annotation id : " + $annid );
+        error_log( "annotation id : ".$annid );
         $sqld = "DELETE FROM audiobook WHERE aoid=".$annid.";";
         $resultdd = $link->query($sqld);
         if ( $resultdd <= 0 ) {

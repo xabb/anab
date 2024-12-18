@@ -46,8 +46,25 @@ class jsonOBJ {
   } else {
      $link->query("SET NAMES utf8");
      $link->query("LOCK TABLES `annotation`");
-     $jsonArr = new jsonOBJ(""); // name of the json array
 
+     // renumber all free annotations
+     $ssql = "SELECT id FROM annotation WHERE source='".addslashes($source)."' AND norder>=4096 ORDER BY start";
+     error_log($ssql);
+     $ressel = $link->query($ssql);
+     $forder=4096;
+     while ( $resrow = mysqli_fetch_row($ressel) ) {
+         $forder++;
+         $usql = "UPDATE annotation SET norder=".$forder." WHERE id=".$resrow[0];
+         error_log($usql);
+         $resupd = $link->query($usql);
+         if ( $resupd === FALSE ) {
+            error_log( 'Couldn\'t update annotation order : '.$resupd);
+            mysqli_close($link);
+            exit(-1);
+         }
+     }
+
+     $jsonArr = new jsonOBJ(""); // name of the json array
      $result = $link->query("SELECT * FROM annotation WHERE source='".addslashes($source)."' AND norder>=4096 ORDER BY start");
      $rows = mysqli_num_rows($result);
      if($rows > 0){

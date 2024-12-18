@@ -114,7 +114,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
              <center>
              <strong>Language</strong>
              <select id='AIlang'>
-                <option value='guess'>Guess</option>
+                <option value='Guess'>Guess</option>
              </select>
              <strong>Model</strong>
              <select id='AImodel'>

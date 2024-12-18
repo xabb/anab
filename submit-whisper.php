@@ -66,6 +66,13 @@ function detached_exec($cmd) {
   }
   $model = $_POST['model'];
 
+  if ( empty($_POST['linear']) )
+  {
+     header('HTTP/1.1 406 Linear mode is Mandatory');	  
+     exit(-1);
+  }
+  $linear = $_POST['linear'];
+
   if (!file_exists('/usr/bin/whisper') && !file_exists('/usr/local/bin/whisper')) {
      header('HTTP/1.1 406 Whisper is not installed on the back-end, you should install it with : pip3 install openai-whisper');	  
      exit(-1);
@@ -99,7 +106,14 @@ function detached_exec($cmd) {
         $source = $annrow[1];
         $start = $annrow[2];
         $end = $annrow[3];
-        error_log( "extracting : ".$start." -- ".$end );
+        $duration = $end - $start;
+        if ( ($duration<=30.0 ) && ($lang=="Guess") ) {
+           error_log( 'Annotaion is less than 30 seconds, so please, specify the language, it\'s impossible to guess!');
+           header('HTTP/1.1 Annotaion is less than 30 seconds, \nso please, specify the language, it\'s impossible to guess!');
+           mysqli_close($link);
+           exit(-1);
+        }
+        error_log( "extracting : ".$start." -- ".$end." duration : ".$duration);
      }
      $excerpt = "excerpts/anno_".$annid.".ogg";
      // generate the audio file 
@@ -118,7 +132,7 @@ function detached_exec($cmd) {
   }
 
   // call whisper in background and detach it from process
-  $cmd = "php whisper.php $annid $source $user $lang $model >/dev/null 2>&1 &";
+  $cmd = "php whisper.php $annid $source $user $lang $model $linear >/dev/null 2>&1 &";
   // $pid = detached_exec($cmd);
   $cmdoutput = array();
   $cmdresult = 0;

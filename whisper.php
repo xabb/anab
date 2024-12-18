@@ -3,9 +3,9 @@
 include("config.php");
 include("functions.php");
 
-if ( count($argv) != 6 ) {
+if ( count($argv) != 7 ) {
    error_log("wrong number of arguments to launch whisper : ".count($argv) );
-   error_log("usage : whisper.php <annid> <source> <user> <language> <model>");
+   error_log("usage : whisper.php <annid> <source> <user> <language> <model> <linear=true|false>");
    exit(-1);
 }
 
@@ -21,11 +21,22 @@ $source=$argv[2];
 $user=$argv[3];
 
 $langoption = "";
-if ( $argv[4] != "guess" ) {
+if ( $argv[4] != "Guess" ) {
    $langoption = " --language $argv[4]";
 }
 
 $modeloption = " --model $argv[5]";
+
+
+$annfilter="";
+$forder=0;
+if ( $argv[6] ) {
+   $annfilter = " AND norder>=4096 ";
+   $forder=4095;
+} else {
+   $annfilter = " AND norder<4096 ";
+   $forder=0;
+}
 
 $whispres=0;
 $starttime = time();
@@ -93,7 +104,7 @@ if (!$link) {
         mysqli_close($link);
         exit(-1);
      }
-     $sql = "UPDATE user SET nbt=nbt+1, tts=ADDTIME(tts,'00:".date("i:s",$timewhisper)."')  WHERE user='".$user."';";
+     $sql = "UPDATE user SET nbt=nbt+1, tts=ADDTIME(tts,'00:".date("H:i:s",$timewhisper)."')  WHERE user='".$user."';";
      error_log( 'Updating user : '.$sql);
      $result = $link->query($sql);
      if ( $result === FALSE  )
@@ -109,8 +120,8 @@ if (!$link) {
        foreach($wresults["segments"] as $segment ) {
          error_log("found text : ".$segment["text"]);
          $nastart=$annstart+$segment["start"];
-         $naend=$annend+$segment["end"];
-         $isql = "INSERT INTO annotation ( norder, start, end, url, source, data, user, color, whispered ) VALUES ( 0,".$nastart.",".$naend.",'".$annurl."=".$segment["start"]."','".addslashes($source)."','".addslashes($segment["text"])."','".addslashes($user)."','".addslashes($ucolor)."', 2 )";         
+         $naend=$annstart+$segment["end"];
+         $isql = "INSERT INTO annotation ( norder, start, end, url, source, data, user, color, whispered ) VALUES ( 100000,".$nastart.",".$naend.",'".$annurl."=".$segment["start"]."','".addslashes($source)."','".addslashes($segment["text"])."','".addslashes($user)."','".addslashes($ucolor)."', 2 )";         
          error_log($isql);
          $resins = $link->query($isql);
          if ( $resins === FALSE )
@@ -136,10 +147,9 @@ if (!$link) {
      }
 
      // renumber all annotations
-     $ssql = "SELECT id FROM annotation WHERE source='".addslashes($source)."' ORDER BY start";         
+     $ssql = "SELECT id FROM annotation WHERE source='".addslashes($source)."' ".$annfilter." ORDER BY start";         
      error_log($ssql);
      $ressel = $link->query($ssql);
-     $forder=0;
      while ( $resrow = mysqli_fetch_row($ressel) ) {
          $forder++;
          $usql = "UPDATE annotation SET norder=".$forder." WHERE id=".$resrow[0];         

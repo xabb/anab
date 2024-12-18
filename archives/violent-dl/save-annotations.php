@@ -27,24 +27,36 @@ include("../../config.php");
      $annotes = json_decode( $annotations, true );
      // error_log( __FILE__." got : ".count($annotes)." notes" );
 
-     // delete all free annotations
-     if ( count($annotes) > 0 ){
-        $dsql = "DELETE FROM annotation WHERE source='".$annotes[0]["source"]."' AND norder<4096";
-        $delete = $link->query($dsql);
-        // error_log('deleted free annotations for '.$annotes[0]["source"]);
-     }
-
      foreach( $annotes as $note )
      {
+        $ssql = "SELECT id FROM annotation WHERE source='".addslashes($note["source"])."' AND norder=".$note["norder"];
+        error_log($ssql);
+        $ressel = $link->query($ssql);
+        if ( mysqli_num_rows($ressel) == 0 )
+        {
            $isql = "INSERT INTO annotation ( norder, start, end, url, source, data, user, color, whispered ) VALUES ( ".$note["order"].",".$note["start"].",".$note["end"].",'".addslashes($note["url"])."','".addslashes($note["source"])."','".addslashes($note["data"])."','".addslashes($note["user"])."','".addslashes($note["color"])."', ".$note["whispered"]." )";
-           $insert = $link->query($isql);
-           if ( $insert !== true ) {
+           // error_log($isql);
+           $resins = $link->query($isql);
+           if ( $resins !== true ) {
               error_log( "ERROR : ".__FILE__." : could not create annotation : ".$note["order"]." : ".mysqli_error($link) );
               header('HTTP/1.1 500 Error creating annotation');	  
               $link->query("UNLOCK TABLES `annotation`");
               mysqli_close($link);
               exit(-1);
            }
+         } else {
+           $rowsel = mysqli_fetch_row($ressel);
+           $usql = "UPDATE annotation SET norder=".$note["order"].", start=".$note["start"].", end=".$note["end"].", url='".addslashes($note["url"])."', source='".addslashes($note["source"])."', data='".addslashes($note["data"])."', user='".addslashes($note["user"])."', color='".addslashes($note["color"])."', whispered=".$note["whispered"]."  WHERE id=".$rowsel[0];
+           // error_log($usql);
+           $resupd = $link->query($usql);
+           if ( $resupd !== true ) {
+              error_log( "ERROR : ".__FILE__." : could not update annotation : ".$note["id"]." : ".mysqli_error($link) );
+              header('HTTP/1.1 500 Error updating annotation');	  
+              $link->query("UNLOCK TABLES `annotation`");
+              mysqli_close($link);
+              exit(-1);
+           }
+         }
      }
   }
 
