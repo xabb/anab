@@ -131,6 +131,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
         <div class="container" id="container">
             <div class="header">
                 <h3 itemprop="title" id="title"></h3>
+                <div id='select-all' class='select-all'>Select All</div>
                 <div id='frozen' class='frozen'>Frozen</div>
                 <i id="help" class="fa fa-question-circle fa-2x" aria-hidden="true" ></i>
             </div>
@@ -144,7 +145,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                     </div>
                 </div>
 		<div class="upper-toolbar">
-                    <div id="zlabel" class="zoom-label">Px/s</div>
+                    <div id="zlabel" class="zoom-label">Zoom</div>
                     <div id="slabel" class="speed-label">Speed</div>
                 </div>
 		<div class="lower-toolbar">

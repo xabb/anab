@@ -286,8 +286,8 @@ document.addEventListener('DOMContentLoaded', function() {
    
                    $("#linear-notes").html('');
                    regions.forEach( function(region) {
-                      if ( region.data != undefined && region.data.note != undefined ) {
-                          var lines = region.data.note.split("\n");
+                      if ( region.data != undefined && region.data != undefined ) {
+                          var lines = region.data.split("\n");
                           lines.forEach( function(line, index) {
                              if ( line.length > 3 && line[2]==':' )
                              {
@@ -337,7 +337,7 @@ document.addEventListener('DOMContentLoaded', function() {
                            var id = $(this).attr('id');
                            let cregion = wavesurfer.regions.list[id];
                            cregion.data.note=evt.target.value;
-                           saveAndDrawRegions();
+                           drawAndSaveRegions();
                            cregion.setLoop(false);
                            deleteNote(cregion);
                            showNote(cregion);
@@ -381,7 +381,7 @@ document.addEventListener('DOMContentLoaded', function() {
         wavesurfer.on('region-update-end', updateAnnotation);
         wavesurfer.on('region-in', showNote);
         wavesurfer.on('region-out', deleteNote);
-        wavesurfer.on('region-updated', saveAndDrawRegions);
+        wavesurfer.on('region-updated', drawAndSaveRegions);
         wavesurfer.on('audioprocess', function() {
             $(".play-time").html( toHHMMSS(wavesurfer.getCurrentTime()) + " / " + toHHMMSS(wavesurfer.getDuration()) );
         });
@@ -391,6 +391,17 @@ document.addEventListener('DOMContentLoaded', function() {
             $(".linear-play").addClass('fa-play');
         });
     
+        wavesurfer.on('play', function() {
+         if ( currentRegion != null ) {
+            let wregion = wavesurfer.regions.list[currentRegion];
+            wregion.setLoop(false);
+            $("#r"+currentRegion).removeClass("fa-pause");
+            $("#r"+currentRegion).addClass("fa-play");
+            $("#"+currentRegion).css("border-color","#000000");
+            currentRegion = null;
+         }
+        });
+
         wavesurfer.responsive=true;
 
     }).fail(function(error) {
@@ -544,7 +555,7 @@ function splitAnnotation() {
                           }
                       });
                 console.log("created linear region # : " + nbRegions+4096+1 );
-                saveAndDrawRegions();
+                drawAndSaveRegions();
                 nbRegions++;
             }
     });
@@ -563,7 +574,7 @@ function updateAnnotation(region, e) {
                 console.log( "update : updating annotation : " + region.id );
                 lregion.start = region.start;
                 lregion.end = region.end;
-                saveAndDrawRegions();
+                drawAndSaveRegions();
             }
     });
     updateTable();
@@ -603,7 +614,7 @@ function doDeleteAnnotation(index) {
            var region = wavesurfer.regions.list[id];
            deleteNote(wavesurfer.regions.list[id]);
            wavesurfer.regions.list[id].remove();
-           saveAndDrawRegions();
+           drawAndSaveRegions();
 
            console.log("Do delete annotation : " + 4096+counter);
            var jqxhr = $.post( {
@@ -655,7 +666,7 @@ function updateTable() {
           var id = $(this).attr('id');
           cregion = wavesurfer.regions.list[id];
           cregion.data.note=evt.target.value;
-          saveAndDrawRegions();
+          drawAndSaveRegions();
           cregion.setLoop(false);
           deleteNote(cregion);
           showNote(cregion);
@@ -691,7 +702,7 @@ function updateTableOne(currentId) {
             var id = $(this).attr('id');
             cregion = wavesurfer.regions.list[id];
             cregion.data.note=evt.target.value;
-            saveAndDrawRegions();
+            drawAndSaveRegions();
             cregion.setLoop(false);
             deleteNote(cregion);
             showNote(cregion);
@@ -704,7 +715,7 @@ function updateTableOne(currentId) {
  * Save to the server and draw notes
  * Called after every modification
  */
-function saveAndDrawRegions() {
+function drawAndSaveRegions() {
     drawRegions();
     saveRegions();
 }
@@ -1002,7 +1013,7 @@ var whisperStart = function(regid) {
     $("#help-whisper").css("display", "block");
     callAI.onsubmit = function(e) {
         var model = $('#AImodel').find(":selected").val();
-        var language = $('#AIlang').find(":selected").val();
+        var wlang = $('#AIlang').find(":selected").val();
         var counter = 4095;
         var order = -1;
         e.preventDefault();
@@ -1024,7 +1035,7 @@ var whisperStart = function(regid) {
            url: '../../submit-whisper.php',
            data: {
              model: fullEncode(model),
-             lang: fullEncode(language),
+             lang: fullEncode(wlang),
              source: fullEncode(soundfile),
              order: order,
              user: user,
@@ -1154,7 +1165,7 @@ var exportSRT = function() {
        subtitles += counter+'\n';
        counter++;
        subtitles += toHHMMSS(note.start)+' --> '+toHHMMSS(note.end)+'\n';
-       var lines = note.data.note.split("\n");
+       var lines = note.data.split("\n");
        lines.forEach( function( line, index ) {
           if ( strstr( line, ":" ) > 0 ) {
              if ( language === '--' || language === line.substring(0,2) ) {
@@ -1171,7 +1182,7 @@ var exportSRT = function() {
     var element = document.createElement('a');
     var rlanguage = language;
     if ( language == '--' ) rlanguage='all';
-    var filename = $("#title").html().toString().substring(8)+"-"+rlanguage+'.srt';
+    var filename = $("#title").html().toString().split('(')[0]+"-"+rlanguage+'.srt';
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(subtitles));
     element.setAttribute('download', filename);
     element.style.display = 'none';

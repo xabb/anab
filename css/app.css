@@ -67,6 +67,17 @@ overview {
   display : none;
 }
 
+.select-all {
+  background-color : #0000cc;
+  text-align : center;
+  border-radius: 30px;
+  border-color: #333333; 
+  color : #ffffff;
+  width : 100px;
+  height : 20px;
+  display : none;
+}
+
 .btn-fplay {
 }
 

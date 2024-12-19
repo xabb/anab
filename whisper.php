@@ -2,6 +2,8 @@
 
 include("config.php");
 include("functions.php");
+include("wlangs.php");
+include("sclangs.php");
 
 if ( count($argv) != 7 ) {
    error_log("wrong number of arguments to launch whisper : ".count($argv) );
@@ -108,11 +110,29 @@ if (!$link) {
      // get json result and create all new annotations
      if ( file_exists( $jsonfile ) ) {
        $wresults = json_decode(file_get_contents($jsonfile), true);
+
+       $flang = $wresults["language"];
+       error_log("language found in results : ".$lang);
+       $lcount=0;
+       $sclang="";
+       if ( strlen($flang)>2 ) {
+          foreach( $wlangs as $wlang ) {
+            if ( $wlang == $flang ) {
+              $sclang=$sclangs[$lcount];
+              break;
+            }
+            $lcount++;
+          }
+       } else {
+          $sclang=$flang;
+       }
+
        foreach($wresults["segments"] as $segment ) {
          error_log("found text : ".$segment["text"]);
          $nastart=$annstart+$segment["start"];
          $naend=$annstart+$segment["end"];
-         $isql = "INSERT INTO annotation ( norder, start, end, url, source, data, user, color, whispered ) VALUES (".$forder.",".$nastart.",".$naend.",'".$annurl."=".$segment["start"]."','".addslashes($source)."','".addslashes($segment["text"])."','".addslashes($user)."','".addslashes($ucolor)."', 2 )";         
+         $ftext=(($forder==4096)?$sclang.":":"").$segment["text"];
+         $isql = "INSERT INTO annotation ( norder, start, end, url, source, data, user, color, whispered ) VALUES (".$forder.",".$nastart.",".$naend.",'".$annurl."=".$segment["start"]."','".addslashes($source)."','".addslashes($ftext)."','".addslashes($user)."','".addslashes($ucolor)."', 2 )"; 
          error_log($isql);
          $resins = $link->query($isql);
          if ( $resins === FALSE )
@@ -123,7 +143,8 @@ if (!$link) {
           }
        }
      } else {
-        error_log( 'JSON file not found : '.$jsonfile);
+        error_log( 'JSON file not found : '.$jsonfile." : do not change anything.");
+        exit(-1);
      }
 
      // delete original annotation

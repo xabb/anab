@@ -13,6 +13,7 @@ var maxFrozen = 20;
 var showFrozen = 0;
 var soundfile = 'https://giss.tv/dmmdb/contents/violent-dl.webm';
 
+
 var strstr = function (haystack, needle) {
   if (needle.length === 0) return 0;
   if (needle === haystack) return 0;
@@ -262,8 +263,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     wavesurfer.on('region-click', regionClick);
     wavesurfer.on('region-dblclick', editAnnotation);
-    wavesurfer.on('region-updated', saveAndDrawRegions);
-    wavesurfer.on('region-removed', saveAndDrawRegions);
+    wavesurfer.on('region-updated', drawAndSaveRegions);
+    wavesurfer.on('region-removed', drawAndSaveRegions);
     wavesurfer.on('region-in', showNote);
     wavesurfer.on('region-out', deleteNote);
     wavesurfer.on('region-play', function(region) {
@@ -427,6 +428,7 @@ document.addEventListener('DOMContentLoaded', function() {
            }
         });
         drawRegions();
+        saveRegions();
         console.log("whisper request on : " + soundfile + " : " + order);
         $('#help-whisper').css('display','none');
         $('#spinner-whisper').css('display','block');
@@ -542,7 +544,7 @@ document.addEventListener('DOMContentLoaded', function() {
         //         color: ucolor
         //     }
         // });
-        // saveAndDrawRegions();
+        // drawAndSaveRegions();
     });
 
     let langselect = document.getElementById('AIlang');
@@ -599,7 +601,7 @@ function drawRegions() {
             $("#"+wregion.id).on( 'change', function(evt) {
                 var id = $(this).attr('id');
                 wavesurfer.regions.list[id].data.note=evt.target.value;
-                saveAndDrawRegions();
+                drawAndSaveRegions();
             });
             wavesurfer.addMarker({
                time : wregion.start,
@@ -647,7 +649,7 @@ function drawRegions() {
 /**
  * Called every time a region is modified
  */
-function saveAndDrawRegions() {
+function drawAndSaveRegions() {
     drawRegions();
     saveRegions();
 }
@@ -740,8 +742,8 @@ function loadRegions() {
        $("#modal-wait").modal("hide");
        $('#spinner-global').css('display','none');
     });
-    wavesurfer.on('region-updated', saveAndDrawRegions);
-    wavesurfer.on('region-removed', saveAndDrawRegions);
+    wavesurfer.on('region-updated', drawAndSaveRegions);
+    wavesurfer.on('region-removed', drawAndSaveRegions);
 }
 
 /**
@@ -959,7 +961,7 @@ function doDeleteAnnotation(index) {
            })
            .fail(function(error) {
              if ( error.status == 200 ) {
-               saveAndDrawRegions();
+               drawAndSaveRegions();
                console.log( "deleting annotation success");
              } else {
                console.log( "deleting annotation failed : " + JSON.stringify(error));
@@ -989,7 +991,7 @@ window.GLOBAL_ACTIONS['delete-region'] = function() {
     if (regionId) {
         deleteNote(wavesurfer.regions.list[regionId]);
         wavesurfer.regions.list[regionId].remove();
-        saveAndDrawRegions();
+        drawAndSaveRegions();
         form.reset();
 
         var jqxhr = $.post( {
@@ -1047,16 +1049,18 @@ window.GLOBAL_ACTIONS['export'] = function() {
        subtitles += counter+'\n';
        counter++;
        subtitles += toHHMMSS(note.start)+' --> '+toHHMMSS(note.end)+'\n';
-       var lines = note.data.note.split("\n");
-       lines.forEach( function( line, index ) {
-           subtitles += $('<div>').html(line).text()+'\n';
-       });
-       subtitles += '\n';
+       var lines = note.data.split("\n");
+       if ( typeof lines != "undefined" ) { 
+          lines.forEach( function( line, index ) {
+             subtitles += $('<div>').html(line).text()+'\n';
+          });
+          subtitles += '\n';
+       }
     });
 
     // force subtitles download
     var element = document.createElement('a');
-    var filename = $("#title").html().toString().substring(8)+'-free.srt';
+    var filename = $("#title").html().toString().split('(')[0]+'-free.srt';
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(subtitles));
     element.setAttribute('download', filename);
     element.style.display = 'none';

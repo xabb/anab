@@ -18,3 +18,7 @@ http://giss.tv/~chevil/Videos/anab.webm
 chevil@giss.tv
 
 ![Annotation Screen](screenshot.png)
+
+concept and programming : chevil@giss.tv
+initial concept & design : beatrice.rettig@gmail.com
+testing and advices : jaume@nualart.cat
