@@ -18,6 +18,7 @@ var frozenl=false;
 var maxFrozenl = 20;
 var showFrozenl = 0;
 var currentRegion;
+var nbRegions=0;
 var soundfile = 'https://giss.tv/dmmdb/contents/violent-dl.webm';
 
 var strstr = function (haystack, needle) {
@@ -312,6 +313,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             whispered : ( region.whispered != undefined ) ? region.whispered : 0 
                           }
                       });
+                      nbRegions++;
                       if ( region.whispered != undefined && region.whispered == 1 ) {
                          console.log("show frozen");
                          $("#frozenl").css('display', 'block');
@@ -536,13 +538,14 @@ function splitAnnotation() {
                           data: {
                             note: ( lregion.data != undefined ) ? lregion.data.note : '',
                             user: user,
-                            id: -1,
-                            norder: 4096,
+                            norder: nbRegions+4095+1,
                             color: ucolor,
                             whispered : ( lregion.data.whispered != undefined ) ? lregion.data.whispered : 0
                           }
                       });
+                console.log("created linear region # : " + nbRegions+4096+1 );
                 saveAndDrawRegions();
+                nbRegions++;
             }
     });
     wavesurfer.drawer.fireEvent('redraw');
@@ -710,7 +713,7 @@ function saveAndDrawRegions() {
  * Draw markers
  */
 function drawRegions() {
-    var counter=4096;
+    var counter=4095;
     // redraw rons and markers
     wavesurfer.clearMarkers();
     wavesurfer.on("marker-click", deleteAnnotation );
@@ -726,7 +729,7 @@ function drawRegions() {
             counter++;
             wavesurfer.addMarker({
                time : region.start,
-               label : region.data.norder-4096,
+               label : region.data.norder-4095,
                color : "#0000ff",
                position : "top"
             });
@@ -736,10 +739,10 @@ function drawRegions() {
                color : "#00ff00",
                position : "bottom"
             });
-            if ((region.data.norder-4096)>0)
+            if ((region.data.norder-4096)>=0)
                wavesurfer.addMarker({
                   time : region.end,
-                  label : region.data.norder-4096,
+                  label : region.data.norder-4095,
                   color : "#ff0000",
                   position : "top"
                });
@@ -747,9 +750,6 @@ function drawRegions() {
             var leyenda = "";
             if ( typeof region.data.note != "undefined" )
                leyenda = region.data.note.replaceAll("<div>","").replaceAll("</div>","").substring(0,20)+"...";
-            var whispered = 0;
-            if ( typeof region.data.whispered != "undefined" )
-                whispered = region.data.whispered;
             return {
                 order: counter,
                 start: region.start,
@@ -760,10 +760,9 @@ function drawRegions() {
                 url: fullEncode(burl+'?start='+region.start),
                 attributes: region.attributes,
                 data: region.data.note,
-                id: region.data.id,
                 user: user,
                 color: ucolor,
-                whispered: whispered
+                whispered: ( typeof region.data.whispered != "undefined" ) ? region.data.whispered:0
             };
         })
     );
@@ -775,7 +774,7 @@ function drawRegions() {
 function saveRegions() {
 
     anotes = JSON.parse(localStorage.regionsl);
-    console.log( "save : " + anotes.length + " regions to the server" );
+    console.log( "save : " + anotes.length + " linear regions to the server" );
     // console.log( "storage : " +  localStorage.regionsl);
 
     // don't really know when there are quotes
@@ -1004,7 +1003,7 @@ var whisperStart = function(regid) {
     callAI.onsubmit = function(e) {
         var model = $('#AImodel').find(":selected").val();
         var language = $('#AIlang').find(":selected").val();
-        var counter = 4096;
+        var counter = 4095;
         var order = -1;
         e.preventDefault();
         if ( currentRegion == null ) {
@@ -1015,8 +1014,6 @@ var whisperStart = function(regid) {
            ++counter;
            if ( id === currentRegion ) {
               order=counter;
-              wavesurfer.regions.list[id].data.whispered = 1;
-              frozenl=true;
            }
         });
         drawRegions();
@@ -1041,12 +1038,16 @@ var whisperStart = function(regid) {
            $("#help-whisper").css("display", "block");
            $("#modal-whisper").modal("hide");
            if ( error.status == 200 ) {
-              console.log( "Whisper job created suuccessfully" );
               alertAndScroll( "Calling whisper succeeded : Now the document is frozen until the job complete, so go play your favorite game and come back later !");
               $("#frozenl").css("display","block");
+              wavesurfer.regions.list[currentRegion].data.whispered = 1;
+              frozenl=true;
+              console.log( "Whisper job created suuccessfully : frozen : " + frozenl);
            } else {
-              console.log( "Calling whisper failed : " + JSON.stringify(error));
               alertAndScroll( "Calling whisper failed : " + error.statusText );
+              wavesurfer.regions.list[currentRegion].data.whispered = 0;
+              frozenl=false;
+              console.log( "Calling whisper failed : " + JSON.stringify(error) + " frozen : " + frozenl);
            }
         });
     }

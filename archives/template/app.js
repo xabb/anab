@@ -424,8 +424,6 @@ document.addEventListener('DOMContentLoaded', function() {
            ++counter;
            if ( id === currentRegion ) { 
               order=counter;
-              wavesurfer.regions.list[id].data.whispered = 1;
-              frozen=true;
            }
         });
         drawRegions();
@@ -450,12 +448,16 @@ document.addEventListener('DOMContentLoaded', function() {
            $('#help-whisper').css('display','block');
            $("#modal-whisper").modal("hide");
            if ( error.status == 200 ) {
-              console.log( "Whisper job created suuccessfully" );
               alertAndScroll( "Calling whisper succeeded : Now the document is frozen until the job complete, so go play your favorite game and come back later !");
               $("#frozen").css("display","block");
+              wavesurfer.regions.list[currentRegion].data.whispered = 1;
+              frozen=true;
+              console.log( "Whisper job created successfully : frozen ! " + frozen );
            } else {
-              console.log( "Calling whisper failed : " + JSON.stringify(error));
               alertAndScroll( "Calling whisper failed : " + error.statusText );
+              wavesurfer.regions.list[currentRegion].data.whispered = 0;
+              frozen=false;
+              console.log( "Calling whisper failed : " + JSON.stringify(error) + " frozen ! " + frozen);
            }
         });
     }
@@ -555,7 +557,6 @@ document.addEventListener('DOMContentLoaded', function() {
  */
 function drawRegions() {
 
-    console.log( "draw regions : " + localStorage.regions.length);
     // redraw and save to the server
     var counter=0;
     var navigation="<center><b>Navigate</b></center><br/><br/>";
@@ -624,7 +625,6 @@ function drawRegions() {
                 whispered = wregion.data.whispered;
             return {
                 order: counter,
-                norder: counter,
                 start: wregion.start,
                 end: wregion.end,
                 baseurl: fullEncode(burl),
@@ -640,6 +640,7 @@ function drawRegions() {
         })
     );
     $("#notes").html(navigation);
+    console.log( "drawn " + counter + " regions");
 }
 
 
@@ -656,16 +657,17 @@ function saveAndDrawRegions() {
  */
 function saveRegions() {
 
-    console.log( "save regions : " + localStorage.regions.length);
     if ( strstr(localStorage.regions.replaceAll('\"',''), 'whispered:1') ) {
        if ( showFrozen <= maxFrozen  ) {
           alertAndScroll("Document is frozen until AI job completes, so your changes will not be saved\n until the automatic transcription completes!");
           showFrozen++;
        }
        frozen=true;
+       console.log( "save regions : frozen : " + frozen );
        return;
     } else {
        frozen=false;
+       console.log( "save regions : frozen : " + frozen );
     }
 
     anotes = JSON.parse(localStorage.regions);
@@ -680,6 +682,7 @@ function saveRegions() {
     }, function() {
        // reload regions from the server with ids
        loadRegions();
+       drawRegions();
        // console.log( "Saving annotations succeeded" );
     })
     .fail(function(error) {
@@ -710,8 +713,9 @@ function loadRegions() {
     }, function(regions) {
       regions.forEach(function(region) {
         if ( region.whispered != undefined && region.whispered == 1 ) {
-           console.log("show free frozen");
            $("#frozen").css("display", "block");
+           frozen=true;
+           console.log("show free frozen : " + frozen);
         }
         wregion = wavesurfer.regions.add({
              start: region.start,

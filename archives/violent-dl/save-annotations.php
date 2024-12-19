@@ -8,12 +8,7 @@ include("../../config.php");
      exit(-1);
   }
   $annotations = $_POST['json'];
-  // if ( !file_put_contents( "./annotations.json", $annotations ) )
-  // {
-  //    $error = error_get_last();
-  //    header('HTTP/1.1 500 Could not store annotations : '.$error['message']);	  
-  //    exit(-1);
-  // }
+  error_log( "received : ".$annotations );
 
   // saving in the database 
   $link = mysqli_connect($config['dbhost'], $config['dbuser'], $config['dbpass'], $config['dbname']);
@@ -29,7 +24,7 @@ include("../../config.php");
 
      foreach( $annotes as $note )
      {
-        $ssql = "SELECT id FROM annotation WHERE source='".addslashes($note["source"])."' AND norder=".$note["norder"];
+        $ssql = "SELECT id FROM annotation WHERE source='".addslashes($note["source"])."' AND norder=".$note["order"];
         error_log($ssql);
         $ressel = $link->query($ssql);
         if ( mysqli_num_rows($ressel) == 0 )

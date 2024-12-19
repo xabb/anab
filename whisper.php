@@ -27,23 +27,23 @@ if ( $argv[4] != "Guess" ) {
 
 $modeloption = " --model $argv[5]";
 
-
 $annfilter="";
 $forder=0;
-if ( $argv[6] ) {
+if ( $argv[6] == "true") {
    $annfilter = " AND norder>=4096 ";
-   $forder=4095;
+   $forder=4096;
 } else {
    $annfilter = " AND norder<4096 ";
    $forder=0;
 }
+error_log("filter : ".$annfilter." forder : ".$forder );
 
 $whispres=0;
 $starttime = time();
 $endtime = $starttime;
 $cmdresult=0;
 $cmdoutput=array();
-$cmd = "whisper --output_dir ./excerpts $annofile $modeloption $langoption";
+$cmd = "whisper --output_dir ./excerpts $annofile $modeloption $langoption > excerpts/whisper_job$annid.log 2>&1";
 error_log("launching : $cmd");
 $result=exec($cmd, $cmdoutput, $cmdresult);
 if ( $cmdresult != 0 ) {
@@ -53,8 +53,8 @@ if ( $cmdresult != 0 ) {
    }
 } else {
    $whispres=2;
-   $endtime = time();
 }
+$endtime = time();
 $timewhisper=$endtime-$starttime;
 error_log("whisper took : $timewhisper seconds");
 
@@ -95,16 +95,7 @@ if (!$link) {
         $ucolor = $rowres[0];
      }
 
-     $sql = "UPDATE annotation SET whispered=$whispres WHERE id=".$annid.";";
-     error_log( 'Updating annotation : '.$sql);
-     $result = $link->query($sql);
-     if ( $result === FALSE  )
-     {
-        error_log( 'Couldn\'t update annotation : '.$result);
-        mysqli_close($link);
-        exit(-1);
-     }
-     $sql = "UPDATE user SET nbt=nbt+1, tts=ADDTIME(tts,'00:".date("H:i:s",$timewhisper)."')  WHERE user='".$user."';";
+     $sql = "UPDATE user SET nbt=nbt+1, tts=ADDTIME(tts,'".date("H:i:s",$timewhisper)."')  WHERE user='".$user."';";
      error_log( 'Updating user : '.$sql);
      $result = $link->query($sql);
      if ( $result === FALSE  )
@@ -121,7 +112,7 @@ if (!$link) {
          error_log("found text : ".$segment["text"]);
          $nastart=$annstart+$segment["start"];
          $naend=$annstart+$segment["end"];
-         $isql = "INSERT INTO annotation ( norder, start, end, url, source, data, user, color, whispered ) VALUES ( 100000,".$nastart.",".$naend.",'".$annurl."=".$segment["start"]."','".addslashes($source)."','".addslashes($segment["text"])."','".addslashes($user)."','".addslashes($ucolor)."', 2 )";         
+         $isql = "INSERT INTO annotation ( norder, start, end, url, source, data, user, color, whispered ) VALUES (".$forder.",".$nastart.",".$naend.",'".$annurl."=".$segment["start"]."','".addslashes($source)."','".addslashes($segment["text"])."','".addslashes($user)."','".addslashes($ucolor)."', 2 )";         
          error_log($isql);
          $resins = $link->query($isql);
          if ( $resins === FALSE )
@@ -151,7 +142,6 @@ if (!$link) {
      error_log($ssql);
      $ressel = $link->query($ssql);
      while ( $resrow = mysqli_fetch_row($ressel) ) {
-         $forder++;
          $usql = "UPDATE annotation SET norder=".$forder." WHERE id=".$resrow[0];         
          error_log($usql);
          $resupd = $link->query($usql);
@@ -160,6 +150,7 @@ if (!$link) {
             mysqli_close($link);
             exit(-1);
          }
+         $forder++;
      }
 
      mysqli_close($link);

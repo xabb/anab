@@ -98,7 +98,7 @@ function detached_exec($cmd) {
         $annrow = mysqli_fetch_row($result);
         if ( $annrow[4] != 0 ) {
            error_log( 'Annotation already transcripted by Open-AI!');
-           header('HTTP/1.1 404 Annotation already transcripted by Open-AI!');	  
+           header('HTTP/1.1 406 Annotation already transcripted by Open-AI!');	  
            mysqli_close($link);
            exit(-1);
         }
@@ -107,9 +107,10 @@ function detached_exec($cmd) {
         $start = $annrow[2];
         $end = $annrow[3];
         $duration = $end - $start;
+         error_log( "Annotation duration ; ".$duration." language : ".$lang );
         if ( ($duration<=30.0 ) && ($lang=="Guess") ) {
-           error_log( 'Annotaion is less than 30 seconds, so please, specify the language, it\'s impossible to guess!');
-           header('HTTP/1.1 Annotaion is less than 30 seconds, \nso please, specify the language, it\'s impossible to guess!');
+           error_log( 'Annotation is less than 30 seconds, so please, specify the language, it\'s impossible to guess!');
+           header('HTTP/1.1 406 Annotation is less than 30 seconds, so please, specify the language, it\'s impossible to guess!');
            mysqli_close($link);
            exit(-1);
         }
@@ -132,7 +133,7 @@ function detached_exec($cmd) {
   }
 
   // call whisper in background and detach it from process
-  $cmd = "php whisper.php $annid $source $user $lang $model $linear >/dev/null 2>&1 &";
+  $cmd = "php whisper.php $annid $source $user $lang $model $linear >excerpts/whisper_$annid.log 2>&1 &";
   // $pid = detached_exec($cmd);
   $cmdoutput = array();
   $cmdresult = 0;

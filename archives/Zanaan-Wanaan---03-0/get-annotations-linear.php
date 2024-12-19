@@ -51,11 +51,11 @@ class jsonOBJ {
      $ssql = "SELECT id FROM annotation WHERE source='".addslashes($source)."' AND norder>=4096 ORDER BY start";
      error_log($ssql);
      $ressel = $link->query($ssql);
-     $forder=4096;
+     $forder=4095;
      while ( $resrow = mysqli_fetch_row($ressel) ) {
          $forder++;
          $usql = "UPDATE annotation SET norder=".$forder." WHERE id=".$resrow[0];
-         error_log($usql);
+         // error_log($usql);
          $resupd = $link->query($usql);
          if ( $resupd === FALSE ) {
             error_log( 'Couldn\'t update annotation order : '.$resupd);
@@ -75,6 +75,7 @@ class jsonOBJ {
         }
         mysqli_free_result($result);
      }
+
      if ( !file_put_contents( "./annotations-linear.json", $jsonArr->toString() ) )
      {
         $error = error_get_last();
