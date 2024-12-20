@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#set -x
 echo $1
 
 strstr() {
@@ -14,8 +13,9 @@ if [ $# -ne 1 ]; then
 fi
 
 dirname=`grep -rl "$1" archives/*/index.php | cut -f2 -d'/'`
+echo "$dirname" > /tmp/anab-archive-dir.txt
 
-for dir in $dirname
+while read dir
 do
 
 echo "Directory : $dir"
@@ -26,4 +26,6 @@ sed -i "s#__file_url__#$1#g" "archives/$dir/appl.js"
 sed -i "s#__file_url__#$1#g" "archives/$dir/index.php"
 chmod -R 777 "archives/$dir"
 
-done
+done < /tmp/anab-archive-dir.txt
+
+rm /tmp/anab-archive-dir.txt

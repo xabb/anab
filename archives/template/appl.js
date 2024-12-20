@@ -404,6 +404,54 @@ document.addEventListener('DOMContentLoaded', function() {
 
         wavesurfer.responsive=true;
 
+        selectAlll.onclick = function(e) {
+          if ( (typeof wavesurfer == "undefined") || (wavesurfer.getDuration() <= 0) ) {
+             alertify.alert("Wavesurfer is not initialized!<br/><br/>");
+          }
+          alertify.confirm( "Are you sure sure you want to select the whole document and loose all previous work?<br/><br/>"
+          , function (e) {
+             if (e) {
+                 var jqxhr = $.post( {
+                    url: '../../delete-all-linear.php',
+                    data: {
+                       source: fullEncode(soundfile),
+                    },
+                    dataType: "text/html"
+                 }).fail(function(data) {
+                    if ( data.status === 200 ) {
+                      console.log("cleared on server");
+                      wavesurfer.un('region-updated');
+                      wavesurfer.un('region-removed');
+                      wavesurfer.clearRegions();
+                      wregion = wavesurfer.regions.add({
+                           start: 0.0,
+                           end: wavesurfer.getDuration(),
+                           resize: true,
+                           drag: true,
+                           data: {
+                              note: "",
+                              user: user,
+                              color: ucolor,
+                              norder: 4096,
+                              id: -1,
+                              whispered : 0
+                           }
+                      });
+                      drawAndSaveRegions();
+                      updateTable();
+                      wavesurfer.on('region-updated', drawAndSaveRegions);
+                      wavesurfer.on('region-removed', drawAndSaveRegions);
+                    } else {
+                      console.log("deleting free annotaions failed : " + JSON.stringify(data));
+                      alertAndScroll("deleting free annotaions failed : " + JSON.stringify(data));
+                    }
+                });
+              } else {
+                console.log("selecting all cancelled");;
+              }
+            });
+        }
+
     }).fail(function(error) {
         console.log( "couldn't load peaks : " + JSON.stringify(error) );
     });
@@ -742,7 +790,7 @@ function drawRegions() {
                time : region.start,
                label : region.data.norder-4095,
                color : "#0000ff",
-               position : "top"
+               position : "bottom"
             });
             wavesurfer.addMarker({
                time : region.end,
@@ -1011,6 +1059,7 @@ var whisperStart = function(regid) {
     $("#modal-whisper").modal("show");
     $("#spinner-whisper").css("display", "none");
     $("#help-whisper").css("display", "block");
+
     callAI.onsubmit = function(e) {
         var model = $('#AImodel').find(":selected").val();
         var wlang = $('#AIlang').find(":selected").val();

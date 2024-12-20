@@ -97,7 +97,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
              <center>
              <strong>Language</strong>
              <select id='AIlang'>
-                <option value='Guess'>Guess</option>
+                <option value='None'>None</option>
              </select>
              <strong>Model</strong>
              <select id='AImodel'>
@@ -131,7 +131,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
         <div class="container" id="container">
             <div class="header">
                 <h3 itemprop="title" id="title"></h3>
-                <div id='select-all' class='select-all'>Select All</div>
+                <div id='selectAll' class='select-all'>Select All</div>
                 <div id='frozen' class='frozen'>Frozen</div>
                 <i id="help" class="fa fa-question-circle fa-2x" aria-hidden="true" ></i>
             </div>

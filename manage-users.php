@@ -177,7 +177,7 @@ while ( $page < $nbpages )
 <?php
 
 $count = $start+1;
-print "<th align=left>User</th><th align=left>Nb Whispers</th><th align=left>API time</th><th>Use AI</th><th align=center>Delete</th>";
+print "<th align=left>User</th><th align=left>Nb Whispers</th><th align=left>AI time</th><th>Use AI</th><th align=center>Delete</th>";
 while ( $rowuser = mysqli_fetch_row( $respageusers) )
 {
    print "<tr><td align=left>".$rowuser[1]."</td>";

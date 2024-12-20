@@ -16,7 +16,7 @@ if (!$link) {
    exit(-1);
 } else {
    $link->query('SET NAMES utf8');
-   $sqls = "SELECT title, date FROM archive WHERE url LIKE '%".addslashes($url)."';";
+   $sqls = "SELECT title, author FROM archive WHERE url LIKE '%".addslashes($url)."';";
    // error_log( 'Getting title : '.$sqls );
    $results = $link->query($sqls);
    if ( mysqli_num_rows($results) <= 0 ) {
@@ -25,7 +25,10 @@ if (!$link) {
       exit(-1);
    } else {
       $row = mysqli_fetch_array($results);
-      echo $row['title']." (".$row['date'].")";
+      if ( $row['author'] != "" && strtolower($row['author']) != "unknown" )
+         echo $row['title']." (".$row['author'].")";
+      else
+         echo $row['title'];
       mysqli_close($link);
    }
 }

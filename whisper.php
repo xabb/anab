@@ -58,7 +58,7 @@ if ( $cmdresult != 0 ) {
 }
 $endtime = time();
 $timewhisper=$endtime-$starttime;
-error_log("whisper took : $timewhisper seconds");
+error_log("whisper took : ".date("H:i:s",$timewhisper)." seconds");
 
 $link = mysqli_connect($config['dbhost'], $config['dbuser'], $config['dbpass'], $config['dbname']);
 if (!$link) {

@@ -34,12 +34,14 @@ then
   exit -1
 fi
 
-hour=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 duration | cut -f2 -d':'`
-echo "hour :"$hour 1>&2
-min=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 duration | cut -f3 -d':'`
-echo "min : "$min 1>&2
-#less than one minute (approx) cannot be analyzed
-if [ $hour = "00" ] && [ $min = "00" ]
+#hour=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 duration | cut -f2 -d':'`
+#echo "hour :"$hour 1>&2
+#min=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 duration | cut -f3 -d':'`
+#echo "min : "$min 1>&2
+tsec=`/usr/bin/ffprobe $tmpfile -show_format 2>&1 | sed -n 's/duration=//p' | cut -f1 -d'.'`
+echo "tsec : "$tsec 1>&2
+#less than 30 seconds cannot be analyzed
+if [ $tsec -lt 30 ]
 then
   /bin/rm $tmpfile
   echo "ERR: This file is too short to be analyzed !!!"

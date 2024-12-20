@@ -13,7 +13,6 @@ var maxFrozen = 20;
 var showFrozen = 0;
 var soundfile = 'https://stream.political-studies.net/~tgs1/audio/2021-03-04-zanaan-wanaan.mp3';
 
-
 var strstr = function (haystack, needle) {
   if (needle.length === 0) return 0;
   if (needle === haystack) return 0;
@@ -411,12 +410,63 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    selectAll.onclick = function(e) {
+      if ( (typeof wavesurfer == "undefined") || (wavesurfer.getDuration() <= 0) ) {
+         alertify.alert("Wavesurfer is not initialized!<br/><br/>");
+      }
+      alertify.confirm( "Are you sure sure you want to select the whole document and loose all previous work?<br/><br/>"      
+      , function (e) {
+         if (e) {
+             var jqxhr = $.post( {
+                url: '../../delete-all-free.php',
+                data: {
+                   source: fullEncode(soundfile),
+                },
+                dataType: "text/html" 
+             }).fail(function(data) {
+                if ( data.status === 200 ) {
+                  console.log("cleared on server");
+                  wavesurfer.un('region-updated');
+                  wavesurfer.un('region-removed');
+                  wavesurfer.clearRegions();
+                  wregion = wavesurfer.regions.add({
+                       start: 0.0,
+                       end: wavesurfer.getDuration(),
+                       resize: true,
+                       drag: true,
+                       data: {
+                          note: "",
+                          user: user,
+                          color: ucolor,
+                          norder: 1,
+                          id: -1,
+                          whispered : 0
+                       }
+                  });
+                  drawAndSaveRegions();
+                  wavesurfer.on('region-updated', drawAndSaveRegions);
+                  wavesurfer.on('region-removed', drawAndSaveRegions);
+                } else {
+                  console.log("deleting free annotaions failed : " + JSON.stringify(data));
+                  alertAndScroll("deleting free annotaions failed : " + JSON.stringify(data));
+                }
+            });
+          } else {
+            console.log("selecting all cancelled");;
+          }
+        });
+    }
+
     callAI.onsubmit = function(e) {
         var model = $('#AImodel').find(":selected").val();
         var language = $('#AIlang').find(":selected").val();
         var counter = 0;
         var order = -1;
         e.preventDefault();
+        if ( language == "None" ) {
+           alertify.alert("Please, choose a language!<br/><br/>");
+           return;
+        }
 	if ( currentRegion == null ) {
            alertAndScroll( "Don't know what you are talking about ( unknown note )" );
            return -1;
@@ -607,7 +657,7 @@ function drawRegions() {
                time : wregion.start,
                label : counter,
                color : "#0000ff",
-               position : "top"
+               position : "bottom"
             });
             wavesurfer.addMarker({
                time : wregion.end,
@@ -702,7 +752,6 @@ function saveRegions() {
  */
 function loadRegions() {
  
-    console.log( "load regions : " + localStorage.regions.length);
     wavesurfer.un('region-updated');
     wavesurfer.un('region-removed');
     wavesurfer.clearRegions();
