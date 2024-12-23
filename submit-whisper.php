@@ -73,7 +73,23 @@ function detached_exec($cmd) {
   }
   $linear = $_POST['linear'];
 
-  if (!file_exists('/usr/bin/whisper') && !file_exists('/usr/local/bin/whisper')) {
+  // check that /var/www/ is writable by apache
+  $cmd="touch /var/www/dummy";
+  $cmdoutput = array();
+  $cmdresult = 0;
+  error_log($cmd);
+  $result = exec($cmd, $cmdoutput, $cmdresult);
+  if ($cmdresult!=0) {
+     header('HTTP/1.1 406 apache (www-data?) doesn\'t have permissions to write in /var/www which is needed!');	  
+     exit(-1);
+  }
+
+  $cmd="which whisper";
+  $cmdoutput = array();
+  $cmdresult = 0;
+  error_log($cmd);
+  $result = exec($cmd, $cmdoutput, $cmdresult);
+  if ($cmdoutput[0]=="") {
      header('HTTP/1.1 406 Whisper is not installed on the back-end, you should install it with : pip3 install openai-whisper');	  
      exit(-1);
   }

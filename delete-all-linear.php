@@ -19,11 +19,11 @@ include("config.php");
      $link->query('SET NAMES utf8');
      // error_log( 'Deleting annotation : '.urldecode($source).':'.$order);
      $sqls = "SELECT id FROM annotation WHERE source='".addslashes($source)."' AND norder>=4096;";
-     error_log( "sqls : ".$sqls );
+     // error_log( "sqls : ".$sqls );
      $results = $link->query($sqls);
      while ( $annrow = mysqli_fetch_row( $results ) ) {
         $annid = $annrow[0];
-        error_log( "annotation id : ".$annid );
+        // error_log( "annotation id : ".$annid );
         $sqld = "DELETE FROM audiobook WHERE aoid=".$annid.";";
         $resultdd = $link->query($sqld);
         if ( $resultdd <= 0 ) {

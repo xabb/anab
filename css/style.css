@@ -72,12 +72,21 @@ body {
     float: left;
     width: 18%; 
     margin-left: 2%;
+    height: 400px;
+    max-height: 400px;
 }
 
 .linear-outer-notes {
     display: table;
+    width: 100%; 
+    margin-left: 0%; 
+    border: 1px solid #dddddd; 
+}
+
+.free-outer-notes {
+    display: table;
     width: 80%; 
-    margin-left: 10%; 
+    margin-left: 0%; 
     border: 1px solid #dddddd; 
 }
 

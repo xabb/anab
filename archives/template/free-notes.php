@@ -103,7 +103,6 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
              <select id='AImodel'>
                 <option value='small'>Small</option>
                 <option value='turbo'>Turbo</option>
-                <option value='large'>Large</option>
              </select><br/><br/>
              <button type="submit" class="btn btn-success btn-block btn-whisper">Call and Pray</button>
              </center>
@@ -221,7 +220,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
             </div>
             <div id="notes" class="outer-notes">
             </div>
-            <div id="linear-notes" class="linear-outer-notes"></div>
+            <div id="linear-notes" class="free-outer-notes"></div>
             <div class="export-notes">
                <button class="btn btn-info btn-block btn-export" data-action="export" title="Export annotations to SRT">
                    <i class="glyphicon glyphicon-file"></i>

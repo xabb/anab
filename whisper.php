@@ -107,6 +107,17 @@ if (!$link) {
         exit(-1);
      }
 
+     // unlock document whatever happens next
+     $usql = "UPDATE annotation SET whispered=".$whispres." WHERE id=".$annid;         
+     error_log($usql);
+     $resupd = $link->query($usql);
+     if ( $resupd === FALSE )
+     {
+        error_log( 'Couldn\'t update annotation state : '.$resupd);
+        mysqli_close($link);
+        exit(-1);
+     }
+
      // get json result and create all new annotations
      if ( file_exists( $jsonfile ) ) {
        $wresults = json_decode(file_get_contents($jsonfile), true);

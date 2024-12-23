@@ -1,6 +1,6 @@
 A.N.a.B. is a collaborative audio annotation tool
 that can be used for different purposes :
-transcription, translation, comments on music, story telling, ...
+transcription, comments on music, story telling, ...
 
 Notes can include images and links to make reference
 to some other ressources and enrich the audio archives.
@@ -15,12 +15,16 @@ to process audio within the browser.
 ===== PREREQUISITES =====
 
 * A LAMP server
-  with a php with 
-  php-mbstring and php-xml
+  php requires php-mbstring and php-xml
 
-* ffmpeg, ffprobe, mimetype from libfile-mimeinfo-perl
+* ffmpeg, ffprobe, mimetype ( from libfile-mimeinfo-perl on ubuntu )
 
 * zip
+
+* optionally, if you want to use AI,
+you need OpenAI whisper,
+( you have the ability to enable/disable the use of AI
+for every user )
 
 ===== INSTALL =====
 
@@ -50,6 +54,10 @@ $config['dbuser'] = "__dbuser__";
 $config['dbpass'] = "__dbpass__";
 
 $config['owner'] = "admin";
+
+optionally, if you want to use AI,
+install OpenAI Whisper with :
+pip3 install openai-whisper
 
 You're set, log in to the system as admin
 and create users, archives and books.

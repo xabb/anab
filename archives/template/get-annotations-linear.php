@@ -45,7 +45,7 @@ class jsonOBJ {
      exit(-1);
   } else {
      $link->query("SET NAMES utf8");
-     $link->query("LOCK TABLES `annotation`");
+     $link->query("LOCK TABLES annotation WRITE");
 
      // renumber all free annotations
      $ssql = "SELECT id FROM annotation WHERE source='".addslashes($source)."' AND norder>=4096 ORDER BY start";
@@ -84,7 +84,7 @@ class jsonOBJ {
      }
   }
 
-  $link->query("UNLOCK TABLES `annotations`");
+  $link->query("UNLOCK TABLES");
   mysqli_close($link);
   header('Location: ./annotations-linear.json');
 

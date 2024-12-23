@@ -8,7 +8,7 @@ include("../../config.php");
      exit(-1);
   }
   $annotations = $_POST['json'];
-  error_log( "received : ".$annotations );
+  // error_log( "received : ".$annotations );
 
   // saving in the database 
   $link = mysqli_connect($config['dbhost'], $config['dbuser'], $config['dbpass'], $config['dbname']);
@@ -18,14 +18,14 @@ include("../../config.php");
      exit(-1);
   } else {
      $link->query("SET NAMES utf8");
-     $link->query("LOCK TABLES `annotation`");
+     $link->query("LOCK TABLES annotation WRITE");
      $annotes = json_decode( $annotations, true );
      // error_log( __FILE__." got : ".count($annotes)." notes" );
 
      foreach( $annotes as $note )
      {
         $ssql = "SELECT id FROM annotation WHERE source='".addslashes($note["source"])."' AND norder=".$note["order"];
-        error_log($ssql);
+        // error_log($ssql);
         $ressel = $link->query($ssql);
         if ( mysqli_num_rows($ressel) == 0 )
         {
@@ -56,7 +56,7 @@ include("../../config.php");
   }
 
   header('HTTP/1.1 200 OK');	  
-  $link->query("UNLOCK TABLES `annotations`");
+  $link->query("UNLOCK TABLES");
   mysqli_close($link);
   exit(0);
 

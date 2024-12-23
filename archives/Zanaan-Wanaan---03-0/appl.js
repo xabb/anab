@@ -325,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
                       $("#bar-"+wregion.id).append(range);
                       var rbook = "<i class='fa fa-book fa-1x linear-book' title='Add to Book' id='b"+wregion.id+"' onclick='addToBook(\""+wregion.id+"\")'></i>";
                       $("#bar-"+wregion.id).append(rbook);
-                      var rplay = "<i class='fa fa-play fa-1x linear-play' title='Play this Part' id='r"+wregion.id+"' onclick='playRegion(\""+wregion.id+"\")'></i>";
+                      var rplay = "<i class='fa fa-play fa-1x linear-play' title='Play this Part' id='r"+wregion.id+"' onclick='playRegion(\""+wregion.id+"\",\"true\")'></i>";
                       $("#bar-"+wregion.id).append(rplay);
                       if ( whisper == 1 ) {
                          var rwhisper = "<img src='../../img/whisper-logo.png' title='Call Whisper AI' class='whisper-logo' id='w"+wregion.id+"' onclick='whisperStart(\""+wregion.id+"\")' />";
@@ -706,7 +706,7 @@ function updateTable() {
       }
       var rbook = "<i class='fa fa-book fa-1x linear-book' title='Add to Book' id='b"+id+"' onclick='addToBook(\""+id+"\")'></i>";
       $("#bar-"+id).append(rbook);
-      var rplay = "<i class='fa fa-play fa-1x linear-play' title='Play this Part' id='r"+id+"' onclick='playRegion(\""+id+"\")'></i>";
+      var rplay = "<i class='fa fa-play fa-1x linear-play' title='Play this Part' id='r"+id+"' onclick='playRegion(\""+id+"\",\"true\")'></i>";
       $("#bar-"+id).append(rplay);
       var ncontent = "<textarea id='"+id+"' class='note-textarea'>"+region.data.note+"</textarea>";
       $("#linear-notes").append(ncontent);
@@ -742,7 +742,7 @@ function updateTableOne(currentId) {
         }
         var rbook = "<i class='fa fa-book fa-1x linear-book' title='Add to Book' id='b"+id+"' onclick='addToBook(\""+id+"\")'></i>";
         $("#bar-"+id).append(rbook);
-        var rplay = "<i class='fa fa-play fa-1x linear-play' title='Play this Part' id='r"+id+"' onclick='playRegion(\""+id+"\")'></i>";
+        var rplay = "<i class='fa fa-play fa-1x linear-play' title='Play this Part' id='r"+id+"' onclick='playRegion(\""+id+"\",\"true\")'></i>";
         $("#bar-"+id).append(rplay);
         var ncontent = "<textarea id='"+id+"' class='note-textarea'>"+region.data.note+"</textarea>";
         $("#linear-notes").append(ncontent);
@@ -977,9 +977,11 @@ function randomColor(alpha) {
 function regionClick(region, e) {
     // play region in a loop, exit the loop when edition is done
     // propagate the click to the sound wave to set play time
-    region.setLoop(true);
-    region.playLoop();
-    deleteNote(region);
+    if ( currentRegion != null && region.id != currentRegion )
+       deleteNote(region);
+    showNote(region);
+    playRegion(region.id, true );
+
     var clickEvent = new MouseEvent("click", {
         bubbles: true,
         cancelable: true,
@@ -1113,21 +1115,54 @@ var whisperStart = function(regid) {
     }
 }
 
-var playRegion = function(regid) {
-    var region = wavesurfer.regions.list[regid];
+var playRegion = function(regid, changeState) {
 
-    console.log( "play region" );
+    var wregion = wavesurfer.regions.list[regid];
+    console.log( "play region : " + regid + " current :  " + currentRegion);
+    if ( regid == currentRegion && !changeState ) {
+       return;
+    }
+
+    // desactivate all playing regions
+    Object.keys(wavesurfer.regions.list).map(function(id) {
+       $("#r"+id).removeClass("fa-pause");
+       $("#r"+id).addClass("fa-play");
+       $("#"+id).css("border-color","#000000");
+    });
+
+    // really stop
+    if ( regid == currentRegion ) {
+       if ( !wavesurfer.isPlaying() ) {
+          wregion.setLoop(true);
+          wregion.playLoop();
+          $("#r"+regid).removeClass("fa-play");
+          $("#r"+regid).addClass("fa-pause");
+          $("#"+regid).css("border-color","#ff0000");
+          return;
+       } else {
+          wavesurfer.pause();
+          return;
+        }
+    }
+
     if ( !wavesurfer.isPlaying() )
     {
-       region.setLoop(true);
-       region.playLoop();
+       wregion.setLoop(true);
+       wregion.playLoop();
        $("#r"+regid).removeClass("fa-play");
        $("#r"+regid).addClass("fa-pause");
+       $("#"+regid).css("border-color","#ff0000");
+       currentRegion = regid;
     } else {
        wavesurfer.pause();
-       $("#r"+regid).removeClass("fa-pause");
-       $("#r"+regid).addClass("fa-play");
+       wregion.setLoop(true);
+       wregion.playLoop();
+       $("#r"+regid).removeClass("fa-play");
+       $("#r"+regid).addClass("fa-pause");
+       $("#"+regid).css("border-color","#ff0000");
+       currentRegion = regid;
     }
+
 }
 
 /**
@@ -1144,11 +1179,6 @@ function showCurrentNote() {
 function showNote(region) {
     console.log( "showNote : " + region.id );
     currentRegion = region.id;
-    updateTableOne(currentRegion);
-    $("#r"+currentRegion).removeClass("fa-play");
-    $("#r"+currentRegion).addClass("fa-pause");
-    $("#"+currentRegion).css("border-color","#ff0000");
-    // console.log( "show note");
     // hide all notes, except this one
     if (!showNote.el) {
         showNote.el = document.querySelector('#subtitle');

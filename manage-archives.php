@@ -4,19 +4,12 @@ include("functions.php");
 
 session_start();
 
+$servroot = "http://".$_SERVER['HTTP_HOST'].":".$_SERVER['SERVER_PORT'];
+
 if (!isset($_SESSION['schtroumpf']) || !isset($_SESSION['papa']) )
 {
    header("Location: index.php");
    die();
-}
-
-if ( $_SERVER['SERVER_PORT'] == 80 )
-{
-   $servroot = "https://".$_SERVER['HTTP_HOST'];
-}
-else
-{
-   $servroot = "https://".$_SERVER['HTTP_HOST'].":".$_SERVER['SERVER_PORT'];
 }
 
 if ( isset( $_GET['search'] ) )

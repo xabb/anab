@@ -120,7 +120,6 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
              <select id='AImodel'>
                 <option value='small'>Small</option>
                 <option value='turbo'>Turbo (default)</option>
-                <option value='large'>Large</option>
              </select><br/><br/>
              <button type="submit" class="btn btn-success btn-block btn-whisper">Call and Pray</button>
              </center>

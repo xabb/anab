@@ -284,10 +284,10 @@ document.addEventListener('DOMContentLoaded', function() {
         $("#fplay").removeClass('fa-play');
         $("#fplay").addClass('fa-pause');
         $("#fplay").attr('data-action','pause');
-        if ( currentRegion != null ) {
-           $("#r"+currentRegion).removeClass("fa-play");
-           $("#r"+currentRegion).addClass("fa-pause");
-        }
+        // if ( currentRegion != null ) {
+        //    $("#r"+currentRegion).removeClass("fa-play");
+        //    $("#r"+currentRegion).addClass("fa-pause");
+        // }
     });
 
     wavesurfer.on('pause', function() {
@@ -297,6 +297,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if ( currentRegion != null ) {
            $("#r"+currentRegion).removeClass("fa-pause");
            $("#r"+currentRegion).addClass("fa-play");
+           $("#"+currentRegion).css("border-color","#000000");
         }
     });
 
@@ -818,7 +819,8 @@ function regionClick(region, e) {
     if ( currentRegion != null && region.id != currentRegion )
        deleteNote(region);
     showNote(region);
-    region.play();
+    playRegion(region.id, true );
+
     // propagate click to the waveform
     var clickEvent = new MouseEvent("click", {
         bubbles: true,
@@ -881,9 +883,6 @@ function editAnnotation(region, e) {
  */
 function showNote(region) {
     currentRegion = region.id;
-    $("#r"+currentRegion).removeClass("fa-play");
-    $("#r"+currentRegion).addClass("fa-pause");
-    $("#"+currentRegion).css("border-color","#ff0000");
     // console.log( "show note");
     if (!showNote.el || !showNote.uel) {
         showNote.uel = document.querySelector('#subtitle');
@@ -931,12 +930,12 @@ function showNote(region) {
  */
 function deleteNote(region) {
     // we're out of the region, so playing button must be turned off
-    if ( currentRegion != null ) {
-      $("#r"+currentRegion).removeClass("fa-pause");
-      $("#r"+currentRegion).addClass("fa-play");
-      $("#"+currentRegion).css("border-color","#000000");
-      currentRegion = null;
-    }
+    // if ( currentRegion != null ) {
+    //   $("#r"+currentRegion).removeClass("fa-pause");
+    //   $("#r"+currentRegion).addClass("fa-play");
+    //   $("#"+currentRegion).css("border-color","#000000");
+    //   currentRegion = null;
+    // }
     if (!deleteNote.el || !deleteNote.uel) {
        deleteNote.el = document.querySelector('#isubtitle');
        deleteNote.uel = document.querySelector('#subtitle');
@@ -1077,10 +1076,20 @@ var playAt = function(position) {
     if ( currentRegion != null ) {
       $("#r"+currentRegion).removeClass("fa-pause");
       $("#r"+currentRegion).addClass("fa-play");
+      $("#"+currentRegion).css("border-color","#000000");
     }
     console.log("play at : " + position/wavesurfer.getDuration() );
     wavesurfer.seekTo( position/wavesurfer.getDuration() );
     wavesurfer.play();
+    Object.keys(wavesurfer.regions.list).map(function(id) {
+       let wregion=wavesurfer.regions.list[id];
+       if ( wregion.start <= position && position <= wregion.end ) {
+          $("#r"+id).removeClass("fa-play");
+          $("#r"+id).addClass("fa-pause");
+          $("#"+id).css("border-color","#ff0000");
+          currentRegion=id;
+       }
+    });
 }
 
 window.GLOBAL_ACTIONS['export'] = function() {
@@ -1119,48 +1128,48 @@ window.GLOBAL_ACTIONS['export'] = function() {
 };
 
 var playRegion = function(regid, changeState) {
-    var region = wavesurfer.regions.list[regid];
-
+    var wregion = wavesurfer.regions.list[regid];
     console.log( "play region : " + regid + " current :  " + currentRegion);
-
     if ( regid == currentRegion && !changeState ) {
        return;
     }
 
+    Object.keys(wavesurfer.regions.list).map(function(id) {
+       $("#r"+id).removeClass("fa-pause");
+       $("#r"+id).addClass("fa-play");
+       $("#"+id).css("border-color","#000000");
+    });
+
     // really stop
     if ( regid == currentRegion ) {
        if ( !wavesurfer.isPlaying() ) {
-          region.setLoop(true);
-          region.playLoop();
+          wregion.setLoop(true);
+          wregion.playLoop();
           $("#r"+regid).removeClass("fa-play");
           $("#r"+regid).addClass("fa-pause");
+          $("#"+regid).css("border-color","#ff0000");
           return;
        } else {
           wavesurfer.pause();
-          region.setLoop(false);
-          $("#r"+regid).removeClass("fa-pause");
-          $("#r"+regid).addClass("fa-play");
           return;
         }
     }
 
     if ( !wavesurfer.isPlaying() )
     {
-       region.setLoop(true);
-       region.playLoop();
+       wregion.setLoop(true);
+       wregion.playLoop();
        $("#r"+regid).removeClass("fa-play");
        $("#r"+regid).addClass("fa-pause");
+       $("#"+regid).css("border-color","#ff0000");
        currentRegion = regid;
     } else {
-       if ( currentRegion != null ) {
-          $("#r"+currentRegion).removeClass("fa-pause");
-          $("#r"+currentRegion).addClass("fa-play");
-       }
-       wavesurfer.pause();
-       region.setLoop(true);
-       region.playLoop();
+       console.log("play region over other : " + regid );
        $("#r"+regid).removeClass("fa-play");
        $("#r"+regid).addClass("fa-pause");
+       $("#"+regid).css("border-color","#ff0000");
        currentRegion = regid;
+       wregion.setLoop(true);
+       wregion.playLoop();
     }
 }
