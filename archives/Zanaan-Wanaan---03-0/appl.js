@@ -404,53 +404,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         wavesurfer.responsive=true;
 
-        selectAlll.onclick = function(e) {
-          if ( (typeof wavesurfer == "undefined") || (wavesurfer.getDuration() <= 0) ) {
-             alertify.alert("Wavesurfer is not initialized!<br/><br/>");
-          }
-          alertify.confirm( "Are you sure sure you want to select the whole document and loose all previous work?<br/><br/>"
-          , function (e) {
-             if (e) {
-                 var jqxhr = $.post( {
-                    url: '../../delete-all-linear.php',
-                    data: {
-                       source: fullEncode(soundfile),
-                    },
-                    dataType: "text/html"
-                 }).fail(function(data) {
-                    if ( data.status === 200 ) {
-                      console.log("cleared on server");
-                      wavesurfer.un('region-updated');
-                      wavesurfer.un('region-removed');
-                      wavesurfer.clearRegions();
-                      wregion = wavesurfer.regions.add({
-                           start: 0.0,
-                           end: wavesurfer.getDuration(),
-                           resize: true,
-                           drag: true,
-                           data: {
-                              note: "",
-                              user: user,
-                              color: ucolor,
-                              norder: 4096,
-                              id: -1,
-                              whispered : 0
-                           }
-                      });
-                      drawAndSaveRegions();
-                      updateTable();
-                      wavesurfer.on('region-updated', drawAndSaveRegions);
-                      wavesurfer.on('region-removed', drawAndSaveRegions);
-                    } else {
-                      console.log("deleting free annotaions failed : " + JSON.stringify(data));
-                      alertAndScroll("deleting free annotaions failed : " + JSON.stringify(data));
-                    }
-                });
-              } else {
-                console.log("selecting all cancelled");;
-              }
-            });
-        }
 
     }).fail(function(error) {
         console.log( "couldn't load peaks : " + JSON.stringify(error) );
@@ -515,6 +468,76 @@ document.addEventListener('DOMContentLoaded', function() {
     $('#help').on('click', function() {
         $("#modal-help").modal("show");
     });
+
+    selectAlll.onclick = function(e) {
+      if ( (typeof wavesurfer == "undefined") || (wavesurfer.getDuration() <= 0) ) {
+         alertify.alert("Wavesurfer is not initialized!<br/><br/>");
+      }
+      if ( frozenl ) {
+         if ( showFrozenl <= maxFrozenl ) {
+            alertAndScroll("Document is frozen until AI job completes, so your changes will not be saved\n until the automatic transcription completes!");
+            showFrozenl++;
+         }
+         return;
+      }
+      let wregion = wavesurfer.regions.add({
+          start: 0.0,
+          end: wavesurfer.getDuration(),
+          resize: true,
+          drag: true,
+          data: {
+             note: "",
+             user: user,
+             color: ucolor,
+             norder: nbRegions+4095+1,
+             id: -1, 
+             whispered : 0
+          }
+      });
+      drawAndSaveRegions();
+      updateTable();
+    }
+
+    resetAlll.onclick = function(e) {
+      if ( (typeof wavesurfer == "undefined") || (wavesurfer.getDuration() <= 0) ) {
+         alertify.alert("Wavesurfer is not initialized!<br/><br/>");
+      }
+      if ( frozenl ) {
+         if ( showFrozenl <= maxFrozenl ) {
+            alertAndScroll("Document is frozen until AI job completes, so your changes will not be saved\n until the automatic transcription completes!");
+            showFrozenl++;
+         }
+         return;
+      }
+      alertify.confirm( "Are you sure sure you want to reset the whole document and loose all previous work?<br/><br/>"
+      , function (e) {
+         if (e) {
+             var jqxhr = $.post( {
+                url: '../../delete-all-linear.php',
+                data: {
+                   source: fullEncode(soundfile),
+                },
+                dataType: "text/html"
+            }).fail(function(data) {
+                if ( data.status === 200 ) {
+                  console.log("cleared on server");
+                  wavesurfer.un('region-updated');
+                  wavesurfer.un('region-removed');
+                  wavesurfer.clearRegions();
+                  drawAndSaveRegions();
+                  updateTable();
+                  wavesurfer.on('region-updated', drawAndSaveRegions);
+                  wavesurfer.on('region-removed', drawAndSaveRegions);
+                } else {
+                  console.log("deleting linear annotaions failed : " + JSON.stringify(data));
+                  alertAndScroll("deleting linear annotaions failed : " + JSON.stringify(data));
+                }
+            });
+          } else {
+            console.log("resetting all cancelled");;
+          }
+        });
+    }
 
     $("#modal-book").on("shown.bs.modal", function() {
         var jqxhr = $.post( {
@@ -602,7 +625,7 @@ function splitAnnotation() {
                             whispered : ( lregion.data.whispered != undefined ) ? lregion.data.whispered : 0
                           }
                       });
-                console.log("created linear region # : " + nbRegions+4096+1 );
+                console.log("created linear region # : " + nbRegions+4095+1 );
                 drawAndSaveRegions();
                 nbRegions++;
             }
@@ -720,6 +743,12 @@ function updateTable() {
           showNote(cregion);
       });
     });
+
+    if ( currentRegion != null ) {
+      $("#r"+currentRegion).removeClass("fa-play");
+      $("#r"+currentRegion).addClass("fa-pause");
+      $("#"+currentRegion).css("border-color","#ff0000");
+    }
 }
 
 /**

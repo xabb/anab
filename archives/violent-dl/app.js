@@ -8,6 +8,7 @@ var evid;
 var svid;
 var currentRegion = null;
 var bRegionId=-1;
+var nbRegions=0;
 var frozen=false;
 var maxFrozen = 20;
 var showFrozen = 0;
@@ -411,11 +412,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    selectAll.onclick = function(e) {
+    resetAll.onclick = function(e) {
       if ( (typeof wavesurfer == "undefined") || (wavesurfer.getDuration() <= 0) ) {
          alertify.alert("Wavesurfer is not initialized!<br/><br/>");
       }
-      alertify.confirm( "Are you sure sure you want to select the whole document and loose all previous work?<br/><br/>"      
+      if ( frozen ) {
+         if ( showFrozen <= maxFrozen ) {
+            alertAndScroll("Document is frozen until AI job completes, so your changes will not be saved\n until the automatic transcription completes!");
+            showFrozen++;
+         }
+         return;
+      }
+      alertify.confirm( "Are you sure sure you want to reset the whole document and loose all previous work?<br/><br/>"      
       , function (e) {
          if (e) {
              var jqxhr = $.post( {
@@ -430,20 +438,6 @@ document.addEventListener('DOMContentLoaded', function() {
                   wavesurfer.un('region-updated');
                   wavesurfer.un('region-removed');
                   wavesurfer.clearRegions();
-                  wregion = wavesurfer.regions.add({
-                       start: 0.0,
-                       end: wavesurfer.getDuration(),
-                       resize: true,
-                       drag: true,
-                       data: {
-                          note: "",
-                          user: user,
-                          color: ucolor,
-                          norder: 1,
-                          id: -1,
-                          whispered : 0
-                       }
-                  });
                   drawAndSaveRegions();
                   wavesurfer.on('region-updated', drawAndSaveRegions);
                   wavesurfer.on('region-removed', drawAndSaveRegions);
@@ -453,9 +447,37 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
           } else {
-            console.log("selecting all cancelled");;
+            console.log("resetting all cancelled");;
           }
         });
+    }
+
+    selectAll.onclick = function(e) {
+      if ( (typeof wavesurfer == "undefined") || (wavesurfer.getDuration() <= 0) ) {
+         alertify.alert("Wavesurfer is not initialized!<br/><br/>");
+      }
+      if ( frozen ) {
+         if ( showFrozen <= maxFrozen ) {
+            alertAndScroll("Document is frozen until AI job completes, so your changes will not be saved\n until the automatic transcription completes!");
+            showFrozen++;
+         }
+         return;
+      }
+      let wregion = wavesurfer.regions.add({
+          start: 0.0,
+          end: wavesurfer.getDuration(),
+          resize: true,
+          drag: true,
+          data: {
+             note: "",
+             user: user,
+             color: ucolor,
+             norder: nbRegions+1,
+             id: -1,
+             whispered : 0
+          }
+      });
+      drawAndSaveRegions();
     }
 
     callAI.onsubmit = function(e) {
@@ -756,6 +778,7 @@ function loadRegions() {
     wavesurfer.un('region-updated');
     wavesurfer.un('region-removed');
     wavesurfer.clearRegions();
+    nbRegions=0;
     $.post({
         responseType: 'json',
         url: 'get-annotations.php',
@@ -769,6 +792,7 @@ function loadRegions() {
            frozen=true;
            console.log("show free frozen : " + frozen);
         }
+        nbRegions++;
         wregion = wavesurfer.regions.add({
              start: region.start,
              end: region.end,
@@ -837,9 +861,11 @@ function regionClick(region, e) {
 function editAnnotation(region, e) {
     e.stopPropagation();
     console.log( "edit : play region" );
-    if ( frozen && showFrozen <= maxFrozen ) {
-       alertAndScroll("Document is frozen until AI job completes, so your changes will not be saved\n until the automatic transcription completes!");
-       showFrozen++;
+    if ( frozen ) {
+       if ( showFrozen <= maxFrozen ) {
+          alertAndScroll("Document is frozen until AI job completes, so your changes will not be saved\n until the automatic transcription completes!");
+          showFrozen++;
+       }
        return;
     }
     currentRegion=region.id;

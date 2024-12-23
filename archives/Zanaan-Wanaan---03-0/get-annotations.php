@@ -60,6 +60,7 @@ class jsonOBJ {
          $resupd = $link->query($usql);
          if ( $resupd === FALSE ) {
             error_log( 'Couldn\'t update annotation order : '.$resupd);
+            $link->query("UNLOCK TABLES");
             mysqli_close($link);
             exit(-1);
          }
@@ -80,6 +81,8 @@ class jsonOBJ {
      {
         $error = error_get_last();
         header('HTTP/1.1 500 Could not store annotations : '.$error['message']);
+        $link->query("UNLOCK TABLES");
+        mysqli_close($link);
         exit(-1);
      }
   }

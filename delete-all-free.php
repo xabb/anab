@@ -17,6 +17,7 @@ include("config.php");
      exit(-1);
   } else {
      $link->query('SET NAMES utf8');
+     $link->query("LOCK TABLES annotation WRITE");
      // error_log( 'Deleting annotation : '.urldecode($source).':'.$order);
      $sqls = "SELECT id FROM annotation WHERE source='".addslashes($source)."' AND norder<4096;";
      error_log( "sqls : ".$sqls );
@@ -34,6 +35,7 @@ include("config.php");
         if ( $resultd <= 0 )
         {
            header('HTTP/1.1 500 Error deleting annotation');	  
+           $link->query("UNLOCK TABLES");
            mysqli_close($link);
            exit(-1);
         }
@@ -41,6 +43,7 @@ include("config.php");
   }
 
   header('HTTP/1.1 200 OK');	  
+  $link->query("UNLOCK TABLES");
   mysqli_close($link);
   exit(0);
 

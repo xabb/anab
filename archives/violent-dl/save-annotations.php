@@ -35,7 +35,7 @@ include("../../config.php");
            if ( $resins !== true ) {
               error_log( "ERROR : ".__FILE__." : could not create annotation : ".$note["order"]." : ".mysqli_error($link) );
               header('HTTP/1.1 500 Error creating annotation');	  
-              $link->query("UNLOCK TABLES `annotation`");
+              $link->query("UNLOCK TABLES");
               mysqli_close($link);
               exit(-1);
            }
@@ -47,7 +47,7 @@ include("../../config.php");
            if ( $resupd !== true ) {
               error_log( "ERROR : ".__FILE__." : could not update annotation : ".$note["id"]." : ".mysqli_error($link) );
               header('HTTP/1.1 500 Error updating annotation');	  
-              $link->query("UNLOCK TABLES `annotation`");
+              $link->query("UNLOCK TABLES");
               mysqli_close($link);
               exit(-1);
            }
