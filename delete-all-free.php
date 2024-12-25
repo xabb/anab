@@ -17,7 +17,7 @@ include("config.php");
      exit(-1);
   } else {
      $link->query('SET NAMES utf8');
-     $link->query("LOCK TABLES annotation WRITE");
+     $link->query("LOCK TABLES annotation WRITE, audiobook WRITE");
      // error_log( 'Deleting annotation : '.urldecode($source).':'.$order);
      $sqls = "SELECT id FROM annotation WHERE source='".addslashes($source)."' AND norder<4096;";
      error_log( "sqls : ".$sqls );

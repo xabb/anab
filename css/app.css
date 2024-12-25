@@ -68,6 +68,10 @@ overview {
   float : right;
 }
 
+input[type='range'] { 
+  accent-color: #0000cc; 
+}
+
 .select-all {
   background-color : #0000cc;
   text-align : center;
@@ -94,7 +98,14 @@ overview {
   float : left;
 }
 
-.btn-fplay {
+.float-left {
+  display : inline-block;
+  float : left;
+}
+
+.float-right {
+  display : inline-block;
+  float : right;
 }
 
 .btn-play {
@@ -248,7 +259,7 @@ overview {
   margin-top:-5px;
 }
 
-.zoom-value, .speed-value {
+.speed-value {
   float:right;
   width:30px;
   height:20px;
@@ -260,24 +271,29 @@ overview {
   margin-top:5px;
 }
 
-.zoom-label, .speed-label, .speed-label-solo {
+.zoom-label {
+  float:right;
+  width:300px;
+  height:20px;
+  text-align:center;
+  font-weight: bold;
+  line-height:20px;
+  margin:auto;;
+}
+
+.speed-control {
+  width:100px;
+  float:right;
+}
+
+.speed-label {
   float:right;
   width:100px;
   height:20px;
   text-align:center;
   font-weight: bold;
   line-height:20px;
-  margin-right:0px;
-  margin-left:10px;
-  margin-top:0px;
-}
-
-.speed-label {
-  width:50px;
-}
-
-.speed-label-solo {
-  width:100px;
+  margin:auto;
 }
 
 wave {

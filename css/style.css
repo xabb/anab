@@ -122,6 +122,11 @@ body {
     height: 80px;
 }
 
+.zoom-range {
+    width: 200px;
+    margin: auto;
+}
+
 #export-subtitles {
     width: 10%;
     float: right;

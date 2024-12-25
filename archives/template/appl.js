@@ -15,7 +15,7 @@ var evid;
 var svid;
 var wavey=-1;
 var frozenl=false;
-var maxFrozenl = 20;
+var maxFrozenl = 200;
 var showFrozenl = 0;
 var currentRegion;
 var nbRegions=0;
@@ -630,6 +630,7 @@ function splitAnnotation() {
                 nbRegions++;
             }
     });
+    updateTable();
     wavesurfer.drawer.fireEvent('redraw');
 }
 

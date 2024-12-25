@@ -10,7 +10,7 @@ var currentRegion = null;
 var bRegionId=-1;
 var nbRegions=0;
 var frozen=false;
-var maxFrozen = 20;
+var maxFrozen = 200;
 var showFrozen = 0;
 var soundfile = '__file_url__';
 
@@ -94,25 +94,6 @@ var getPosition = function(e)
       }
     }
     return {x:x, y:y};
-}
-
-var decZoom = function() {
-    if ( wzoom <= 1.0 ) 
-       wzoom=Math.max(wzoom-0.1,0.1);
-    else
-       wzoom=Math.max(wzoom-1,1);
-    console.log( "wzoom = " + wzoom );
-    $('#zvalue').html(("x"+wzoom).substring(0,4));
-    // evid = setTimeout( "decZoom();", 500 );
-}
-
-var incZoom = function() {
-    if ( wzoom < 1 ) 
-       wzoom=Math.min(wzoom+0.1,1.0);
-    else
-       wzoom=Math.min(wzoom+1,100);
-    $('#zvalue').html(("x"+wzoom).substring(0,4));
-    // evid = setTimeout( "incZoom();", 500 );
 }
 
 var decSpeed = function() {
@@ -246,7 +227,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // zoom is the number of minutes limited to 10
         wzoom = Math.floor( wavesurfer.getDuration() / 60.0 )+1;
         if ( wzoom > 10 ) wzoom = 10;
-        $('#zvalue').html(("x"+wzoom).substring(0,4));
+        $('#zlabel').html("Zoom : " + Number(wzoom));
+        $('#zoomZoom').value = Number(wzoom);
         wavesurfer.zoom(wzoom);
         $('#svalue').html(("x"+wspeed).substring(0,4));
 	if ( sstart !== null )
@@ -277,7 +259,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     wavesurfer.on('audioprocess', function() {
-        // wavesurfer.zoom(wzoom);
         moveSpeech();
     });
 
@@ -303,38 +284,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     wavesurfer.responsive=true;
-
-    $('#zminus').on('mousedown', function() {
-       evid = setTimeout( "decZoom();", 100 );
-    });
-
-    $('#zminus').on('mouseup', function() {
-       if ( typeof evid != "undefined" ) clearTimeout(evid);
-       wavesurfer.zoom(wzoom);
-       moveSpeech();
-    });
-
-    $('#zminus').on('mouseout', function() {
-       if ( typeof evid != "undefined" ) clearTimeout(evid);
-       wavesurfer.zoom(wzoom);
-       moveSpeech();
-    });
-
-    $('#zplus').on('mousedown', function() {
-       evid = setTimeout( "incZoom();", 100 );
-    });
-
-    $('#zplus').on('mouseup', function() {
-       if ( typeof evid != "undefined" ) clearTimeout(evid);
-       wavesurfer.zoom(wzoom);
-       moveSpeech();
-    });
-
-    $('#zplus').on('mouseout', function() {
-       if ( typeof evid != "undefined" ) clearTimeout(evid);
-       wavesurfer.zoom(wzoom);
-       moveSpeech();
-    });
 
     $('#sminus').on('mousedown', function() {
        evid = setTimeout( "decSpeed();", 100 );
@@ -478,6 +427,14 @@ document.addEventListener('DOMContentLoaded', function() {
           }
       });
       drawAndSaveRegions();
+    }
+
+    zoomZoom.oninput = function(e) {
+       wavesurfer.responsive=false;
+       console.log("setting zoom : " + Number(this.value) );
+       wavesurfer.zoom(Number(this.value));
+       $("#zlabel").html("Zoom : " + Number(this.value) );
+       wavesurfer.responsive=true;
     }
 
     callAI.onsubmit = function(e) {
