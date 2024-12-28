@@ -1,6 +1,6 @@
 <?php
 
-$clangs = array(
+$sclangs = array(
 "af",
 "sq",
 "am",

@@ -118,17 +118,20 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                     <p>
                      Select a part of the file to create a region.<br /><br />
                      You can then resize it by moving its border, move it with click-and-drag or removing it by clicking on the upper-right red marker.<br /><br />
-                     To create a note, double-click on a region and a pop-up will appear where you can enter a note in rich text format, save it before closing the pop-up.<br /><br />
+                     To edit a note, double-click on a region and a pop-up will appear where you can enter a note in rich text format, save it before closing the pop-up.<br /><br />
                      In edition mode, the region will play in a loop, to resume playing the file normally, close the edition pop-up.<br /><br />
                      In edition mode, you can also add the region to an audio book by clicking on the audiobook icon.<br /><br />
-                     Enjoy and shout "F*** Elon Musk" each time you save your work !!<br />
+                     Additionnally, you can use the AI transcription ( OpenAI whisper ) by clicking on the whisper icon on all screens : <img src="../../img/whisper-logo.png" width="30px" height="30px" /><br/><br/>
+                     And, cherry on the cake!, you can use the translation icon : <img src="../../img/translate.png" width="30px" height="30px" /> to translate to the language(s) of your choice ( multiple ).<br/><br/> After a translation, each line will start with the short code of the language like en, pt, it... and choosing a language in the drop -down menu in the title will only show you one language without abbreviations.<br/><br/>
+                     Once you chose a language, you can also export all your notes to a subtitle file (.srt) using the Export button.<br/><br/>
+                     Enjoy and shout "In your ***, Elon Musk" each time you save your work !!<br />
                   </p>                              
                  </div>
              </div>
         </div>
 
         <div class="container" id="container">
-            <div class="header">
+            <div class="header" id="archive-header">
                 <h3 itemprop="title" id="title"></h3>
                 <div id='selectAll' class='select-all'>Select All</div>
                 <div id='resetAll' class='reset-all'>Reset All</div>
@@ -156,13 +159,13 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                   </div>
                   <div class="zoom-range">
                     <div>
-                       <i class="glyphicon glyphicon-zoom-in float-right"></i>
+                       <i id="zplus" class="glyphicon glyphicon-zoom-in float-right"></i>
                     </div>
                     <div>
                         <input id="zoomZoom" data-action="zoom" class="float-right" type="range" min="1" max="200" value="0" style="width: 100px" />
                     </div>
                     <div>
-                        <i class="glyphicon glyphicon-zoom-out float-right"></i>
+                        <i id="zminus" class="glyphicon glyphicon-zoom-out float-right"></i>
                     </div>
                   </div>
 		  <div id="ptime" class="play-time"></div>
@@ -174,7 +177,8 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                   <div class="modal-dialog">
                     <center><h3>Edit Note</h3>
                     <div id="audiobook-div"><i id="audiobook" class="fa fa-book fa-2x" width="30px" height="30px" /></i></div>
-                    <div id="whisper-div"><img src="../../img/whisper-logo.png" width="30px" height="30px" onclick="whisperStart('')" /></div>
+                    <div id="whisper-div" class="whisper-div"><img src="../../img/whisper-logo.png" width="30px" height="30px" onclick="whisperStart('')" /></div>
+                    <div id="trans-div" class="trans-div"><img src="../../img/translate.png" width="30px" height="30px" onclick="translationStart('')" /></div>
                     <div class="modal-content">
                       <center>
                         <i id="fplay" class="fa fa-play fa-2x" data-action="play-region"></i>  

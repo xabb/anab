@@ -34,10 +34,13 @@ if (!$link) {
      } else {
         $rowres=mysqli_fetch_row($results);
         $anntext = $rowres[0];
-        if ( strstr( $anntext, $langin.":" ) ) {
-           print $anntext;
-        } else {
-           print $slang.":".$anntext."\n";
+        $annlines = preg_split('/\r\n|\r|\n/', $anntext);
+        forEach( $annlines as $line ) {
+          if ( strstr( $line, $langin.":" ) ) {
+             print $line."\n";
+          } else {
+             print $slang.":".$line."\n";
+          }
         }
      }
      if ( $anntext == "" ) {
@@ -49,16 +52,28 @@ if (!$link) {
      $cmdresult = 0;
      $langsout = explode(',', $olang );
      forEach ($langsout as $lo) {
-        $cmdoutput = array();
-        $cmd="php translate.php $slang $lo \"$anntext\"\n";
-        // error_log($cmd);
-        $result = exec($cmd, $cmdoutput, $cmdresult);
-        if ($cmdresult!=0) {
-           error_log('Couldn\'t translate annotation : '.$annid." (".$cmdresult.")");
-           mysqli_close($link);
-           exit(-1);
-        } else {
-           print $lo.":".$cmdoutput[0]."\n";
+        if ( strstr( $anntext, $lo.":" ) ) {
+           // annotation is already translated to that language
+           continue;
+        }
+        $annlines = preg_split('/\r\n|\r|\n/', $anntext);
+        forEach( $annlines as $line ) {
+           $rline = $line;
+           if ( $line[2] == ':' ) {
+              // annotation is already a translation, remove translation part
+              $rline = substr($line, 3);
+           }
+           $cmdoutput = array();
+           $cmd="php translate.php $slang $lo \"$rline\"\n";
+           // error_log($cmd);
+           $result = exec($cmd, $cmdoutput, $cmdresult);
+           if ($cmdresult!=0) {
+              error_log('Couldn\'t translate annotation : '.$annid." (".$cmdresult.")");
+              mysqli_close($link);
+              exit(-1);
+           } else {
+              print $lo.":".$cmdoutput[0]."\n";
+           }
         }
      }
 }

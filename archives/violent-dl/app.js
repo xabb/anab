@@ -7,6 +7,8 @@ var wspeed=1.0;
 var evid;
 var svid;
 var currentRegion = null;
+var languages = '--';
+var language = '--';
 var bRegionId=-1;
 var nbRegions=0;
 var frozen=false;
@@ -429,12 +431,22 @@ document.addEventListener('DOMContentLoaded', function() {
       drawAndSaveRegions();
     }
 
+    zplus.onclick = function(e) {
+       wzoom++;
+       wavesurfer.zoom(wzoom);
+       $("#zlabel").html("Zoom : " + wzoom );
+    }
+
+    zminus.onclick = function(e) {
+       wzoom--;
+       wavesurfer.zoom(wzoom);
+       $("#zlabel").html("Zoom : " + wzoom );
+    }
+
     zoomZoom.oninput = function(e) {
-       wavesurfer.responsive=false;
-       console.log("setting zoom : " + Number(this.value) );
-       wavesurfer.zoom(Number(this.value));
-       $("#zlabel").html("Zoom : " + Number(this.value) );
-       wavesurfer.responsive=true;
+       wzoom=Number(this.value);
+       wavesurfer.zoom(wzoom);
+       $("#zlabel").html("Zoom : " + wzoom );
     }
 
     callAI.onsubmit = function(e) {
@@ -591,8 +603,10 @@ function drawRegions() {
 
     // redraw and save to the server
     var counter=0;
-    var navigation="<center><b>Navigate</b></center><br/><br/>";
+    var navigation="<center><br/><br/><br/><br/><b>Navigate</b></center>";
     $("#linear-notes").html('');
+
+
     // redraw markers
     wavesurfer.clearMarkers();
     localStorage.regions = JSON.stringify(
@@ -622,6 +636,8 @@ function drawRegions() {
                var rwhisper = "<img src='../../img/whisper-logo.png' title='Call Whisper AI' class='whisper-logo' id='w"+wregion.id+"' onclick='whisperStart(\""+wregion.id+"\")' />";
                $("#bar-"+wregion.id).append(rwhisper);
             }
+            var rtrans = "<img src='../../img/translate.png' title='Translate Note' class='trans-logo' id='t"+wregion.id+"' onclick='translateStart(\""+wregion.id+"\")' />";
+            $("#bar-"+wregion.id).append(rtrans);
             var wnote = '';
             if ( wregion.data != undefined && wregion.data.note != undefined ) {
                wnote = wregion.data.note.replaceAll("<div>","").replaceAll("</div>","");
@@ -749,6 +765,20 @@ function loadRegions() {
            frozen=true;
            console.log("show free frozen : " + frozen);
         }
+
+        if ( region.data != undefined && region.data != "" ) {
+           var lines = region.data.split("\n");
+           lines.forEach( function(line, index) {
+              if ( line.length > 3 && line[2]==':' )
+              {
+                var lang = line.substring(0,2);
+                if ( strstr( languages, lang ) == 0 ) {
+                   languages += ","+lang;
+                }
+              }
+           });
+        }
+
         nbRegions++;
         wregion = wavesurfer.regions.add({
              start: region.start,
@@ -768,6 +798,19 @@ function loadRegions() {
       drawRegions();
       creationPending=false;
       console.log("creationPending = false");
+      var select = "<select id='set-language' class='select-language'></select>&nbsp;&nbsp;";
+      $("#archive-header").append(select);
+      var header = "<span class='header-language'>Language&nbsp;&nbsp;</span>";
+      $("#archive-header").append(header);
+      var options = languages.split(",");
+      options.forEach( function( option, index ) {
+        var option = "<option value='"+option+"'>"+option+"</option>";
+        $("#set-language").append(option);
+      });
+      $("#set-language").change(function() {
+        language = $("#set-language option:selected").val();
+        console.log("language set to : " + language );
+      });
     }).fail(function(error) {
        console.log( "couldn't load annotations : " + JSON.stringify(error) );
        $("#modal-wait").modal("hide");
@@ -926,11 +969,24 @@ function deleteNote(region) {
     }
     deleteNote.uel.style.display = 'none';
     if ( !region.data.note ) return;
+
+    // checking that the text that is shown is ours
+    // or if another annotation has updated it
     var textl =  $('#isubtitle').text();
     var div = document.createElement("div");
     div.innerHTML = region.data.note;
     var textr = div.textContent || div.innerText || "";
     textr = textr.replaceAll("\n","");
+    var lines = textr.split("\n");
+    textr="";
+    lines.forEach( function( line, index ) {
+      // console.log(line.substring(2,3) + " " + line);
+      if ( line.substring(2,3) ==  ":" ) {
+         textr += line.substring(3);
+      } else {
+         textr += line;
+      }
+    });
     console.log( "delete note : " + textr );
     console.log( "delete note : " + textl );
     if ( (textr === textl) || (textr=="") || (textl=="") ) {

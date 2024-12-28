@@ -66,10 +66,21 @@ overview {
   height : 20px;
   display : none;
   float : right;
+  margin-right : -100px;
 }
 
 input[type='range'] { 
   accent-color: #0000cc; 
+}
+
+.select-language {
+  float: right;
+  margin-right: 20px;
+}
+
+.header-language {
+  float: right;
+  font-weight: bold;
 }
 
 .select-all {
@@ -130,6 +141,14 @@ input[type='range'] {
   height: 15px;
   float: right;
   margin-right: 45px;
+  margin-top: -17px;
+}
+
+.trans-logo {
+  width: 15px;
+  height: 15px;
+  float: right;
+  margin-right: 65px;
   margin-top: -17px;
 }
 
@@ -209,7 +228,7 @@ input[type='range'] {
 
 #help {
   float:right;
-  margin-right:20px;
+  margin-right:-80px;
   margin-top:-30px;
 }
 
@@ -226,12 +245,21 @@ input[type='range'] {
   float:right;
 }
 
-#whisper-div {
+.whisper-div {
   height:40px;
   max-width:40px;
   width:32px;
   margin-top:-30px;
   margin-right:40px;
+  float:right;
+}
+
+.trans-div {
+  height:40px;
+  max-width:40px;
+  width:32px;
+  margin-top:-30px;
+  margin-right:10px;
   float:right;
 }
 
@@ -256,7 +284,19 @@ input[type='range'] {
   line-height:20px;
   margin-right:0px;
   margin-left:2px;
-  margin-top:-5px;
+  margin-top:-15px;
+}
+
+.play-timel {
+  float:left;
+  width:250px;
+  height:20px;
+  font-size:16px;
+  text-align:left;
+  line-height:20px;
+  margin-right:0px;
+  margin-left:2px;
+  margin-top:-30px;
 }
 
 .speed-value {
@@ -278,7 +318,9 @@ input[type='range'] {
   text-align:center;
   font-weight: bold;
   line-height:20px;
-  margin:auto;;
+  margin-top: 25px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .speed-control {
@@ -294,6 +336,9 @@ input[type='range'] {
   font-weight: bold;
   line-height:20px;
   margin:auto;
+  margin-top: 25px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 wave {

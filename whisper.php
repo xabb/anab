@@ -22,9 +22,10 @@ if ( !file_exists( $annofile ) ) {
 $source=$argv[2];
 $user=$argv[3];
 
+$ilang=$argv[4];
 $langoption = "";
-if ( $argv[4] != "Guess" ) {
-   $langoption = " --language $argv[4]";
+if ( $ilang != "Guess" ) {
+   $langoption = " --language $ilang";
 }
 
 $modeloption = " --model $argv[5]";
@@ -122,27 +123,25 @@ if (!$link) {
      if ( file_exists( $jsonfile ) ) {
        $wresults = json_decode(file_get_contents($jsonfile), true);
 
-       $flang = $wresults["language"];
-       error_log("language found in results : ".$lang);
        $lcount=0;
        $sclang="";
-       if ( strlen($flang)>2 ) {
+       if ( strlen($ilang)>2 ) {
           foreach( $wlangs as $wlang ) {
-            if ( $wlang == $flang ) {
+            if ( $wlang == $ilang ) {
               $sclang=$sclangs[$lcount];
               break;
             }
             $lcount++;
           }
        } else {
-          $sclang=$flang;
+          $sclang=$ilang;
        }
 
        foreach($wresults["segments"] as $segment ) {
-         error_log("found text : ".$segment["text"]);
+         // error_log("found text : ".$segment["text"]);
          $nastart=$annstart+$segment["start"];
          $naend=$annstart+$segment["end"];
-         $ftext=(($forder==4096)?$sclang.":":"").$segment["text"];
+         $ftext=$sclang.":".$segment["text"];
          $isql = "INSERT INTO annotation ( norder, start, end, url, source, data, user, color, whispered ) VALUES (".$forder.",".$nastart.",".$naend.",'".$annurl."=".$segment["start"]."','".addslashes($source)."','".addslashes($ftext)."','".addslashes($user)."','".addslashes($ucolor)."', 2 )"; 
          error_log($isql);
          $resins = $link->query($isql);

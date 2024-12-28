@@ -129,7 +129,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
         </div>
 
         <div class="container">
-            <div class="header">
+            <div class="header" id="archive-header">
                 <h3 itemprop="title" id="title"></h3>
                 <div id='selectAlll' class='select-all'>Select All</div>
                 <div id='resetAlll' class='reset-all'>Reset All</div>
@@ -139,17 +139,27 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
 
             <div id="demo" class="outer-wave-full">
 		<div class="upper-toolbar">
-                    <div id="zlabel" class="zoom-label">Zoom</div>
                     <div id="slabel" class="speed-label">Speed</div>
+                    <div id="zlabel" class="zoom-label">Zoom</div>
                 </div>
 		<div class="lower-toolbar">
-		    <div id="ptime" class="play-time"></div>
-                    <div id="zvalue" class="zoom-value"></div>
-                    <i id="zplus" class="fa fa-plus-square-o fa-2x" width=20px height=20px ></i>
-                    <i id="zminus" class="fa fa-minus-square-o fa-2x" width=20px height=20px ></i>
-                    <div id="svalue" class="speed-value"></div>
-                    <i id="splus" class="fa fa-plus-square-o fa-2x" width=20px height=20px ></i>  
-                    <i id="sminus" class="fa fa-minus-square-o fa-2x" width=20px height=20px ></i>  
+                  <div class="speed-control">
+                     <div id="svalue" class="speed-value"></div>
+                     <i id="splus" class="fa fa-plus-square-o fa-2x" width=20px height=20px ></i>
+                     <i id="sminus" class="fa fa-minus-square-o fa-2x" width=20px height=20px ></i>
+                  </div>
+                  <div class="zoom-rangel">
+                    <div>
+                       <i id="zplus" class="glyphicon glyphicon-zoom-in float-right"></i>
+                    </div>
+                    <div>
+                        <input id="zoomZoom" data-action="zoom" class="float-right" type="range" min="1" max="200" value="0" style="width: 100px" />
+                    </div>
+                    <div>
+                        <i id="zminus" class="glyphicon glyphicon-zoom-out float-right"></i>
+                    </div>
+                  </div>
+                <div id="ptime" class="play-timel"></div>
                 </div>
                 <div id="waveform"></div>
                 <div id="subtitle" class="linear-subtitle"></div>
