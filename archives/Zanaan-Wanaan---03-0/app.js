@@ -127,6 +127,21 @@ var addToBook = function(regid) {
     $("#spinner-book").css("display", "none");
 }
 
+var translateStart = function(regid) {
+    $("#modal-edit").off("hidden.bs.modal");
+    $("#modal-edit").modal("hide");
+    if ( regid != '' ) {
+       currentRegion = regid;
+    }
+    parent.window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth"
+    });
+    $("#modal-trans").modal("show");
+    $("#spinner-trans").css("display", "none");
+}
+
 var whisperStart = function(regid) {
     $("#modal-edit").off("hidden.bs.modal");
     $("#modal-edit").modal("hide");
@@ -315,10 +330,13 @@ document.addEventListener('DOMContentLoaded', function() {
        wavesurfer.setPlaybackRate(wspeed);
     });
 
-    $('#sfull').on('click', function() {
-       var ih = document.querySelector('#isubtitle').innerHTML;
-       document.querySelector('#content-fs').innerHTML = ih;
-       $("#modal-sfull").modal("show");
+    $('#sfull').on('click', function(e) {
+       if ( currentRegion == null ) {
+          return;
+       } else {
+          let wregion = wavesurfer.regions.list[currentRegion];
+          editAnnotation(wregion, e );
+       }
     });
 
     $('#help').on('click', function() {
@@ -386,6 +404,8 @@ document.addEventListener('DOMContentLoaded', function() {
              }).fail(function(data) {
                 if ( data.status === 200 ) {
                   console.log("cleared on server");
+                  let wregion=wavesurfer.regions.list[currentRegion];
+                  deleteNote(wregion);
                   wavesurfer.un('region-updated');
                   wavesurfer.un('region-removed');
                   wavesurfer.clearRegions();
@@ -506,6 +526,67 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    callTR.onsubmit = function(e) {
+        var slang = $('#TRlang').find(":selected").val();
+        var targets = $('#TRtarget').val();
+        var counter = 0;
+        var order = -1;
+        e.preventDefault();
+        if ( slang == "None" ) {
+           alertify.alert("Please, indicate the source language!<br/><br/>");
+           return;
+        }
+        if ( targets.length == 0 ) {
+           alertify.alert("Please, select one or more target languages!<br/><br/>");
+           return;
+        }
+        var starget = "";
+        for ( const target of targets ) {
+            starget = starget + target + ",";
+        }
+        starget = starget.substring(0, starget.length - 1);
+        console.log( "targets : " + starget );
+	if ( currentRegion == null ) {
+           alertAndScroll( "Don't know what you are talking about ( unknown note )" );
+           return -1;
+        }
+        Object.keys(wavesurfer.regions.list).map(function(id) {
+           ++counter;
+           if ( id === currentRegion ) { 
+              order=counter;
+           }
+        });
+        console.log("translate request on : " + soundfile + " : " + order);
+        $('#help-trans').css('display','none');
+        $('#spinner-trans').css('display','block');
+        var jqxhr = $.post( {
+           url: '../../translate-anno.php',
+           data: {
+             slang: slang,
+             target: starget,
+             source: fullEncode(soundfile),
+             order: order,
+             user: user,
+             color: ucolor,
+           },
+           dataType: 'application/json'
+        })
+        .fail(function(error) {
+           $('#spinner-trans').css('display','none');
+           $('#help-trans').css('display','block');
+           $("#modal-trans").modal("hide");
+           if ( error.status == 200 ) {
+              alertAndScroll( "Calling translation success !" );
+              loadRegions();
+              drawRegions();
+              updateLanguages();
+           } else {
+              alertAndScroll( "Calling translation failed : " + error.statusText );
+              console.log( "Calling translation failed : " + JSON.stringify(error) + " frozen ! " + frozen);
+           }
+        });
+    }
+
     addbook.onsubmit = function(e) {
         var regionId = bRegionId;
         var order = -1;
@@ -605,7 +686,6 @@ function drawRegions() {
     var counter=0;
     var navigation="<center><br/><br/><br/><br/><b>Navigate</b></center>";
     $("#linear-notes").html('');
-
 
     // redraw markers
     wavesurfer.clearMarkers();
@@ -802,15 +882,7 @@ function loadRegions() {
       $("#archive-header").append(select);
       var header = "<span class='header-language'>Language&nbsp;&nbsp;</span>";
       $("#archive-header").append(header);
-      var options = languages.split(",");
-      options.forEach( function( option, index ) {
-        var option = "<option value='"+option+"'>"+option+"</option>";
-        $("#set-language").append(option);
-      });
-      $("#set-language").change(function() {
-        language = $("#set-language option:selected").val();
-        console.log("language set to : " + language );
-      });
+      updateLanguages();
     }).fail(function(error) {
        console.log( "couldn't load annotations : " + JSON.stringify(error) );
        $("#modal-wait").modal("hide");
@@ -818,6 +890,21 @@ function loadRegions() {
     });
     wavesurfer.on('region-updated', drawAndSaveRegions);
     wavesurfer.on('region-removed', drawAndSaveRegions);
+}
+
+function updateLanguages() {
+    if ( languages == "--" ) {
+       return;
+    }
+    var options = languages.split(",");
+    options.forEach( function( option, index ) {
+        var option = "<option value='"+option+"'>"+option+"</option>";
+        $("#set-language").append(option);
+    });
+    $("#set-language").change(function() {
+        language = $("#set-language option:selected").val();
+        console.log("language set to : " + language );
+    });
 }
 
 /**
@@ -872,13 +959,14 @@ function editAnnotation(region, e) {
     playRegion(currentRegion, true);
     var form = document.forms.edit;
     form.dataset.region = region.id;
-    $('#note').trumbowyg('html', region.data.note || '');
+    $('#note').trumbowyg('html', region.data.note.replaceAll("\n", "<br/>") || '');
     form.onsubmit = function(e) {
         e.preventDefault();
         // console.log( 'saving : ' + form.elements.note.value);
         var newnote = form.elements.note.value;
         newnote = newnote.replaceAll("<p", "<div" );
         newnote = newnote.replaceAll("</p>", "</div>" );
+        newnote = newnote.replaceAll("<br/>", "\n" );
         region.update({
             start: region.start,
             end: region.end,
@@ -989,7 +1077,8 @@ function deleteNote(region) {
     });
     console.log( "delete note : " + textr );
     console.log( "delete note : " + textl );
-    if ( (textr === textl) || (textr=="") || (textl=="") ) {
+    // if ( (textr === textl) || (textr=="") || (textl=="") ) {
+    if ( region.id === currentRegion ) {
        deleteNote.el.innerHTML = '';
        deleteNote.el.style.display = 'none';
        deleteNote.uel.style.display = 'none';

@@ -2,6 +2,7 @@
 
 include("../../config.php");
 include("../../functions.php");
+include("../../trlangs.php");
 
 session_start();
 
@@ -111,6 +112,43 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
            </div>
         </div>
 
+        <div class="modal fade" id="modal-trans">
+           <div class="modal-tdialog modal-dialog">
+            <br/><center><strong><h4>Translation Service from Python Anywhere</h4></strong></center>
+            <div class="modal-content modal-tcontent">
+             <div class="lds-spinner" id="spinner-trans" ><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+             <div class='help-whisper' id='help-trans'><b>
+             Please, indicate the source language and the destination tongue(s)<br/>
+             You can select several target languages.
+             </b></div>
+             <form role="form" id="callTR" name="callTR" style="transition: opacity 300ms linear; margin: 10px 0;">
+             <center>
+             <strong>Source</strong>
+             <select id='TRlang'>
+<?php
+             print "<option value='None'>None</option>\n";
+             forEach ( $trlangs as $key => $value ) {
+                print "<option value='$key'>$value</option>\n";
+             } 
+?>
+             </select>
+             <br/><br/><center>
+             <strong>Translate to ( 1 to many )</strong>
+             </center>
+             <select id='TRtarget' multiple>
+<?php
+             forEach ( $trlangs as $key => $value ) {
+                print "<option value='$key'>$value</option>\n";
+             } 
+?>
+             </select><br/><br.><br/>
+             <button type="submit" class="btn btn-success btn-block btn-whisper">Translate now!</button>
+             </center>
+             </form>
+            </div>
+           </div>
+        </div>
+
         <div class="modal fade" id="modal-help" role="dialog">
             <div class="modal-dialog modal-hdialog">
                 <center><h3>Mini help</h3></center>
@@ -184,7 +222,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                         <i id="fplay" class="fa fa-play fa-2x" data-action="play-region"></i>  
                       </center>
                       <form role="form" id="edit" name="edit" style="transition: opacity 300ms linear; margin: 30px 0;">
-                         <div class="form-group">
+                         <div class="form-group" style="text-align: left;">
                              <label for="note">Note</label>
                              <textarea id="note" class="form-control" name="note"></textarea>
                          </div>

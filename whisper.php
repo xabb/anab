@@ -4,6 +4,7 @@ include("config.php");
 include("functions.php");
 include("wlangs.php");
 include("sclangs.php");
+include("trlangs.php");
 
 if ( count($argv) != 7 ) {
    error_log("wrong number of arguments to launch whisper : ".count($argv) );
@@ -123,15 +124,13 @@ if (!$link) {
      if ( file_exists( $jsonfile ) ) {
        $wresults = json_decode(file_get_contents($jsonfile), true);
 
-       $lcount=0;
        $sclang="";
        if ( strlen($ilang)>2 ) {
-          foreach( $wlangs as $wlang ) {
-            if ( $wlang == $ilang ) {
-              $sclang=$sclangs[$lcount];
+          foreach( $trlangs as $key => $value ) {
+            if ( $value == $ilang ) {
+              $sclang=$key;
               break;
             }
-            $lcount++;
           }
        } else {
           $sclang=$ilang;

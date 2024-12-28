@@ -1215,7 +1215,9 @@ function deleteNote(region) {
     if (!deleteNote.el) {
        deleteNote.el = document.querySelector('#subtitle');
     }
-    deleteNote.el.innerHTML = '';
+    if ( region.id === currentRegion ) {
+       deleteNote.el.innerHTML = '';
+    }
 }
 
 

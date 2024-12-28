@@ -162,6 +162,10 @@ input[type='range'] {
   height:300px;
 }
 
+.modal-tdialog {
+  height:380px;
+}
+
 .modal-hdialog {
   height:450px;
   padding-top:10px;
@@ -197,6 +201,13 @@ input[type='range'] {
   padding:30px;
   margin:20px;
   height:230px;
+  margin-top:-10px;
+}
+
+.modal-tcontent {
+  padding:30px;
+  margin:20px;
+  height:300px;
   margin-top:-10px;
 }
 

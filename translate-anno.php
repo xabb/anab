@@ -5,16 +5,48 @@ include("functions.php");
 include("wlangs.php");
 include("sclangs.php");
 
-if ( count($argv) != 4 ) {
-   error_log("wrong number of arguments to launch annotation translation : ".count($argv) );
-   error_log("usage : $argv[0] <annid> <langin> <langsout>");
-   error_log("example : $argv[0] 1245 fr en,es,it,hi");
+if ( empty($_POST['slang']) )
+{
+   header('HTTP/1.1 406 Source language is Mandatory');
    exit(-1);
 }
+$slang = $_POST['slang'];
 
-$annid = $argv[1];
-$slang=$argv[2];
-$olang=$argv[3];
+if ( empty($_POST['target']) )
+{
+   header('HTTP/1.1 406 Target language(s) is(are) Mandatory');
+   exit(-1);
+}
+$target = $_POST['target'];
+
+if ( empty($_POST['source']) )
+{
+   header('HTTP/1.1 406 Source is Mandatory');
+   exit(-1);
+}
+$source = $_POST['source'];
+
+if ( empty($_POST['order']) )
+{
+   header('HTTP/1.1 406 Annotation order is Mandatory');
+   exit(-1);
+}
+$order = $_POST['order'];
+
+if ( empty($_POST['user']) )
+{
+   header('HTTP/1.1 406 User is Mandatory');
+   exit(-1);
+}
+$user = $_POST['user'];
+
+if ( empty($_POST['color']) )
+{
+   header('HTTP/1.1 406 Color is Mandatory');
+   exit(-1);
+}
+$color = $_POST['color'];
+
 
 $link = mysqli_connect($config['dbhost'], $config['dbuser'], $config['dbpass'], $config['dbname']);
 if (!$link) {
@@ -23,23 +55,26 @@ if (!$link) {
 } else {
      $link->query('SET NAMES utf8');
 
+     $transdata="";
+
      // get annotation text
      $anntext = '';
-     $sql="SELECT data FROM annotation WHERE id=".$annid;
+     $sql="SELECT data, id FROM annotation WHERE source='".addslashes($source)."' AND norder=".$order.";";
      $results=$link->query($sql);
      if ( mysqli_num_rows($results) != 1 ) {
-        error_log( 'Couldn\'t get annotation : '.$annid.' : '.$sql);
+        error_log( 'Couldn\'t get annotation for : '.$source.' : '.$sql);
         mysqli_close($link);
         exit(-1);
      } else {
         $rowres=mysqli_fetch_row($results);
         $anntext = $rowres[0];
+        $annid = $rowres[1];
         $annlines = preg_split('/\r\n|\r|\n/', $anntext);
         forEach( $annlines as $line ) {
           if ( strstr( $line, $langin.":" ) ) {
-             print $line."\n";
+             $transdata .= $line."\n";
           } else {
-             print $slang.":".$line."\n";
+              $transdata .= $slang.":".$line."\n";
           }
         }
      }
@@ -50,7 +85,7 @@ if (!$link) {
 
      // translate the annotation for each out language
      $cmdresult = 0;
-     $langsout = explode(',', $olang );
+     $langsout = explode(',', $target );
      forEach ($langsout as $lo) {
         if ( strstr( $anntext, $lo.":" ) ) {
            // annotation is already translated to that language
@@ -59,25 +94,42 @@ if (!$link) {
         $annlines = preg_split('/\r\n|\r|\n/', $anntext);
         forEach( $annlines as $line ) {
            $rline = $line;
-           if ( $line[2] == ':' ) {
-              // annotation is already a translation, remove translation part
-              $rline = substr($line, 3);
+           if ( $line[2] == ':' ) { // this is translation
+              if ( substr($line, 0, 2) == $slang ) { // ==> to be translated
+                  $rline = substr($line, 3);
+              } else {
+                  // ignored, never asked to be translated from this language
+                  continue;
+              }
            }
+           if ( $rline === "" ) continue;
            $cmdoutput = array();
            $cmd="php translate.php $slang $lo \"$rline\"\n";
            // error_log($cmd);
            $result = exec($cmd, $cmdoutput, $cmdresult);
            if ($cmdresult!=0) {
+              header('HTTP/1.1 406 Couldn\'t translate annotation : '.$annid);
               error_log('Couldn\'t translate annotation : '.$annid." (".$cmdresult.")");
               mysqli_close($link);
               exit(-1);
            } else {
-              print $lo.":".$cmdoutput[0]."\n";
+              if ( $cmdoutput[0] != "" )  
+                 $transdata .= $lo.":".$cmdoutput[0]."\n";
            }
         }
      }
+     $sql="UPDATE annotation SET data='".addslashes($transdata)."' WHERE id=".$annid.";";
+     // error_log($sql);
+     $resupd=$link->query($sql);
+     if ( $resupd != TRUE ) {
+        header('HTTP/1.1 406 Couldn\'t update annotation : '.$annid);
+        error_log('Couldn\'t update annotation : '.$annid." (".$sql.")");
+        mysqli_close($link);
+        exit(-1);
+     }
 }
 
+header('HTTP/1.1 200 Annotation '.$annid.' has been updated');
 mysqli_close($link);
 exit(0)
 ?>
