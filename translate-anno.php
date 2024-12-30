@@ -71,6 +71,7 @@ if (!$link) {
         $annid = $rowres[1];
         $annlines = preg_split('/\r\n|\r|\n/', $anntext);
         forEach( $annlines as $line ) {
+          if ( $line == "" ) continue;
           if ( strstr( $line, $langin.":" ) ) {
              $transdata .= $line."\n";
           } else {

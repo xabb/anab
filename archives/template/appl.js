@@ -115,6 +115,109 @@ var incSpeed = function() {
     // svid = setTimeout( "incSpeed();", 500 );
 }
 
+/*
+ * Update languages choice
+ */
+function updateLanguages() {
+    var regions = JSON.parse(localStorage.regionsl);
+    languages= "--";
+    regions.forEach( function(region) {
+       if ( region.data != undefined && region.data.length >3 ) {
+          var lines = region.data.split("\n");
+          lines.forEach( function(line, index) {
+            if ( line.length > 3 && line[2]==':' ) {
+              var lang = line.substring(0,2);
+              if ( strstr( languages, lang ) == 0 ) {
+                languages += ","+lang;
+              } 
+            } 
+            if ( line.length > 4 && line[3]==':' ) {
+              var lang = line.substring(0,3);
+              if ( strstr( languages, lang ) == 0 ) {
+                languages += ","+lang;
+              } 
+            } 
+          }); 
+        }
+    });
+    $("#set-languagel").children().remove();
+    var options = languages.split(",");
+    options.forEach( function( option, index ) {
+        var option = "<option value='"+option+"'>"+option+"</option>";
+        $("#set-languagel").append(option);
+    });
+    $("#set-languagel").change(function() {
+        language = $("#set-languagel option:selected").val();
+        console.log("language set to : " + language );
+    });
+}
+
+/*
+ * Load or  reload regions from the server
+ */
+
+var loadRegions = function() {
+    console.log('loading region linear');
+        var jqxhr = $.post( {
+                   responseType: 'json',
+                   url: 'get-annotations-linear.php',
+                   data: {
+                      source: fullEncode(soundfile)
+                   }
+        }, function(data) {
+                   var counter=4095;
+                   if (data) console.log( "got linear annotations : " + data.length );
+                   if ( data.length > 0 )
+                      regions = data;
+                   else
+                      regions = extractRegions( peaks, wavesurfer.getDuration() );
+   
+                   wavesurfer.clearRegions();
+                   $("#linear-notes").html('');
+                   regions.forEach( function(region) {
+                      counter++;
+                      wregion = wavesurfer.regions.add({
+                          start: region.start,
+                          end: region.end,
+                          resize: true,
+                          drag: true,
+                          data: {
+                            note: ( region.data != undefined ) ? region.data : '',
+                            user: user,
+                            color: ucolor,
+                            id: region.id,
+                            norder: region.norder,
+                            whispered : ( region.whispered != undefined ) ? region.whispered : 0 
+                          }
+                      });
+                      nbRegions++;
+                      if ( region.whispered != undefined && region.whispered == 1 ) {
+                         console.log("show frozen");
+                         $("#frozenl").css('display', 'block');
+                         frozenl=true;
+                      }
+                   });
+                   updateTable();
+                   drawRegions();
+                   updateLanguages();
+                   console.log( "we have : " + languages );
+                   // zoom is proportional to the number of minutes limited to 10
+                   wzoom = Math.floor( wavesurfer.getDuration() / 60.0 )+1;
+                   if ( wzoom > 10 ) wzoom = 10;
+                   $('#zlabel').html("Zoom : " + Number(wzoom));
+                   $('#zoomZoom').value = Number(wzoom);
+                   wavesurfer.zoom(wzoom);
+                   $('#svalue').html(("x"+wspeed).substring(0,4));
+   
+                   $("#ptime").html( toHHMMSS(wavesurfer.getCurrentTime()) + " / " + toHHMMSS(wavesurfer.getDuration()) );
+
+                   $("#modal-waitl").modal("hide");
+
+         }).fail(function(error) {
+                   console.log( "couldn't load annotations : " + JSON.stringify(error) );
+         });
+}
+
 /**
  * Init & load.
  */
@@ -248,113 +351,12 @@ document.addEventListener('DOMContentLoaded', function() {
                });
 
             } else {
-
-               var jqxhr = $.post( {
-                   responseType: 'json',
-                   url: 'get-annotations-linear.php',
-                   data: {
-                      source: fullEncode(soundfile)
-                   }
-               }, function(data) {
-   
-                   var counter=4096;
-                   if (data) console.log( "got linear annotations : " + data.length );
-                   if ( data.length > 0 )
-                      regions = data;
-                   else
-                      regions = extractRegions( peaks, wavesurfer.getDuration() );
-   
-                   $("#linear-notes").html('');
-                   regions.forEach( function(region) {
-
-                      if ( region.data != undefined && region.data != "" ) {
-                          var lines = region.data.split("\n");
-                          lines.forEach( function(line, index) {
-                             if ( line.length > 3 && line[2]==':' )
-                             {
-                                var lang = line.substring(0,2);
-                                if ( strstr( languages, lang ) == 0 ) {
-                                   languages += ","+lang;
-                                } 
-                             } 
-                          });
-                      }
-                      counter++;
-                      wregion = wavesurfer.regions.add({
-                          start: region.start,
-                          end: region.end,
-                          resize: true,
-                          drag: true,
-                          data: {
-                            note: ( region.data != undefined ) ? region.data : '',
-                            user: user,
-                            color: ucolor,
-                            id: region.id,
-                            norder: region.norder,
-                            whispered : ( region.whispered != undefined ) ? region.whispered : 0 
-                          }
-                      });
-                      nbRegions++;
-                      if ( region.whispered != undefined && region.whispered == 1 ) {
-                         console.log("show frozen");
-                         $("#frozenl").css('display', 'block');
-                      }
-                      // console.log( wregion.id );
-                      var blank = "<br/><br/><div class='linear-bar' id='bar-"+wregion.id+"'>";
-                      $("#linear-notes").append(blank);
-                      var range = "<p>"+(counter-4096)+" : "+toHHMMSS(region.start)+" - "+toHHMMSS(region.end)+" (" + Math.round(region.end-region.start) + " s) : </p>";
-                      $("#bar-"+wregion.id).append(range);
-                      var rbook = "<i class='fa fa-book fa-1x linear-book' title='Add to Book' id='b"+wregion.id+"' onclick='addToBook(\""+wregion.id+"\")'></i>";
-                      $("#bar-"+wregion.id).append(rbook);
-                      var rplay = "<i class='fa fa-play fa-1x linear-play' title='Play this Part' id='r"+wregion.id+"' onclick='playRegion(\""+wregion.id+"\",\"true\")'></i>";
-                      $("#bar-"+wregion.id).append(rplay);
-                      if ( whisper == 1 ) {
-                         var rwhisper = "<img src='../../img/whisper-logo.png' title='Call Whisper AI' class='whisper-logo' id='w"+wregion.id+"' onclick='whisperStart(\""+wregion.id+"\")' />";
-                         $("#bar-"+wregion.id).append(rwhisper);
-                      }
-                      var ncontent = "<textarea id='"+wregion.id+"' class='note-textarea'>"+wregion.data.note+"</textarea>";
-                      $("#linear-notes").append(ncontent);
-                      $("#"+wregion.id).on( 'change', function(evt) {
-                           var id = $(this).attr('id');
-                           let cregion = wavesurfer.regions.list[id];
-                           cregion.data.note=evt.target.value;
-                           drawAndSaveRegions();
-                           cregion.setLoop(false);
-                           deleteNote(cregion);
-                           showNote(cregion);
-                      });
-                   });
-                   drawRegions();
-                   console.log( "we have : " + languages );
-                   var select = "<select id='set-language' class='select-language'></select>&nbsp;&nbsp;";
+                   loadRegions();
+                   var select = "<select id='set-languagel' class='select-language'></select>&nbsp;&nbsp;";
                    $("#archive-header").append(select);
                    var header = "<span class='header-language'>Language&nbsp;&nbsp;</span>";
                    $("#archive-header").append(header);
-                   var options = languages.split(",");
-                   options.forEach( function( option, index ) {
-                       var option = "<option value='"+option+"'>"+option+"</option>";
-                       $("#set-language").append(option);
-                   });
-                   $("#set-language").change(function() {
-                       language = $("#set-language option:selected").val();
-                       console.log("language set to : " + language );
-                   });
    
-                   // zoom is proportional to the number of minutes limited to 10
-                   wzoom = Math.floor( wavesurfer.getDuration() / 60.0 )+1;
-                   if ( wzoom > 10 ) wzoom = 10;
-                   $('#zlabel').html("Zoom : " + Number(wzoom));
-                   $('#zoomZoom').value = Number(wzoom);
-                   wavesurfer.zoom(wzoom);
-                   $('#svalue').html(("x"+wspeed).substring(0,4));
-   
-                   $("#ptime").html( toHHMMSS(wavesurfer.getCurrentTime()) + " / " + toHHMMSS(wavesurfer.getDuration()) );
-
-                   $("#modal-waitl").modal("hide");
-
-               }).fail(function(error) {
-                   console.log( "couldn't load annotations : " + JSON.stringify(error) );
-               });
             }
         
         }); // ready
@@ -365,6 +367,7 @@ document.addEventListener('DOMContentLoaded', function() {
         wavesurfer.on('region-in', showNote);
         wavesurfer.on('region-out', deleteNote);
         wavesurfer.on('region-updated', drawAndSaveRegions);
+        wavesurfer.on("marker-click", deleteAnnotation );
         wavesurfer.on('audioprocess', function() {
             $(".play-time").html( toHHMMSS(wavesurfer.getCurrentTime()) + " / " + toHHMMSS(wavesurfer.getDuration()) );
         });
@@ -423,6 +426,66 @@ document.addEventListener('DOMContentLoaded', function() {
     $('#help').on('click', function() {
         $("#modal-help").modal("show");
     });
+
+    callTRl.onsubmit = function(e) {
+        var slang = $('#TRlangl').find(":selected").val();
+        var targets = $('#TRtargetl').val();
+        var counter = 0;
+        var order = -1;
+        e.preventDefault();
+        if ( slang == "None" ) {
+           alertify.alert("Please, indicate the source language!<br/><br/>");
+           return;
+        }
+        if ( targets.length == 0 ) {
+           alertify.alert("Please, select one or more target languages!<br/><br/>");
+           return;
+        }
+        var starget = "";
+        for ( const target of targets ) {
+            starget = starget + target + ",";
+        }
+        starget = starget.substring(0, starget.length - 1);
+        console.log( "targets : " + starget );
+        if ( currentRegion == null ) {
+           alertAndScroll( "Don't know what you are talking about ( unknown note )" );
+           return -1;
+        }
+        Object.keys(wavesurfer.regions.list).map(function(id) {
+           ++counter;
+           if ( id === currentRegion ) {
+              order=counter+4095;
+           }
+        });
+        console.log("translate request on : " + soundfile + " : " + order);
+        $('#help-trans').css('display','none');
+        $('#spinner-trans').css('display','block');
+        $('#callTRl').css('display','none');
+        var jqxhr = $.post( {
+           url: '../../translate-anno.php',
+           data: {
+             slang: slang,
+             target: starget,
+             source: fullEncode(soundfile),
+             order: order,
+             user: user,
+             color: ucolor,
+           },
+           dataType: 'application/json'
+        })
+        .fail(function(error) {
+           $('#spinner-trans').css('display','none');
+           $('#help-trans').css('display','block');
+           $("#modal-trans").modal("hide");
+           if ( error.status == 200 ) {
+              alertAndScroll( "Calling translation success !" );
+              loadRegions();
+           } else {
+              alertAndScroll( "Calling translation failed : " + error.statusText );
+              console.log( "Calling translation failed : " + JSON.stringify(error) + " frozen ! " + frozen);
+           }
+        });
+    }
 
     selectAlll.onclick = function(e) {
       if ( (typeof wavesurfer == "undefined") || (wavesurfer.getDuration() <= 0) ) {
@@ -561,6 +624,24 @@ function launchSplitAnnotation(region, e) {
 }
 
 /**
+ * Showing the translation modal
+ */
+var translateStart = function(regid) {
+    if ( regid != '' ) {
+       currentRegion = regid;
+    }
+    parent.window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth"
+    });
+    $("#modal-trans").modal("show");
+    $('#callTRl').css('display','block');
+    $("#spinner-trans").css("display", "none");
+}
+
+
+/**
  * Split annotations at the given wavesurfer play time
  */
 function splitAnnotation() {
@@ -620,21 +701,17 @@ function updateAnnotation(region, e) {
  * Delete annotation after click on the red marker
  * Strangely, this event is received for each annotation although you only click on only one at a time
  */
-let showConfirm = false;
 function deleteAnnotation(marker, e) {
     e.stopPropagation();
-    if ( marker.color == "#ff0000" && !showConfirm) {
-       showConfirm = true;
+    if ( marker.color == "#ff0000") {
        console.log( "Deleting annotation : " + marker.label + " " + marker.time + " wavesurfer time : " + wavesurfer.getCurrentTime() );
        alertify.confirm( "Are you sure sure you want to delete annotation : " + marker.label + " ?<br/>", function (e) {
          if (e) {
            //after clicking OK
            doDeleteAnnotation(marker.label);
-           showConfirm = false;
          } else {
            //after clicking Cancel
            console.log("deletion cancelled");
-           showConfirm = false;
          }
        });
     }
@@ -647,6 +724,7 @@ function doDeleteAnnotation(index) {
         ++counter;
         if ( counter == index ) {
            console.log("Deleting region : " + id);
+           currentRegion = id;
            var region = wavesurfer.regions.list[id];
            deleteNote(wavesurfer.regions.list[id]);
            wavesurfer.regions.list[id].remove();
@@ -692,6 +770,8 @@ function updateTable() {
         var rwhisper = "<img src='../../img/whisper-logo.png' title='Call Whisper AI' class='whisper-logo' id='w"+id+"' onclick='whisperStart(\""+id+"\")' />";
         $("#bar-"+id).append(rwhisper);
       }
+      var rtrans = "<img src='../../img/translate.png' title='Translate Note' class='trans-logo' id='t"+wregion.id+"' onclick='translateStart(\""+id+"\")' />";
+      $("#bar-"+id).append(rtrans);
       var rbook = "<i class='fa fa-book fa-1x linear-book' title='Add to Book' id='b"+id+"' onclick='addToBook(\""+id+"\")'></i>";
       $("#bar-"+id).append(rbook);
       var rplay = "<i class='fa fa-play fa-1x linear-play' title='Play this Part' id='r"+id+"' onclick='playRegion(\""+id+"\",\"true\")'></i>";
@@ -734,6 +814,8 @@ function updateTableOne(currentId) {
            var rwhisper = "<img src='../../img/whisper-logo.png' title='Call Whisper AI' class='whisper-logo' id='w"+id+"' onclick='whisperStart(\""+id+"\")' />";
            $("#bar-"+id).append(rwhisper);
         }
+        var rtrans = "<img src='../../img/translate.png' title='Translate Note' class='trans-logo' id='t"+wregion.id+"' onclick='translateStart(\""+id+"\")' />";
+        $("#bar-"+id).append(rtrans);
         var rbook = "<i class='fa fa-book fa-1x linear-book' title='Add to Book' id='b"+id+"' onclick='addToBook(\""+id+"\")'></i>";
         $("#bar-"+id).append(rbook);
         var rplay = "<i class='fa fa-play fa-1x linear-play' title='Play this Part' id='r"+id+"' onclick='playRegion(\""+id+"\",\"true\")'></i>";
@@ -769,7 +851,6 @@ function drawRegions() {
     var counter=4095;
     // redraw rons and markers
     wavesurfer.clearMarkers();
-    wavesurfer.on("marker-click", deleteAnnotation );
     console.log( "draw and store regions" );
     localStorage.regionsl = JSON.stringify(
         Object.keys(wavesurfer.regions.list).map(function(id) {
@@ -1062,6 +1143,10 @@ var whisperStart = function(regid) {
         var counter = 4095;
         var order = -1;
         e.preventDefault();
+        if ( language == "None" ) {
+           alertify.alert("Please, choose a language!<br/><br/>");
+           return;
+        } 
         if ( currentRegion == null ) {
            alertAndScroll( "Don't know what you are talking about ( unknown note )" );
            return -1;
@@ -1185,6 +1270,10 @@ function showNote(region) {
            if ( language === '--' || language === line.substring(0,2) ) {
               snote += line.substring(3);
            } 
+        } else if ( line.substring(3,4) ==  ":" ) {
+           if ( language === '--' || language === line.substring(0,3) ) {
+              snote += line.substring(4);
+           }
         } else {
            snote += line;
         }
@@ -1211,13 +1300,13 @@ function deleteNote(region) {
     // }
     // show all notes
     console.log( "deleteNote : " + region.id );
-    updateTable();
     if (!deleteNote.el) {
        deleteNote.el = document.querySelector('#subtitle');
     }
     if ( region.id === currentRegion ) {
        deleteNote.el.innerHTML = '';
     }
+    // updateTable();
 }
 
 

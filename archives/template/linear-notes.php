@@ -2,6 +2,7 @@
 
 include("../../config.php");
 include("../../functions.php");
+include("../../trlangs.php");
 
 session_start();
 
@@ -94,7 +95,15 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                      You can enter multiple translations this way and the user can choose his language using the right side "Language" drop-down menu.<br /><br /> 
                      You can also export the translations to a specific language as a subtitles file (SRT) using the "Export" button at the bottom of the page, after having selected your language before.<br /><br /> 
                      As in notes mode, you can add a region to an audiobook using the book icon next to its box in the list of transcriptions/translations.<br /><br /> 
-                     Enjoy and shout "F*** Elon Musk" each time you save your work !!<br /><br /> 
+                     Finally, cherry on the cake, you can also use the helpers to make the machine work instead of doing it yourself, but, maybe, it will not be 100% accurate and you might have to modify the result by hand, namingly :
+                     <br/>
+                     <ul>
+                     <li>The OpenAI whisper transcription tool with the whisper icon : <img src='../../img/whisper-logo.png' width='30' height='30' /></li>
+                     <li>note: this is very ressources consuming on your server, so use it sparingly!!</li>
+                     <br/>
+                     <li>The python anywhere free translation API <br/>( using usual Google translation engine ) <br/>with the translation icon : <img src='../../img/translate.png' width='30' height='30' /></li>
+                     </ul>
+                     Enjoy and shout "In your ***, Elon Musk !!" each time you save your work !!<br /><br /> 
                  </p>
                  </div>
              </div>
@@ -114,7 +123,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
              <center>
              <strong>Language</strong>
              <select id='AIlang'>
-                <option value='Guess'>Guess</option>
+                <option value='None'>None</option>
              </select>
              <strong>Model</strong>
              <select id='AImodel'>
@@ -122,6 +131,43 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                 <option value='turbo'>Turbo (default)</option>
              </select><br/><br/>
              <button type="submit" class="btn btn-success btn-block btn-whisper">Call and Pray</button>
+             </center>
+             </form>
+            </div>
+           </div>
+        </div>
+
+        <div class="modal fade" id="modal-trans">
+           <div class="modal-tdialog modal-dialog">
+            <br/><center><strong><h4>Translation Service from Python Anywhere</h4></strong></center>
+            <div class="modal-content modal-tcontent">
+             <div class="lds-spinner" id="spinner-trans" ><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+             <div class='help-whisper' id='help-trans'><b>
+             Please, indicate the source language and the destination tongue(s)<br/>
+             You can select several target languages.
+             </b></div>
+             <form role="form" id="callTRl" name="callTR" style="transition: opacity 300ms linear; margin: 10px 0;">
+             <center>
+             <strong>Source</strong>
+             <select id='TRlangl'>
+<?php
+             print "<option value='None'>None</option>\n";
+             forEach ( $trlangs as $key => $value ) {
+                print "<option value='$key'>$value</option>\n";
+             }
+?>
+             </select>
+             <br/><br/><center>
+             <strong>Translate to ( 1 to many )</strong>
+             </center>
+             <select id='TRtargetl' multiple>
+<?php
+             forEach ( $trlangs as $key => $value ) {
+                print "<option value='$key'>$value</option>\n";
+             }
+?>
+             </select><br/><br.><br/>
+             <button type="submit" class="btn btn-success btn-block btn-whisper">Translate now!</button>
              </center>
              </form>
             </div>

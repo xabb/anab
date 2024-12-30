@@ -7,7 +7,7 @@ var wspeed=1.0;
 var evid;
 var svid;
 var currentRegion = null;
-var languages = '--';
+var anguages = '--';
 var language = '--';
 var bRegionId=-1;
 var nbRegions=0;
@@ -139,6 +139,7 @@ var translateStart = function(regid) {
       behavior: "smooth"
     });
     $("#modal-trans").modal("show");
+    $('#callTR').css('display','block');
     $("#spinner-trans").css("display", "none");
 }
 
@@ -240,7 +241,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         loadRegions();
-        drawRegions();
         // zoom is the number of minutes limited to 10
         wzoom = Math.floor( wavesurfer.getDuration() / 60.0 )+1;
         if ( wzoom > 10 ) wzoom = 10;
@@ -255,6 +255,11 @@ document.addEventListener('DOMContentLoaded', function() {
 	       wavesurfer.seekTo( sstart/wavesurfer.getDuration() );
            }
         }
+        // adding the language choice to the title ( only once )
+        var select = "<select id='set-language' class='select-language'></select>&nbsp;&nbsp;";
+        $("#archive-header").append(select);
+        var header = "<span class='header-language'>Language&nbsp;&nbsp;</span>";
+        $("#archive-header").append(header);
         moveSpeech();
         $("#modal-wait").modal("hide");
         $('#spinner-global').css('display','none');
@@ -266,6 +271,7 @@ document.addEventListener('DOMContentLoaded', function() {
     wavesurfer.on('region-removed', drawAndSaveRegions);
     wavesurfer.on('region-in', showNote);
     wavesurfer.on('region-out', deleteNote);
+    wavesurfer.on("marker-click", deleteAnnotation);
     wavesurfer.on('region-play', function(region) {
         // console.log( 'got region play : ' + region.id );
         // do nothing, the loop option on region is enough
@@ -404,8 +410,10 @@ document.addEventListener('DOMContentLoaded', function() {
              }).fail(function(data) {
                 if ( data.status === 200 ) {
                   console.log("cleared on server");
-                  let wregion=wavesurfer.regions.list[currentRegion];
-                  deleteNote(wregion);
+                  if ( currentRegion != null ) {
+                     let wregion=wavesurfer.regions.list[currentRegion];
+                     deleteNote(wregion);
+                  }
                   wavesurfer.un('region-updated');
                   wavesurfer.un('region-removed');
                   wavesurfer.clearRegions();
@@ -559,6 +567,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log("translate request on : " + soundfile + " : " + order);
         $('#help-trans').css('display','none');
         $('#spinner-trans').css('display','block');
+        $('#callTR').css('display','none');
         var jqxhr = $.post( {
            url: '../../translate-anno.php',
            data: {
@@ -578,8 +587,6 @@ document.addEventListener('DOMContentLoaded', function() {
            if ( error.status == 200 ) {
               alertAndScroll( "Calling translation success !" );
               loadRegions();
-              drawRegions();
-              updateLanguages();
            } else {
               alertAndScroll( "Calling translation failed : " + error.statusText );
               console.log( "Calling translation failed : " + JSON.stringify(error) + " frozen ! " + frozen);
@@ -747,7 +754,6 @@ function drawRegions() {
                color : "#ff0000",
                position : "top"
             });
-            wavesurfer.on("marker-click", deleteAnnotation);
             let whispered=0;
             if ( typeof wregion.data.whispered != "undefined" )
                 whispered = wregion.data.whispered;
@@ -810,7 +816,6 @@ function saveRegions() {
     }, function() {
        // reload regions from the server with ids
        loadRegions();
-       drawRegions();
        // console.log( "Saving annotations succeeded" );
     })
     .fail(function(error) {
@@ -845,20 +850,6 @@ function loadRegions() {
            frozen=true;
            console.log("show free frozen : " + frozen);
         }
-
-        if ( region.data != undefined && region.data != "" ) {
-           var lines = region.data.split("\n");
-           lines.forEach( function(line, index) {
-              if ( line.length > 3 && line[2]==':' )
-              {
-                var lang = line.substring(0,2);
-                if ( strstr( languages, lang ) == 0 ) {
-                   languages += ","+lang;
-                }
-              }
-           });
-        }
-
         nbRegions++;
         wregion = wavesurfer.regions.add({
              start: region.start,
@@ -876,13 +867,9 @@ function loadRegions() {
         });
       });
       drawRegions();
+      updateLanguages();
       creationPending=false;
       console.log("creationPending = false");
-      var select = "<select id='set-language' class='select-language'></select>&nbsp;&nbsp;";
-      $("#archive-header").append(select);
-      var header = "<span class='header-language'>Language&nbsp;&nbsp;</span>";
-      $("#archive-header").append(header);
-      updateLanguages();
     }).fail(function(error) {
        console.log( "couldn't load annotations : " + JSON.stringify(error) );
        $("#modal-wait").modal("hide");
@@ -893,9 +880,28 @@ function loadRegions() {
 }
 
 function updateLanguages() {
-    if ( languages == "--" ) {
-       return;
-    }
+    var regions = JSON.parse(localStorage.regions);
+    languages= "--";
+    regions.forEach( function(region) {
+       if ( region.data != undefined && region.data != "" ) {
+          var lines = region.data.split("\n");
+          lines.forEach( function(line, index) {
+            if ( line.length > 3 && line[2]==':' ) {
+               var lang = line.substring(0,2);
+               if ( strstr( languages, lang ) == 0 ) {
+                  languages += ","+lang;
+               }
+            }
+            if ( line.length > 4 && line[3]==':' ) {
+               var lang = line.substring(0,3);
+               if ( strstr( languages, lang ) == 0 ) {
+                  languages += ","+lang;
+               }
+             }
+           });
+        }
+    });
+    $("#set-language").children().remove();
     var options = languages.split(",");
     options.forEach( function( option, index ) {
         var option = "<option value='"+option+"'>"+option+"</option>";
@@ -1013,6 +1019,10 @@ function showNote(region) {
              if ( language === '--' || language === line.substring(0,2) ) {
                 snote += line.substring(3);
              }
+          } else if ( line.substring(3,4) ==  ":" ) {
+             if ( language === '--' || language === line.substring(0,3) ) {
+                snote += line.substring(4);
+             }
           } else {
              snote += line;
           }
@@ -1056,58 +1066,56 @@ function deleteNote(region) {
        deleteNote.speaker = document.querySelector('#ispeaker');
     }
     deleteNote.uel.style.display = 'none';
-    if ( !region.data.note ) return;
+    if ( typeof region.data == undefined || !region.data.note ) return;
 
     // checking that the text that is shown is ours
     // or if another annotation has updated it
-    var textl =  $('#isubtitle').text();
-    var div = document.createElement("div");
-    div.innerHTML = region.data.note;
-    var textr = div.textContent || div.innerText || "";
-    textr = textr.replaceAll("\n","");
-    var lines = textr.split("\n");
-    textr="";
-    lines.forEach( function( line, index ) {
-      // console.log(line.substring(2,3) + " " + line);
-      if ( line.substring(2,3) ==  ":" ) {
-         textr += line.substring(3);
-      } else {
-         textr += line;
-      }
-    });
-    console.log( "delete note : " + textr );
-    console.log( "delete note : " + textl );
+    // var textl =  $('#isubtitle').text();
+    // var div = document.createElement("div");
+    // div.innerHTML = region.data.note;
+    // var textr = div.textContent || div.innerText || "";
+    // textr = textr.replaceAll("\n","");
+    // var lines = textr.split("\n");
+    // textr="";
+    // lines.forEach( function( line, index ) {
+    //   console.log(line.substring(2,3) + " " + line);
+    //   if ( line.substring(2,3) ==  ":" ) {
+    //      textr += line.substring(3);
+    //   } else {
+    //      textr += line;
+    //   }
+    // });
+    // console.log( "delete note : " + textr );
+    // console.log( "delete note : " + textl );
     // if ( (textr === textl) || (textr=="") || (textl=="") ) {
-    if ( region.id === currentRegion ) {
+
+    // just checking we are the current region
+    if ( currentRegion != null && region.id === currentRegion ) {
        deleteNote.el.innerHTML = '';
        deleteNote.el.style.display = 'none';
        deleteNote.uel.style.display = 'none';
        deleteNote.speaker.style.display = 'none';
-    } else
-       deleteNote.uel.style.display = 'block';
+    }
 }
 
 /**
  * Delete annotation after click on the red marker
  * Strangely, this event is received for each annotation although you only click on only one at a time
  */
-let showConfirm = false;
 function deleteAnnotation(marker, e) {
     e.stopPropagation();
-    if ( marker.color == "#ff0000" && !showConfirm) {
-       showConfirm = true;
+    if ( marker.color == "#ff0000" ) {
        if ( currentRegion != null )
-          deleteNote(wavesurfer.regions.list[currentRegion]);
        console.log( "Deleting annotation : " + marker.label + " " + marker.time + " wavesurfer time : " + wavesurfer.getCurrentTime() );
        alertify.confirm( "Are you sure sure you want to delete annotation : " + marker.label + " ?<br/>", function (e) {
          if (e) {
            //after clicking OK
            doDeleteAnnotation(marker.label);
-           showConfirm = false;
+           return true;
          } else {
            //after clicking Cancel
            console.log("deletion cancelled");
-           showConfirm = false;
+           return false;
          }
        });
     }
@@ -1120,6 +1128,7 @@ function doDeleteAnnotation(index) {
         ++counter;
         if ( counter == index ) {
            console.log("Deleting region : " + id);
+           currentRegion = id;
            var region = wavesurfer.regions.list[id];
            deleteNote(wavesurfer.regions.list[id]);
            wavesurfer.regions.list[id].remove();
