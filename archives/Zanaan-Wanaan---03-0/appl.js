@@ -158,6 +158,7 @@ function updateLanguages() {
 
 var loadRegions = function() {
     console.log('loading region linear');
+        $("#modal-waitl").modal("show");
         var jqxhr = $.post( {
                    responseType: 'json',
                    url: 'get-annotations-linear.php',
@@ -169,8 +170,10 @@ var loadRegions = function() {
                    if (data) console.log( "got linear annotations : " + data.length );
                    if ( data.length > 0 )
                       regions = data;
-                   else
+                   else {
+                      console.log("extracting regions... it might take a while");
                       regions = extractRegions( peaks, wavesurfer.getDuration() );
+                   }
    
                    wavesurfer.clearRegions();
                    $("#linear-notes").html('');
@@ -198,7 +201,7 @@ var loadRegions = function() {
                       }
                    });
                    updateTable();
-                   drawRegions();
+                   drawAndSaveRegions();
                    updateLanguages();
 
                    wzoom = ( $("#waveform").width() / wavesurfer.getDuration() ).toFixed(2);
@@ -220,7 +223,11 @@ var loadRegions = function() {
 /**
  * Init & load.
  */
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('readystatechange', function(e) {
+
+    console.log( "ready state changed (linear): " + document.readyState ); 
+
+    if ( document.readyState != "complete" ) return;
 
     $("#modal-waitl").modal("show");
 
@@ -311,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function() {
               ]
            });
 
-           console.log( "loading : " + soundfile );
+           console.log( "loading no peaks : " + soundfile );
            wavesurfer.load(
               soundfile
            );
@@ -321,6 +328,7 @@ document.addEventListener('DOMContentLoaded', function() {
         /* Regions */
         wavesurfer.on('ready', function() {
 
+            console.log( "wavesurfer ready" );
             var wposition = getPosition( document.getElementById("waveform") );
             console.log("waveform is at : (" + wposition.x + "," + wposition.x + ")");
             wavey = wposition.y;
@@ -351,7 +359,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             } else {
                    loadRegions();
-                   var atrans = "<img src='../../img/translate.png' title='Translate Document' class='trans-header' id='tall' onclick='translateAll()' />";
+                   var atrans = "<img src='../../img/translate.png' title='Translate Document' class='trans-header' id='tall' onclick='translateStartAlll()' />";
                    $("#archive-header").append(atrans);
                    var select = "<select id='set-languagel' class='select-language'></select>&nbsp;&nbsp;";
                    $("#archive-header").append(select);
@@ -478,6 +486,56 @@ document.addEventListener('DOMContentLoaded', function() {
            $('#spinner-trans').css('display','none');
            $('#help-trans').css('display','block');
            $("#modal-trans").modal("hide");
+           if ( error.status == 200 ) {
+              alertAndScroll( "Calling translation success !" );
+              loadRegions();
+           } else {
+              alertAndScroll( "Calling translation failed : " + error.statusText );
+              console.log( "Calling translation failed : " + JSON.stringify(error) + " frozen ! " + frozen);
+           }
+        });
+    }
+
+    callTRAl.onsubmit = function(e) {
+        var slang = $('#TRAlangl').find(":selected").val();
+        var targets = $('#TRAtargetl').val();
+        var counter = 0;
+        var order = -1;
+        e.preventDefault();
+        if ( slang == "None" ) {
+           alertify.alert("Please, indicate the source language!<br/><br/>");
+           return;
+        }
+        if ( targets.length == 0 ) {
+           alertify.alert("Please, select one or more target languages!<br/><br/>");
+           return;
+        }
+        var starget = "";
+        for ( const target of targets ) {
+            starget = starget + target + ",";
+        }
+        starget = starget.substring(0, starget.length - 1);
+        console.log( "targets : " + starget );
+        console.log("translate request on : " + soundfile);
+        $('#help-trans-alll').css('display','none');
+        $('#spinner-trans-alll').css('display','block');
+        $('#callTRAl').css('display','none');
+        var jqxhr = $.post( {
+           url: '../../translate-all.php',
+           data: {
+             slang: slang,
+             target: starget,
+             source: fullEncode(soundfile),
+             user: user,
+             color: ucolor,
+             linear: true
+           },
+           dataType: 'application/json'
+        })
+        .fail(function(error) {
+           $('#spinner-trans-alll').css('display','none');
+           $('#help-trans-alll').css('display','block');
+           $("#modal-trans-alll").modal("hide");
            if ( error.status == 200 ) {
               alertAndScroll( "Calling translation success !" );
               loadRegions();
@@ -641,6 +699,19 @@ var translateStart = function(regid) {
     $("#spinner-trans").css("display", "none");
 }
 
+var translateStartAlll = function(regid) {
+    if ( regid != '' ) {
+       currentRegion = regid;
+    }
+    parent.window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth"
+    });
+    $("#modal-trans-alll").modal("show");
+    $('#callTRAl').css('display','block');
+    $("#spinner-trans-alll").css("display", "none");
+}
 
 /**
  * Split annotations at the given wavesurfer play time

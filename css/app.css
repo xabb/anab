@@ -65,8 +65,8 @@ overview {
   width : 100px;
   height : 20px;
   display : none;
-  float : right;
-  margin-right : -100px;
+  float : left;
+  margin-left : 20px;
 }
 
 input[type='range'] { 
@@ -176,7 +176,7 @@ input[type='range'] {
 }
 
 .modal-tdialog {
-  height:380px;
+  height:420px;
 }
 
 .modal-hdialog {
@@ -330,8 +330,7 @@ input[type='range'] {
 .zoom-label {
   text-align:center;
   font-weight:bold;
-  line-height:20px;
-  padding-top:20px;
+  margin-top:80px;
 }
 
 .speed-label {

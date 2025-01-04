@@ -47,7 +47,6 @@ if ( empty($_POST['color']) )
 }
 $color = $_POST['color'];
 
-
 $link = mysqli_connect($config['dbhost'], $config['dbuser'], $config['dbpass'], $config['dbname']);
 if (!$link) {
    error_log( "Could not connect to the database : ".$config['dbname']);
@@ -72,10 +71,10 @@ if (!$link) {
         $annlines = preg_split('/\r\n|\r|\n/', $anntext);
         forEach( $annlines as $line ) {
           if ( $line == "" ) continue;
-          if ( strstr( $line, $langin.":" ) ) {
+          if ( strstr( $line, $slang.":" ) ) {
              $transdata .= $line."\n";
           } else {
-              $transdata .= $slang.":".$line."\n";
+             $transdata .= $slang.":".$line."\n";
           }
         }
      }

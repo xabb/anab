@@ -127,6 +127,22 @@ var addToBook = function(regid) {
     $("#spinner-book").css("display", "none");
 }
 
+var translateStartAll = function(regid) {
+    $("#modal-edit").off("hidden.bs.modal");
+    $("#modal-edit").modal("hide");
+    if ( regid != '' ) {
+       currentRegion = regid;
+    }
+    parent.window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth"
+    });
+    $("#modal-trans-all").modal("show");
+    $('#callTRA').css('display','block');
+    $("#spinner-trans-all").css("display", "none");
+}
+
 var translateStart = function(regid) {
     $("#modal-edit").off("hidden.bs.modal");
     $("#modal-edit").modal("hide");
@@ -163,7 +179,11 @@ var whisperStart = function(regid) {
 /**
  * Init & load.
  */
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('readystatechange', function(e) {
+
+    console.log( "ready state changed (free): " + document.readyState ); 
+
+    if ( document.readyState != "complete" ) return
 
     $("#modal-wait").modal("show");
     $('#spinner-global').css('display','block');
@@ -255,7 +275,7 @@ document.addEventListener('DOMContentLoaded', function() {
            }
         }
         // adding the language choice to the title ( only once )
-        var atrans = "<img src='../../img/translate.png' title='Translate Document' class='trans-header' id='tall' onclick='translateAll()' />";
+        var atrans = "<img src='../../img/translate.png' title='Translate Document' class='trans-header' id='tall' onclick='translateStartAll()' />";
         $("#archive-header").append(atrans);
         var select = "<select id='set-language' class='select-language'></select>&nbsp;&nbsp;";
         $("#archive-header").append(select);
@@ -585,6 +605,56 @@ document.addEventListener('DOMContentLoaded', function() {
            $('#spinner-trans').css('display','none');
            $('#help-trans').css('display','block');
            $("#modal-trans").modal("hide");
+           if ( error.status == 200 ) {
+              alertAndScroll( "Calling translation success !" );
+              loadRegions();
+           } else {
+              alertAndScroll( "Calling translation failed : " + error.statusText );
+              console.log( "Calling translation failed : " + JSON.stringify(error) + " frozen ! " + frozen);
+           }
+        });
+    }
+
+    callTRA.onsubmit = function(e) {
+        var slang = $('#TRAlang').find(":selected").val();
+        var targets = $('#TRAtarget').val();
+        var counter = 0;
+        var order = -1;
+        e.preventDefault();
+        if ( slang == "None" ) {
+           alertify.alert("Please, indicate the source language!<br/><br/>");
+           return;
+        }
+        if ( targets.length == 0 ) {
+           alertify.alert("Please, select one or more target languages!<br/><br/>");
+           return;
+        }
+        var starget = "";
+        for ( const target of targets ) {
+            starget = starget + target + ",";
+        }
+        starget = starget.substring(0, starget.length - 1);
+        console.log( "targets : " + starget );
+        console.log("translate request on : " + soundfile);
+        $('#help-trans-all').css('display','none');
+        $('#spinner-trans-all').css('display','block');
+        $('#callTRA').css('display','none');
+        var jqxhr = $.post( {
+           url: '../../translate-all.php',
+           data: {
+             slang: slang,
+             target: starget,
+             source: fullEncode(soundfile),
+             user: user,
+             color: ucolor,
+             linear: false
+           },
+           dataType: 'application/json'
+        })
+        .fail(function(error) {
+           $('#spinner-trans-all').css('display','none');
+           $('#help-trans-all').css('display','block');
+           $("#modal-trans-all").modal("hide");
            if ( error.status == 200 ) {
               alertAndScroll( "Calling translation success !" );
               loadRegions();
@@ -966,7 +1036,8 @@ function editAnnotation(region, e) {
     playRegion(currentRegion, true);
     var form = document.forms.edit;
     form.dataset.region = region.id;
-    $('#note').trumbowyg('html', region.data.note.replaceAll("\n", "<br/>") || '');
+    if ( typeof region.data.note != "undefined" )
+       $('#note').trumbowyg('html', region.data.note.replaceAll("\n", "<br/>") || '');
     form.onsubmit = function(e) {
         e.preventDefault();
         // console.log( 'saving : ' + form.elements.note.value);
