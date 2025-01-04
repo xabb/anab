@@ -48,24 +48,24 @@ then
   exit -1
 fi
 
-artist=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 artist | cut -f2 -d':' | sed 's/ /-/g' -`
+artist=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 artist | cut -f2 -d':' | xargs`
 fartist=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 artist | cut -f2 -d':'`
 echo "artist : $artist" 1>&2
 date=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 date | cut -f2 -d':' | xargs | sed 's/ //g' - | sed 's/\//-/g' -`
 echo "date : $date" 1>&2
-title=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 title | cut -f2 -d':' | awk '{print $1 " " $2 " " $3 " " $4 " " $5}' | sed 's/ /-/g' | sed 's/--/-/g'`
-ftitle=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 title | cut -f2-3 -d':' | sed 's/^ //g'`
+title=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 title | cut -f2 -d':' | awk '{print $1 " " $2 " " $3 " " $4 " " $5}'`
+ftitle=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 title | cut -f2-3 -d':'`
 echo "title : $title" 1>&2
-collection=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 album | grep -v replaygain | cut -f2 -d':' | awk '{print $1 $2 $3}'`
+collection=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 album | grep -v replaygain | cut -f2 -d':' | awk '{print $1 " " $2 " " $3 " " $4 " " $5}'`
 echo "collection : $collection" 1>&2
 
-if [ "x"$ftitle == "x" ]
+if [ -z "$ftitle" ]
 then
    title='Unknown'
    ftitle='Unknown'
 fi
 
-if [ "x"$date == "x" ]
+if [ -z "$date" ]
 then
    date='xx:xx:xx'
    fdate='Unknown'
@@ -73,7 +73,7 @@ else
    fdate=$date
 fi
 
-if [ "x"$artist != "x" ]
+if [ -n "$artist" ]
 then
    dirname=$artist"-"$title"-"$date
 else

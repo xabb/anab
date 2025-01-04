@@ -200,13 +200,12 @@ var loadRegions = function() {
                    updateTable();
                    drawRegions();
                    updateLanguages();
-                   console.log( "we have : " + languages );
-                   // zoom is proportional to the number of minutes limited to 10
-                   wzoom = Math.floor( wavesurfer.getDuration() / 60.0 )+1;
-                   if ( wzoom > 10 ) wzoom = 10;
-                   $('#zlabel').html("Zoom : " + Number(wzoom));
+
+                   wzoom = ( $("#waveform").width() / wavesurfer.getDuration() ).toFixed(2);
+                   $('#zlabel').html("Zoom : " + Number(wzoom).toFixed(2));
                    $('#zoomZoom').value = Number(wzoom);
                    wavesurfer.zoom(wzoom);
+
                    $('#svalue').html(("x"+wspeed).substring(0,4));
    
                    $("#ptime").html( toHHMMSS(wavesurfer.getCurrentTime()) + " / " + toHHMMSS(wavesurfer.getDuration()) );
@@ -352,6 +351,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
             } else {
                    loadRegions();
+                   var atrans = "<img src='../../img/translate.png' title='Translate Document' class='trans-header' id='tall' onclick='translateAll()' />";
+                   $("#archive-header").append(atrans);
                    var select = "<select id='set-languagel' class='select-language'></select>&nbsp;&nbsp;";
                    $("#archive-header").append(select);
                    var header = "<span class='header-language'>Language&nbsp;&nbsp;</span>";
@@ -516,22 +517,22 @@ document.addEventListener('DOMContentLoaded', function() {
       updateTable();
     }
 
-    zplus.onclick = function(e) {
-       wzoom++;
-       wavesurfer.zoom(wzoom);
-       $("#zlabel").html("Zoom : " + wzoom );
-    }
+    // zplus.onclick = function(e) {
+    //    wzoom++;
+    //    wavesurfer.zoom(wzoom);
+    //    $("#zlabel").html("Zoom : " + wzoom.toFixed(2) );
+    // }
 
-    zminus.onclick = function(e) {
-       wzoom--;
-       wavesurfer.zoom(wzoom);
-       $("#zlabel").html("Zoom : " + wzoom );
-    }
+    // zminus.onclick = function(e) {
+    //    wzoom--;
+    //    wavesurfer.zoom(wzoom);
+    //    $("#zlabel").html("Zoom : " + wzoom.toFixed(2) );
+    // }
 
     zoomZoom.oninput = function(e) {
-       wzoom=Number(this.value);
+       wzoom=Number(this.value)/10.0;
        wavesurfer.zoom(wzoom);
-       $("#zlabel").html("Zoom : " + wzoom );
+       $("#zlabel").html("Zoom : " + wzoom.toFixed(2) );
     }
 
     resetAlll.onclick = function(e) {

@@ -180,33 +180,39 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                 <div id='selectAlll' class='select-all'>Select All</div>
                 <div id='resetAlll' class='reset-all'>Reset All</div>
                 <div id='frozenl' class='frozen'>Frozen</div>
-                <i id="help" class="fa fa-question-circle fa-2x" aria-hidden="true" ></i>
+                <i id="help" class="fa fa-question-circle fa-2x help-question" aria-hidden="true" ></i>
             </div>
 
             <div id="demo" class="outer-wave-full">
-		<div class="upper-toolbar">
-                    <div id="slabel" class="speed-label">Speed</div>
-                    <div id="zlabel" class="zoom-label">Zoom</div>
-                </div>
-		<div class="lower-toolbar">
-                  <div class="speed-control">
-                     <div id="svalue" class="speed-value"></div>
-                     <i id="splus" class="fa fa-plus-square-o fa-2x" width=20px height=20px ></i>
+                <table width=100%>
+                <tr>
+                <td></td>
+                <td align=center>
+                    <span id="zlabel" class="zoom-label">Zoom</span>
+                </td>
+                <td align=center>
+                    <span id="slabel" class="speed-label">Speed</span>
+                </td>
+                </tr>
+                <tr>
+                <td>
+                  <div id="ptime" class="play-time"></div>
+                </td>
+                <td align=center>
+                    <div>
+                       <!-- <i id="zplus" class="glyphicon glyphicon-zoom-in float-center"></i> -->
+                       <input id="zoomZoom" data-action="zoom" class="float-center" type="range" min="1" max="500" value="0" style="width: 100px" />
+                       <!-- <i id="zminus" class="glyphicon glyphicon-zoom-out float-center"></i> -->
+                    </div>
+                </td>
+                <td align=center>
                      <i id="sminus" class="fa fa-minus-square-o fa-2x" width=20px height=20px ></i>
-                  </div>
-                  <div class="zoom-rangel">
-                    <div>
-                       <i id="zplus" class="glyphicon glyphicon-zoom-in float-right"></i>
-                    </div>
-                    <div>
-                        <input id="zoomZoom" data-action="zoom" class="float-right" type="range" min="1" max="200" value="0" style="width: 100px" />
-                    </div>
-                    <div>
-                        <i id="zminus" class="glyphicon glyphicon-zoom-out float-right"></i>
-                    </div>
-                  </div>
-                <div id="ptime" class="play-timel"></div>
-                </div>
+                     <i id="splus" class="fa fa-plus-square-o fa-2x" width=20px height=20px ></i>
+                     <div id="svalue"></div>
+                </td>
+                </tr>
+                </table>
+
                 <div id="waveform"></div>
                 <div id="subtitle" class="linear-subtitle"></div>
                 <div id="subtitle-left" class="linear-subtitle-left"></div>

@@ -155,7 +155,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                 <div class="modal-content modal-hcontent">
                     <p>
                      Select a part of the file to create a region.<br /><br />
-                     You can then resize it by moving its border, move it with click-and-drag or removing it by clicking on the upper-right red marker.<br /><br />
+                     You can then resize it by moving its border, move it with click-and-drag or remove it by clicking on the upper-right red marker.<br /><br />
                      To edit a note, double-click on a region and a pop-up will appear where you can enter a note in rich text format, save it before closing the pop-up.<br /><br />
                      In edition mode, the region will play in a loop, to resume playing the file normally, close the edition pop-up.<br /><br />
                      In edition mode, you can also add the region to an audio book by clicking on the audiobook icon.<br /><br />
@@ -174,7 +174,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                 <div id='selectAll' class='select-all'>Select All</div>
                 <div id='resetAll' class='reset-all'>Reset All</div>
                 <div id='frozen' class='frozen'>Frozen</div>
-                <i id="help" class="fa fa-question-circle fa-2x" aria-hidden="true" ></i>
+                <i id="help" class="fa fa-question-circle fa-2x help-question" aria-hidden="true" ></i>
             </div>
 
             <div id="container-wave" class="outer-wave">
@@ -185,29 +185,34 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                     <i id="sfull" class="fa fa-expand sfull" aria-hidden="true" data-action="pause"></i>
                     </div>
                 </div>
-		<div class="upper-toolbar">
-                    <div id="slabel" class="speed-label">Speed</div>
-                    <div id="zlabel" class="zoom-label">Zoom</div>
-                </div>
-		<div class="lower-toolbar">
-                  <div class="speed-control">
-                     <div id="svalue" class="speed-value"></div>
-                     <i id="splus" class="fa fa-plus-square-o fa-2x" width=20px height=20px ></i>  
-                     <i id="sminus" class="fa fa-minus-square-o fa-2x" width=20px height=20px ></i>  
-                  </div>
-                  <div class="zoom-range">
-                    <div>
-                       <i id="zplus" class="glyphicon glyphicon-zoom-in float-right"></i>
-                    </div>
-                    <div>
-                        <input id="zoomZoom" data-action="zoom" class="float-right" type="range" min="1" max="200" value="0" style="width: 100px" />
-                    </div>
-                    <div>
-                        <i id="zminus" class="glyphicon glyphicon-zoom-out float-right"></i>
-                    </div>
-                  </div>
+		<table width=100%>
+                <tr>
+                <td></td>
+                <td align=center>
+                    <span id="zlabel" class="zoom-label">Zoom</span>
+                </td>
+                <td align=center>
+                    <span id="slabel" class="speed-label">Speed</span>
+                </td>
+                </tr>
+		<tr>
+                <td>
 		  <div id="ptime" class="play-time"></div>
-                </div>
+                </td>
+                <td align=center>
+                    <div>
+                       <!-- <i id="zplus" class="glyphicon glyphicon-zoom-in float-center"></i> -->
+                       <input id="zoomZoom" data-action="zoom" class="float-center" type="range" min="1" max="500" value="0" style="width: 100px" />
+                       <!-- <i id="zminus" class="glyphicon glyphicon-zoom-out float-center"></i> -->
+                    </div>
+                </td>
+                <td align=center>
+                     <i id="sminus" class="fa fa-minus-square-o fa-2x" width=20px height=20px ></i>  
+                     <i id="splus" class="fa fa-plus-square-o fa-2x" width=20px height=20px ></i>  
+                     <div id="svalue"></div>
+                </td>
+                </tr>
+                </table>
                 <div id="waveform"></div>
                 <div id="wave-timeline"></div>
                 <div id="wave-minimap"></div>
