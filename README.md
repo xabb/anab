@@ -21,4 +21,4 @@ chevil@giss.tv
 
 concept and programming : chevil@giss.tv
 initial concept & design : beatrice.rettig@gmail.com
-testing and advices : jaume@nualart.cat
+testing & advices : jaume@nualart.cat

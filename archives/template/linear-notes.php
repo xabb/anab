@@ -101,7 +101,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                      <li>The OpenAI whisper transcription tool with the whisper icon : <img src='../../img/whisper-logo.png' width='30' height='30' /></li>
                      <li>note: this is very ressources consuming on your server, so use it sparingly!!</li>
                      <br/>
-                     <li>The python anywhere free translation API <br/>( using usual Google translation engine ) <br/>with the translation icon : <img src='../../img/translate.png' width='30' height='30' /></li>
+                     <li>The python anywhere free translation API ( Google translation engine ) <br/>with the translation icon : <img src='../../img/translate.png' width='30' height='30' /></li>
                      </ul>
                      Enjoy and shout "In your ***, Elon Musk !!" each time you save your work !!<br /><br /> 
                  </p>
@@ -117,7 +117,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
              <div class='help-whisper' id='help-whisper'><h4>
              You will call OpenAI whisper for an automatic transcription...<br/>
              Your job will be queued and you can come back a few minutes later<br/>
-             to check the result by reloading this page.</h4><br/>
+             to check the result by reloading this page.</h4>
              </div>
              <form role="form" id="callAI" name="callAI" style="transition: opacity 300ms linear; margin: 10px 0;">
              <center>
@@ -166,7 +166,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                 print "<option value='$key'>$value</option>\n";
              }
 ?>
-             </select><br/><br.><br/>
+             </select><br/><br/><br/>
              <button type="submit" class="btn btn-success btn-block btn-whisper">Translate now!</button>
              </center>
              </form>
@@ -175,7 +175,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
         </div>
 
         <div class="modal fade" id="modal-trans-alll">
-           <div class="modal-tdialog modal-dialog">
+          <div class="modal-tdialog modal-dialog">
             <br/><center><strong><h3>Translation Service from Python Anywhere</h3></strong></center>
             <div class="modal-content modal-tcontent">
              <div class="lds-spinner" id="spinner-trans-alll" ><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
@@ -203,13 +203,13 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                 print "<option value='$key'>$value</option>\n";
              }
 ?>
-             </select><br/><br.><br/>
+             </select><br/><br/>
              <button type="submit" class="btn btn-success btn-block btn-whisper">Translate now!</button>
              </center>
              </form>
             </div>
-           </div>
-        </div
+          </div>
+        </div>
 
         <div class="container">
             <div class="header" id="archive-header">
@@ -257,7 +257,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
 
                 <div class="modal fade" id="modal-book" role="dialog">
                   <div class="modal-dialog modal-bdialog">
-                    <center><b>Add to audiobook</b></center><br/>
+                    <center><h3>Add to Audiobook</h3></center><br/>
                     <div class="modal-content modal-bcontent">
                       <center>
                          <div class="lds-spinner" id="spinner-modal"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>

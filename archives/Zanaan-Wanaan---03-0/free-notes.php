@@ -141,7 +141,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                 print "<option value='$key'>$value</option>\n";
              } 
 ?>
-             </select><br/><br.><br/>
+             </select><br/><br/>
              <button type="submit" class="btn btn-success btn-block btn-whisper">Translate now!</button>
              </center>
              </form>
@@ -178,7 +178,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
                 print "<option value='$key'>$value</option>\n";
              } 
 ?>
-             </select><br/><br.><br/>
+             </select><br/><br/><br/>
              <button type="submit" class="btn btn-success btn-block btn-whisper">Translate now!</button>
              </center>
              </form>
@@ -273,7 +273,7 @@ while ( $rowsetting = mysqli_fetch_array( $ressettings) )
 
                 <div class="modal fade" id="modal-book" role="dialog">
                   <div class="modal-dialog modal-bdialog">
-                    <center><h3>Add to audiobook</h3></center><br/>
+                    <center><h3>Add to Audiobook</h3></center><br/>
                     <div class="modal-content modal-bcontent">
                       <center>
                          <div class="lds-spinner" id="spinner-book" ><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>

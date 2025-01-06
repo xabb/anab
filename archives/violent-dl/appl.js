@@ -225,7 +225,7 @@ var loadRegions = function() {
  */
 document.addEventListener('readystatechange', function(e) {
 
-    console.log( "ready state changed (linear): " + document.readyState ); 
+    console.log( "ready state changed (linear): " + document.readyState );
 
     if ( document.readyState != "complete" ) return;
 
@@ -467,7 +467,7 @@ document.addEventListener('readystatechange', function(e) {
            }
         });
         console.log("translate request on : " + soundfile + " : " + order);
-        $('#help-trans').css('display','none');
+        $('#help-transl').css('display','none');
         $('#spinner-trans').css('display','block');
         $('#callTRl').css('display','none');
         var jqxhr = $.post( {
@@ -517,7 +517,7 @@ document.addEventListener('readystatechange', function(e) {
         starget = starget.substring(0, starget.length - 1);
         console.log( "targets : " + starget );
         console.log("translate request on : " + soundfile);
-        $('#help-trans-alll').css('display','none');
+        $('#help-trans-all').css('display','none');
         $('#spinner-trans-alll').css('display','block');
         $('#callTRAl').css('display','none');
         var jqxhr = $.post( {
@@ -534,7 +534,6 @@ document.addEventListener('readystatechange', function(e) {
         })
         .fail(function(error) {
            $('#spinner-trans-alll').css('display','none');
-           $('#help-trans-alll').css('display','block');
            $("#modal-trans-alll").modal("hide");
            if ( error.status == 200 ) {
               alertAndScroll( "Calling translation success !" );

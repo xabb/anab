@@ -100,8 +100,14 @@ var openTab = function(name) {
   $(".tablinks").removeClass("active");
   $("#"+name).css("display","block");
   $("#"+name.toLowerCase()).addClass("active");
-  if ( name == "Linear" ) 
-        $("#modal-wait").modal("hide");
+  if ( name == "Linear" ) {
+     $("#modal-wait").modal("hide");
+     $("#linear-frame").attr("src","linear-notes.php");
+  }
+  if ( name == "Free" ) {
+     $("#modal-waitl").modal("hide");
+     $("#free-frame").attr("src","free-notes.php");
+  }
 } 
 
 var getParameterByName = function(name) {

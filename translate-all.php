@@ -69,16 +69,17 @@ if (!$link) {
      error_log("translate-all : translating annotation : ".$sql );
      $results=$link->query($sql);
      while ( $rowres=mysqli_fetch_row($results) ) {
+        $transdata = "";
         $anntext = $rowres[0];
         $annid = $rowres[1];
         error_log("translate-all : translating annotation : ".$annid );
         $annlines = preg_split('/\r\n|\r|\n/', $anntext);
         forEach( $annlines as $line ) {
           if ( $line == "" ) continue;
-          if ( strstr( $line, $slang.":" ) ) {
+          if ( strstr( $line, ":" ) ) {
              $transdata .= $line."\n";
           } else {
-              $transdata .= $slang.":".$line."\n";
+             $transdata .= $slang.":".$line."\n";
           }
         }
         if ( $anntext == "" ) {
@@ -96,7 +97,7 @@ if (!$link) {
            $annlines = preg_split('/\r\n|\r|\n/', $anntext);
            forEach( $annlines as $line ) {
               $rline = $line;
-              if ( $line[2] == ':' ) { // this is translation
+              if ( strstr( $line[2], ':' ) ) { // this is a translation
                  if ( substr($line, 0, 2) == $slang ) { // ==> to be translated
                      $rline = substr($line, 3);
                  } else {

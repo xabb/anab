@@ -183,7 +183,7 @@ document.addEventListener('readystatechange', function(e) {
 
     console.log( "ready state changed (free): " + document.readyState ); 
 
-    if ( document.readyState != "complete" ) return
+    if ( document.readyState != "complete" ) return;
 
     $("#modal-wait").modal("show");
     $('#spinner-global').css('display','block');
@@ -777,10 +777,18 @@ function drawRegions() {
             } 
             counter++;
             // console.log(wregion.data.note);
-            var leyenda = "...";
-            if ( typeof wregion.data.note != "undefined" )
-               leyenda = wregion.data.note.replaceAll("<div>","").replaceAll("</div>","").substring(0,20)+"...";
-            navigation+="<a href='javascript: playAt("+wregion.start+")'>"+counter+" - "+leyenda+"<br/></a>";
+            if ( typeof wregion.data.note != "undefined" ) {
+               var noteparts = wregion.data.note.split(':');
+               var leyenda = wregion.data.note;
+               if ( wregion.data.note[2] == ":" ) {
+                  leyenda = wregion.data.note.substring(3);
+               }
+               if ( wregion.data.note[3] == ":" ) {
+                  leyenda = wregion.data.note.substring(4);
+               }
+               leyenda = leyenda.replaceAll("<div>","").replaceAll("</div>","").substring(0,20)+"...";
+               navigation+="<a href='javascript: playAt("+wregion.start+")'>"+counter+" - "+leyenda+"<br/></a>";
+            }
             var blank = "<br/><br/><div class='linear-bar' id='bar-"+wregion.id+"'>";
             $("#linear-notes").append(blank);
             var range = "<p>"+counter+" : "+toHHMMSS(wregion.start)+" - "+toHHMMSS(wregion.end)+" (" + Math.round(wregion.end-wregion.start) + " s) : </p>";
