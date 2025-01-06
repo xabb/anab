@@ -1327,7 +1327,13 @@ window.GLOBAL_ACTIONS['export'] = function() {
        var lines = note.data.split("\n");
        if ( typeof lines != "undefined" ) { 
           lines.forEach( function( line, index ) {
+           if ( strstr( line, ":" ) > 0 ) {
+             if ( language === '--' || language === line.substring(0,2) ) {
+                subtitles += $('<div>').html(line.substring(3)).text()+"\n";
+             }
+           } else {
              subtitles += $('<div>').html(line).text()+'\n';
+           }
           });
           subtitles += '\n';
        }
@@ -1335,7 +1341,9 @@ window.GLOBAL_ACTIONS['export'] = function() {
 
     // force subtitles download
     var element = document.createElement('a');
-    var filename = $("#title").html().toString().split('(')[0]+'-free.srt';
+    var rlanguage = language;
+    if ( language == '--' ) rlanguage='all'
+    var filename = $("#title").text().split('(')[0]+"-"+rlanguage+'-free.srt';
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(subtitles));
     element.setAttribute('download', filename);
     element.style.display = 'none';
