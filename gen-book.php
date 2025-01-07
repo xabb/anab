@@ -41,6 +41,12 @@ if (!$excerpt_smil=file_get_contents("audiobooks/template/excerpt.smil"))
    die("ERR: Could not generate audio book.");
 }
 
+#clean old book and create an empty one
+if ( ( $result=exec("./create-empty-book.sh \"".$dirname."\"; echo $?") ) != 0 )
+{
+   die("ERR: Could not create book.");
+}
+
 $resultdb=db_query("SELECT audiobook.title, data, audiobook.norder, source, excerpt, audiobook.aoid FROM audiobook, annotation WHERE audiobook.aoid=annotation.id AND audiobook.title='".addslashes($title)."' ORDER BY audiobook.norder" );
 $nbexcerpts=mysqli_num_rows($resultdb);
 if ( $nbexcerpts == 0 )
@@ -106,9 +112,11 @@ else
 
    // set header
    $date = date("Y-m-d");
-   $hour = round( $ttime/3600 );
-   $min = round( ($ttime-$hour*3600) / 60 );
-   $sec = round( $ttime-$hour*3600-$min*60 );
+   error_log( "book duration : ".$ttime );
+   $hour = floor( $ttime/3600 );
+   $min = floor( ($ttime-$hour*3600) / 60 );
+   $sec = floor( $ttime-$hour*3600-$min*60 );
+   error_log( "book duration : ".$hour.":".$min.":".$sec );
    if ( ( $esize=exec("du -b 'audiobooks/".$dirname."' | cut -f1") ) < 0 )  
    {
        die("ERR: Could not get book size.");

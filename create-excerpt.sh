@@ -40,7 +40,7 @@ echo "extension : $extension"
    fi
    #echo "done." 1>&2
 
-   cmd="/usr/bin/ffmpeg -f $extension -y -ss $1 -t $2 -i $tmpfile -vn $4"
+   cmd="/usr/bin/ffmpeg -i $tmpfile -map_metadata -1 -f $extension -y -ss $1 -t $2 -vn $4"
    echo $cmd 1>&2
    $cmd
    if [ $? -ne 0 ]
