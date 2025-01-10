@@ -28,7 +28,7 @@ if ( !isset($_SESSION['schtroumpf']) || !isset($_SESSION['papa']) )
   <script type="text/javascript">
 
     function doCreateArchive() {
-       url=$("#createform :input[name='url']").val();
+       url=$("#createform :input[name='url']").val().replaceAll('&','%26');
        if ( url == "" )
        {
           alertify.alert("Please, enter a url!");
@@ -39,7 +39,11 @@ if ( !isset($_SESSION['schtroumpf']) || !isset($_SESSION['papa']) )
        $('#error-zone').animate({ opacity : 0.0 },{queue:false,duration:1000});
        $('.lds-spinner').css('opacity','1.0');
        $('#create').prop('disabled', true);
-       $.get( "create-archive.php", { file : encodeURIComponent(url), user : '<?php echo $_SESSION['schtroumpf']; ?>' }, function(data) {
+       $.get( "create-archive.php", 
+       { 
+         file : encodeURIComponent(url), 
+         user : '<?php echo $_SESSION['schtroumpf']; ?>' 
+       }, function(data) {
         $('.lds-spinner').css('opacity','0.0');
         if ( data.indexOf("ERR:")>=0 )
         {

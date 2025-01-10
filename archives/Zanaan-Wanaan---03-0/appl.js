@@ -3,7 +3,7 @@
  */
 var wavesurfer;
 var wavewidth=940;
-var nbPeaks=32768;
+var nbPeaks=16384;
 var wzoom=10;
 var wspeed=1.0;
 var gotPeaks=false;
@@ -223,11 +223,10 @@ var loadRegions = function() {
 /**
  * Init & load.
  */
-document.addEventListener('readystatechange', function(e) {
+document.addEventListener('DOMContentLoaded', (e) => {
 
-    console.log( "ready state changed (linear): " + document.readyState );
-
-    if ( document.readyState != "complete" ) return;
+    // console.log( "ready state changed (linear): " + document.readyState );
+    // if ( document.readyState != "complete" ) return;
 
     $("#modal-waitl").modal("show");
 
@@ -329,10 +328,10 @@ document.addEventListener('readystatechange', function(e) {
         wavesurfer.on('ready', function() {
 
             console.log( "wavesurfer ready" );
+            // this function doesn't work
             var wposition = getPosition( document.getElementById("waveform") );
             console.log("waveform is at : (" + wposition.x + "," + wposition.x + ")");
             wavey = wposition.y;
-            // this function doesn't work
             wavey = 100;
 
             if ( !gotPeaks )
@@ -1327,6 +1326,7 @@ function showCurrentNote() {
  * Display annotation.
  */
 function showNote(region) {
+    if ( region == null ) return; 
     console.log( "showNote : " + region.id );
     currentRegion = region.id;
     // hide all notes, except this one
@@ -1370,6 +1370,7 @@ function deleteNote(region) {
     //   currentRegion = null;
     // }
     // show all notes
+    if ( region == null ) return; 
     console.log( "deleteNote : " + region.id );
     if (!deleteNote.el) {
        deleteNote.el = document.querySelector('#subtitle');

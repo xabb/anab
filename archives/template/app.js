@@ -14,6 +14,8 @@ var nbRegions=0;
 var frozen=false;
 var maxFrozen = 200;
 var showFrozen = 0;
+var nbPeaks=16384;
+var gotPeaks=false;
 var soundfile = '__file_url__';
 
 var strstr = function (haystack, needle) {
@@ -179,11 +181,10 @@ var whisperStart = function(regid) {
 /**
  * Init & load.
  */
-document.addEventListener('readystatechange', function(e) {
+document.addEventListener('DOMContentLoaded', (e) => {
 
-    console.log( "ready state changed (free): " + document.readyState ); 
-
-    if ( document.readyState != "complete" ) return;
+    // console.log( "ready state changed (free): " + document.readyState ); 
+    // if ( document.readyState != "complete" ) return;
 
     $("#modal-wait").modal("show");
     $('#spinner-global').css('display','block');
@@ -241,17 +242,31 @@ document.addEventListener('readystatechange', function(e) {
         ]
     });
 
-    wavesurfer.util
-        .fetchFile({
-            responseType: 'json',
-            url: 'peaks.json'
-        })
-        .on('success', function(data) {
-            wavesurfer.load(
-                soundfile,
-                data
-            );
-        });
+    // doesn't work
+    wavesurfer.on('loading', function (percents, evt) {
+      console.log( "free wavesurfer loading : " + percents + "%");
+      if ( percents >= 95 )
+          $("#modal-wait").modal("hide");
+    });
+
+    console.log("loading peaks");
+    var jqxhr = $.post( {
+        responseType: 'json',
+        url: 'peaks.json'
+    }, function(data) {
+        peaks = data;
+        console.log( "got peaks : " + peaks.length );
+        if ( peaks.length == 2*nbPeaks ) {
+           console.log( "free : loading with peaks : " + soundfile );
+           wavesurfer.load( soundfile, data );
+           gotPeaks=true;
+
+        } else {
+           console.log( "loading no peaks : " + soundfile );
+           wavesurfer.load( soundfile );
+           gotPeaks=false;
+        }
+    });
 
     /* Regions */
     wavesurfer.on('ready', function() {
@@ -282,7 +297,6 @@ document.addEventListener('readystatechange', function(e) {
         var header = "<span class='header-language'>Language&nbsp;&nbsp;</span>";
         $("#archive-header").append(header);
         moveSpeech();
-        $("#modal-wait").modal("hide");
         $('#spinner-global').css('display','none');
     });
 
@@ -949,10 +963,11 @@ function loadRegions() {
       updateLanguages();
       creationPending=false;
       console.log("creationPending = false");
+      $("#modal-wait").modal("hide");
     }).fail(function(error) {
-       console.log( "couldn't load annotations : " + JSON.stringify(error) );
-       $("#modal-wait").modal("hide");
-       $('#spinner-global').css('display','none');
+      console.log( "couldn't load annotations : " + JSON.stringify(error) );
+      $("#modal-wait").modal("hide");
+      $('#spinner-global').css('display','none');
     });
     wavesurfer.on('region-updated', drawAndSaveRegions);
     wavesurfer.on('region-removed', drawAndSaveRegions);
@@ -1082,6 +1097,7 @@ function editAnnotation(region, e) {
  * Display annotation.
  */
 function showNote(region) {
+    if ( region == null ) return;
     currentRegion = region.id;
     // console.log( "show note");
     if (!showNote.el || !showNote.uel) {
@@ -1140,6 +1156,7 @@ function deleteNote(region) {
     //   $("#"+currentRegion).css("border-color","#000000");
     //   currentRegion = null;
     // }
+    if ( region == null ) return;
     if (!deleteNote.el || !deleteNote.uel) {
        deleteNote.el = document.querySelector('#isubtitle');
        deleteNote.uel = document.querySelector('#subtitle');
