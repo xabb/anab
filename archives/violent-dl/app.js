@@ -4,17 +4,17 @@
 var wavesurfer;
 var wzoom;
 var wspeed=1.0;
+var nbPeaks=32768;
 var evid;
 var svid;
 var currentRegion = null;
-var anguages = '--';
+var languages = '--';
 var language = '--';
 var bRegionId=-1;
 var nbRegions=0;
 var frozen=false;
 var maxFrozen = 200;
 var showFrozen = 0;
-var nbPeaks=16384;
 var gotPeaks=false;
 var soundfile = 'https://giss.tv/dmmdb/contents/violent-dl.webm';
 
@@ -187,7 +187,6 @@ document.addEventListener('DOMContentLoaded', (e) => {
     // if ( document.readyState != "complete" ) return;
 
     $("#modal-wait").modal("show");
-    $('#spinner-global').css('display','block');
 
     var jqxhr = $.post( {
        url: '../../get-title.php',
@@ -242,9 +241,8 @@ document.addEventListener('DOMContentLoaded', (e) => {
         ]
     });
 
-    // doesn't work
     wavesurfer.on('loading', function (percents, evt) {
-      console.log( "free wavesurfer loading : " + percents + "%");
+      // console.log( "free wavesurfer loading : " + percents + "%");
       if ( percents >= 95 )
           $("#modal-wait").modal("hide");
     });
@@ -297,7 +295,6 @@ document.addEventListener('DOMContentLoaded', (e) => {
         var header = "<span class='header-language'>Language&nbsp;&nbsp;</span>";
         $("#archive-header").append(header);
         moveSpeech();
-        $('#spinner-global').css('display','none');
     });
 
     wavesurfer.on('region-click', regionClick);
@@ -455,6 +452,7 @@ document.addEventListener('DOMContentLoaded', (e) => {
                   drawAndSaveRegions();
                   wavesurfer.on('region-updated', drawAndSaveRegions);
                   wavesurfer.on('region-removed', drawAndSaveRegions);
+                  nbRegions=0;
                 } else {
                   console.log("deleting free annotaions failed : " + JSON.stringify(data));
                   alertAndScroll("deleting free annotaions failed : " + JSON.stringify(data));
@@ -963,11 +961,9 @@ function loadRegions() {
       updateLanguages();
       creationPending=false;
       console.log("creationPending = false");
-      $("#modal-wait").modal("hide");
     }).fail(function(error) {
       console.log( "couldn't load annotations : " + JSON.stringify(error) );
       $("#modal-wait").modal("hide");
-      $('#spinner-global').css('display','none');
     });
     wavesurfer.on('region-updated', drawAndSaveRegions);
     wavesurfer.on('region-removed', drawAndSaveRegions);

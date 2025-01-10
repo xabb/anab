@@ -2,8 +2,7 @@
  * Create a WaveSurfer instance.
  */
 var wavesurfer;
-var wavewidth=940;
-var nbPeaks=16384;
+var nbPeaks=32768;
 var wzoom=10;
 var wspeed=1.0;
 var gotPeaks=false;
@@ -257,6 +256,56 @@ document.addEventListener('DOMContentLoaded', (e) => {
           $("#waveform").css({top:$(document).scrollTop()-wavey});
     });
 
+    // Init wavesurfer
+    wavesurfer = WaveSurfer.create({
+       container: '#waveform',
+       height: 100,
+       pixelRatio: 1,
+       scrollParent: true,
+       normalize: true,
+       minimap: true,
+       barRadius: 0,
+       forceDecode: false,
+       fillParent: true,
+       mediaControls: true,
+       hideScrollbar: true,
+       backend: 'MediaElement',
+       minPxPerSec: 50,
+       waveColor: waveColor,
+       progressColor: progressColor,
+       plugins: [
+          WaveSurfer.regions.create(),
+          WaveSurfer.markers.create(),
+       ]
+    });
+
+    wavesurfer.on('loading', function (percents, evt) {
+      // console.log( "linear wavesurfer loading : " + percents + "%");
+      if ( percents == 100 ) {
+        $("#modal-waitl").modal("hide");
+        if ( !gotPeaks ) {
+           aPeaks = wavesurfer.backend.getPeaks(nbPeaks);
+           console.log( "saving peaks : " + aPeaks.length );
+           var jqxhr = $.post( {
+               url: 'save-peaks.php',
+               data: {
+	           'json': JSON.stringify(aPeaks)
+               },
+               dataType: 'application/json'
+           }, function() {
+               console.log( "saving peaks succeeded" );
+           }).fail(function(error) {
+               if ( error.status === 200 ) {
+                  console.log( "saving peaks success");
+                  // location.reload();
+               } else {
+                  console.log( "saving peaks failed : status : " + error.status + " message : " + JSON.stringify(error));
+               }
+           });
+        } 
+      }
+    });
+
     console.log("loading peaks");
     var jqxhr = $.post( {
         responseType: 'json',
@@ -265,143 +314,65 @@ document.addEventListener('DOMContentLoaded', (e) => {
         peaks = data;
         console.log( "got peaks : " + peaks.length );
         if ( peaks.length == 2*nbPeaks ) {
-           // Init wavesurfer
-           wavesurfer = WaveSurfer.create({
-              container: '#waveform',
-              height: 100,
-              pixelRatio: 1,
-              scrollParent: true,
-              normalize: true,
-              minimap: true,
-              barRadius: 0,
-              forceDecode: false,
-              fillParent: true,
-              mediaControls: true,
-              hideScrollbar: true,
-              backend: 'MediaElement',
-              minPxPerSec: 50,
-              waveColor: waveColor,
-              progressColor: progressColor,
-              plugins: [
-                 WaveSurfer.regions.create(),
-                 WaveSurfer.markers.create(),
-              ]
-           });
-
-           console.log( "loading with peaks : " + soundfile );
-           wavesurfer.load(
-              soundfile,
-              data
-           );
+           console.log( "free : loading with peaks : " + soundfile );
+           wavesurfer.load( soundfile, data );
            gotPeaks=true;
         } else {
-           // Init wavesurfer
-           wavesurfer = WaveSurfer.create({
-              container: '#waveform',
-              height: 100,
-              pixelRatio: 1,
-              scrollParent: true,
-              normalize: true,
-              minimap: true,
-              barRadius: 0,
-              forceDecode: false,
-              fillParent: true,
-              mediaControls: true,
-              hideScrollbar: true,
-              backend: 'WebAudio',
-              minPxPerSec: 50,
-              waveColor: waveColor,
-              progressColor: progressColor,
-              plugins: [
-                 WaveSurfer.regions.create(),
-              ]
-           });
-
            console.log( "loading no peaks : " + soundfile );
-           wavesurfer.load(
-              soundfile
-           );
+           wavesurfer.load( soundfile );
            gotPeaks=false;
         }
-
-        /* Regions */
-        wavesurfer.on('ready', function() {
-
-            console.log( "wavesurfer ready" );
-            // this function doesn't work
-            var wposition = getPosition( document.getElementById("waveform") );
-            console.log("waveform is at : (" + wposition.x + "," + wposition.x + ")");
-            wavey = wposition.y;
-            wavey = 100;
-
-            if ( !gotPeaks )
-            {
-               aPeaks = wavesurfer.backend.getPeaks(nbPeaks);
-               console.log( "saving peaks : " + aPeaks.length );
-               var jqxhr = $.post( {
-                   url: 'save-peaks.php',
-                   data: {
-	               'json': JSON.stringify(aPeaks)
-                   },
-                   dataType: 'application/json'
-               }, function() {
-                   console.log( "saving peaks succeeded" );
-                   location.reload();
-               }).fail(function(error) {
-                   if ( error.status === 200 ) {
-                      console.log( "saving peaks success");
-                      location.reload();
-                   } else {
-                      console.log( "saving peaks failed : status : " + error.status + " message : " + JSON.stringify(error));
-                   }
-               });
-
-            } else {
-                   loadRegions();
-                   var atrans = "<img src='../../img/translate.png' title='Translate Document' class='trans-header' id='tall' onclick='translateStartAlll()' />";
-                   $("#archive-header").append(atrans);
-                   var select = "<select id='set-languagel' class='select-language'></select>&nbsp;&nbsp;";
-                   $("#archive-header").append(select);
-                   var header = "<span class='header-language'>Language&nbsp;&nbsp;</span>";
-                   $("#archive-header").append(header);
-   
-            }
-        
-        }); // ready
-
-        wavesurfer.on('region-click', regionClick);
-        wavesurfer.on('region-dblclick', launchSplitAnnotation);
-        wavesurfer.on('region-update-end', updateAnnotation);
-        wavesurfer.on('region-in', showNote);
-        wavesurfer.on('region-out', deleteNote);
-        wavesurfer.on('region-updated', drawAndSaveRegions);
-        wavesurfer.on("marker-click", deleteAnnotation );
-        wavesurfer.on('audioprocess', function() {
-            $(".play-time").html( toHHMMSS(wavesurfer.getCurrentTime()) + " / " + toHHMMSS(wavesurfer.getDuration()) );
-        });
-    
-        wavesurfer.on('pause', function() {
-            $(".linear-play").removeClass('fa-pause');
-            $(".linear-play").addClass('fa-play');
-        });
-    
-        wavesurfer.on('play', function() {
-         if ( currentRegion != null ) {
-            let wregion = wavesurfer.regions.list[currentRegion];
-            wregion.setLoop(false);
-            $("#r"+currentRegion).removeClass("fa-pause");
-            $("#r"+currentRegion).addClass("fa-play");
-            $("#"+currentRegion).css("border-color","#000000");
-            currentRegion = null;
-         }
-        });
-
-        wavesurfer.responsive=true;
-
-
-    }).fail(function(error) {
-        console.log( "couldn't load peaks : " + JSON.stringify(error) );
     });
+
+    /* Regions */
+    wavesurfer.on('ready', function() {
+
+        console.log( "wavesurfer ready" );
+        // this function doesn't work
+        var wposition = getPosition( document.getElementById("waveform") );
+        console.log("waveform is at : (" + wposition.x + "," + wposition.x + ")");
+        wavey = wposition.y;
+        wavey = 100;
+
+        loadRegions();
+        var atrans = "<img src='../../img/translate.png' title='Translate Document' class='trans-header' id='tall' onclick='translateStartAlll()' />";
+        $("#archive-header").append(atrans);
+        var select = "<select id='set-languagel' class='select-language'></select>&nbsp;&nbsp;";
+        $("#archive-header").append(select);
+        var header = "<span class='header-language'>Language&nbsp;&nbsp;</span>";
+        $("#archive-header").append(header);
+    
+    }); // ready
+
+    wavesurfer.on('region-click', regionClick);
+    wavesurfer.on('region-dblclick', launchSplitAnnotation);
+    wavesurfer.on('region-update-end', updateAnnotation);
+    wavesurfer.on('region-in', showNote);
+    wavesurfer.on('region-out', deleteNote);
+    wavesurfer.on('region-updated', drawAndSaveRegions);
+    wavesurfer.on("marker-click", deleteAnnotation );
+    wavesurfer.on('audioprocess', function() {
+        $(".play-time").html( toHHMMSS(wavesurfer.getCurrentTime()) + " / " + toHHMMSS(wavesurfer.getDuration()) );
+    });
+
+    wavesurfer.on('pause', function() {
+        $(".linear-play").removeClass('fa-pause');
+        $(".linear-play").addClass('fa-play');
+    });
+
+    wavesurfer.on('play', function() {
+     if ( currentRegion != null ) {
+        let wregion = wavesurfer.regions.list[currentRegion];
+        wregion.setLoop(false);
+        $("#r"+currentRegion).removeClass("fa-pause");
+        $("#r"+currentRegion).addClass("fa-play");
+        $("#"+currentRegion).css("border-color","#000000");
+        currentRegion = null;
+     }
+    });
+
+    wavesurfer.responsive=true;
+
 
     $('#sminus').on('mousedown', function() {
        evid = setTimeout( "decSpeed();", 100 );
@@ -442,11 +413,11 @@ document.addEventListener('DOMContentLoaded', (e) => {
         var order = -1;
         e.preventDefault();
         if ( slang == "None" ) {
-           alertify.alert("Please, indicate the source language!<br/><br/>");
+           alertAndScroll("Please, indicate the source language!<br/><br/>");
            return;
         }
         if ( targets.length == 0 ) {
-           alertify.alert("Please, select one or more target languages!<br/><br/>");
+           alertAndScroll("Please, select one or more target languages!<br/><br/>");
            return;
         }
         var starget = "";
@@ -502,11 +473,11 @@ document.addEventListener('DOMContentLoaded', (e) => {
         var order = -1;
         e.preventDefault();
         if ( slang == "None" ) {
-           alertify.alert("Please, indicate the source language!<br/><br/>");
+           alertAndScroll("Please, indicate the source language!<br/><br/>");
            return;
         }
         if ( targets.length == 0 ) {
-           alertify.alert("Please, select one or more target languages!<br/><br/>");
+           alertAndScroll("Please, select one or more target languages!<br/><br/>");
            return;
         }
         var starget = "";
@@ -546,7 +517,7 @@ document.addEventListener('DOMContentLoaded', (e) => {
 
     selectAlll.onclick = function(e) {
       if ( (typeof wavesurfer == "undefined") || (wavesurfer.getDuration() <= 0) ) {
-         alertify.alert("Wavesurfer is not initialized!<br/><br/>");
+         alertAndScroll("Wavesurfer is not initialized!<br/><br/>");
       }
       if ( frozenl ) {
          if ( showFrozenl <= maxFrozenl ) {
@@ -593,7 +564,7 @@ document.addEventListener('DOMContentLoaded', (e) => {
 
     resetAlll.onclick = function(e) {
       if ( (typeof wavesurfer == "undefined") || (wavesurfer.getDuration() <= 0) ) {
-         alertify.alert("Wavesurfer is not initialized!<br/><br/>");
+         alertAndScroll("Wavesurfer is not initialized!<br/><br/>");
       }
       if ( frozenl ) {
          if ( showFrozenl <= maxFrozenl ) {
@@ -621,6 +592,7 @@ document.addEventListener('DOMContentLoaded', (e) => {
                   updateTable();
                   wavesurfer.on('region-updated', drawAndSaveRegions);
                   wavesurfer.on('region-removed', drawAndSaveRegions);
+                  nbRegions=0;
                 } else {
                   console.log("deleting linear annotaions failed : " + JSON.stringify(data));
                   alertAndScroll("deleting linear annotaions failed : " + JSON.stringify(data));
@@ -840,7 +812,7 @@ function updateTable() {
         var rwhisper = "<img src='../../img/whisper-logo.png' title='Call Whisper AI' class='whisper-logo' id='w"+id+"' onclick='whisperStart(\""+id+"\")' />";
         $("#bar-"+id).append(rwhisper);
       }
-      var rtrans = "<img src='../../img/translate.png' title='Translate Note' class='trans-logo' id='t"+wregion.id+"' onclick='translateStart(\""+id+"\")' />";
+      var rtrans = "<img src='../../img/translate.png' title='Translate Note' class='trans-logo' id='t"+id+"' onclick='translateStart(\""+id+"\")' />";
       $("#bar-"+id).append(rtrans);
       var rbook = "<i class='fa fa-book fa-1x linear-book' title='Add to Book' id='b"+id+"' onclick='addToBook(\""+id+"\")'></i>";
       $("#bar-"+id).append(rbook);
@@ -884,7 +856,7 @@ function updateTableOne(currentId) {
            var rwhisper = "<img src='../../img/whisper-logo.png' title='Call Whisper AI' class='whisper-logo' id='w"+id+"' onclick='whisperStart(\""+id+"\")' />";
            $("#bar-"+id).append(rwhisper);
         }
-        var rtrans = "<img src='../../img/translate.png' title='Translate Note' class='trans-logo' id='t"+wregion.id+"' onclick='translateStart(\""+id+"\")' />";
+        var rtrans = "<img src='../../img/translate.png' title='Translate Note' class='trans-logo' id='t"+id+"' onclick='translateStart(\""+id+"\")' />";
         $("#bar-"+id).append(rtrans);
         var rbook = "<i class='fa fa-book fa-1x linear-book' title='Add to Book' id='b"+id+"' onclick='addToBook(\""+id+"\")'></i>";
         $("#bar-"+id).append(rbook);

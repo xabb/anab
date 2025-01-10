@@ -71,7 +71,7 @@ A showcase video of actual features is available here :
 http://giss.tv/~chevil/Videos/anab.webm
 
    - concept and programming : chevil@giss.tv
-   - initial concept & design : beatrice.rettig@gmail.com
+   - initial concept & design : californiadream@free.fr
    - testing & advices : jaume@nualart.cat
 
 LICENSE <b>!important</b>
