@@ -31,8 +31,15 @@ require("html2text.php");
   } else if ( !empty($_POST['oldbook']) ) {
      $book = $_POST['oldbook'];
   }
+
   if ( $book === '' ) {
      header('HTTP/1.1 406 Book is mandatory');	  
+     exit(-1);
+  }
+
+  if ( ( $result=exec("./create-empty-book.sh \"".$book."\"; echo $?") ) != 0 )
+  {
+     header('HTTP/1.1 500 Could not create book');
      exit(-1);
   }
 
