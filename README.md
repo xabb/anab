@@ -2,7 +2,7 @@ A.N.a.B. is a cool toolkit ( coolkit ) to handle audio archive in a collaborativ
 for a group of people to share audio documents, whatever they are,
 from conferences to music remixes to archive of social movements...
 
-let us put it more clearly by having a tour of its features
+Let us put it more clearly by having a tour of its features
 and you will get a clearer vision of what it can do for you :
 
  * <b>a smart audio archive for your documents and music :</b>
