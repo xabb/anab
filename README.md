@@ -21,7 +21,7 @@ and you will get a clearer vision of what it can do for you :
      and put your own comments on files with links to other ressources on the web.
    - the notes you create on files can be exported as a subtitle file in the language 
      or your choice, when the notes start with a language code like en:, ar:, es:, ...
-   - for each node created, you can translate them to other language using
+   - for each note created, you can translate them to other language using
      the translate icon on each note or the global translate icon that
      will translate all your document :
      ![Translate icon](img/translate.png)
@@ -37,10 +37,10 @@ and you will get a clearer vision of what it can do for you :
      every single phrase in your file and cut the files in section accordingly!
    - this process requires lots of machine ressources, so you should not abuse of it.
    - OpenAI Whisper, according to our experience, has a 70-75 % of accuracy,
-     so you surely have to rework all the transcription by hand,
+     so you will surely have to rework all the transcription by hand,
      see the example below where it extracts phrases and transcript 
      'We don't torture' to 'We don't touch it', wrongly of course,
-     but the section created are correct :
+     but the sections created are correct :
   
 ![Transcription Screen](whispered.png)
 
