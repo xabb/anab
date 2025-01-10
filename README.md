@@ -70,7 +70,7 @@ http://giss.tv/~chevil/Videos/anab.webm
 
    - concept and programming : chevil@giss.tv
    - initial concept & design : beatrice.rettig@gmail.com
-   -testing & advices : jaume@nualart.cat
+   - testing & advices : jaume@nualart.cat
 
 LICENSE <b>!important</b>
 
