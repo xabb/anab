@@ -62,6 +62,7 @@ and you will get a clearer vision of what it can do for you :
    - here, we create a book about surveillance in different countries :
 
 ![Audio_Book_Screen](surveillance.png)
+![Reader_Screen](cozy.png)
 
 These are the main features but we think of extending it to other uses,
 if some requests are communicated to : chevil@giss.tv
