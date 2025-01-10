@@ -49,6 +49,7 @@ and you will get a clearer vision of what it can do for you :
    - once you have created notes on whatever audio files in your collection,
      you can add them to Audio Books that you can create with the Audio Book icon :
      ![Audio Book icon](img/audiobook.png)
+   - each of your notes becomes a chapter in the audio book.
    - when a book is filled and ready, it can be exported to a .zip
      file containing the book in Daisy 2.0 format.
    - these audio books can be seen as a tool to confront points of view
