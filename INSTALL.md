@@ -23,8 +23,10 @@ to process audio within the browser.
 
 * optionally, if you want to use AI,
 you need OpenAI whisper,
-( you have the ability to enable/disable the use of AI
-for every user )
+install it with :
+pip3 install openai-whisper
+
+( you have the ability to enable/disable the use of AI for each user )
 
 ===== INSTALL =====
 
@@ -38,7 +40,9 @@ for every user )
 
 > mysqladmin create wavesurfer
 
-* change the admin password in wavesurfer.sql
+* change the admin password :s etting your-password in wavesurfer.sql
+
+* create the wavesurfer database with :
 
 > mysql wavesurfer < wavesurfer.sql
 
@@ -57,6 +61,7 @@ $config['owner'] = "admin";
 
 optionally, if you want to use AI,
 install OpenAI Whisper with :
+
 pip3 install openai-whisper
 
 You're set, log in to the system as admin
