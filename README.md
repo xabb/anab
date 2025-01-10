@@ -55,7 +55,7 @@ and you will get a clearer vision of what it can do for you :
      for a specific subject of philosophy ot politics, the initial goal
      of this project created with the 'Political Studies' group.
      http://political-studies.net
-   - this is a suggestion of use, but you can also created mixes of music,
+   - this is a suggestion of use, but you can also create mixes of music,
      or story telling by extracting parts of 'relatos', narratives, experiences, ...
      or reports of demonstration ...
    - here, we create a book about surveillance in different countries :
@@ -68,16 +68,17 @@ if some requests are communicated to : chevil@giss.tv
 A showcase video of actual features is available here :
 http://giss.tv/~chevil/Videos/anab.webm
 
-concept and programming : chevil@giss.tv
-initial concept & design : beatrice.rettig@gmail.com
-testing & advices : jaume@nualart.cat
+   - concept and programming : chevil@giss.tv
+   - initial concept & design : beatrice.rettig@gmail.com
+   -testing & advices : jaume@nualart.cat
 
-LICENSE !important
+LICENSE <b>!important</b>
+
 This piece of software is published under the terms
-of HIPPOCRATIC license that fosters the ethical 
+of <b>HIPPOCRATIC</b> license that fosters the ethical 
 use of tools in this age of digital surveillance :
 
 https://firstdonoharm.dev/ 
 
-so don't use it for an archive of FAKE NEWS
-or CONSPIRATION THEORIES!
+so don't use it for an archive of <b>FAKE NEWS</b>
+or <b>CONSPIRATION THEORIES!</b>
