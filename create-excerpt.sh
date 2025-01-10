@@ -3,21 +3,11 @@
 #set -x 
 
 if [ $# -ne 5 ]; then
-   echo "ERR: Usage: $0 <start> <duration> <infile> <outfile> <book>"
+   echo "ERR: Usage: $0 <start> <duration> <infile> <outfile> <note>"
    exit 1
 fi
 
-book=$5
-
-# generate an empty book from an audiobook template
-# echo "creating book : $book" >2
-if [ ! -f "audiobooks/$book" ]
-then
-    mkdir "audiobooks/$book"
-    cp audiobooks/template/listen.php "audiobooks/$book"
-    chmod -R 777 "audiobooks/$book"
-    sed -i "s#__title__#$book#g" "audiobooks/$book/listen.php"
-fi
+title=$5
 
 filename=$(basename -- "$3")
 extension="${filename##*.}"
@@ -40,9 +30,7 @@ echo "extension : $extension"
    fi
    #echo "done." 1>&2
 
-   cmd="/usr/bin/ffmpeg -i $tmpfile -map_metadata -1 -f $extension -y -ss $1 -t $2 -vn $4"
-   echo $cmd 1>&2
-   $cmd
+   /usr/bin/ffmpeg -i $tmpfile -f $extension -map_metadata -1 -metadata title="$title" -y -ss $1 -t $2 -vn $4
    if [ $? -ne 0 ]
    then
       /bin/rm $tmpfile

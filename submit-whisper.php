@@ -1,6 +1,7 @@
 <?php
 
-include("config.php");
+require("config.php");
+require("html2text.php");
 
 function detached_exec($cmd) {
     $pid = pcntl_fork();
@@ -102,7 +103,7 @@ function detached_exec($cmd) {
   } else {
      $link->query('SET NAMES utf8');
      error_log( 'Selecting annotation : '.urldecode($source).':'.$order);
-     $sql = "SELECT id, source, start, end, whispered FROM annotation WHERE source='".addslashes($source)."' AND norder=".$order.";";
+     $sql = "SELECT id, source, start, end, whispered, data FROM annotation WHERE source='".addslashes($source)."' AND norder=".$order.";";
      $result = $link->query($sql);
      if ( mysqli_num_rows($result) !== 1 )
      {
@@ -122,6 +123,16 @@ function detached_exec($cmd) {
         $source = $annrow[1];
         $start = $annrow[2];
         $end = $annrow[3];
+        $anntext = convert_html_to_text($annrow[4]);
+        $annlines = preg_split('/\r\n|\r|\n/', $anntext);
+        if ( $annlines[0] == ':' )
+        {
+          $excerpt_title= substr(substr($annlines[0],3),0,40)."...";
+        }
+        else
+        {
+          $excerpt_title= substr($annlines[0],0,40)."...";
+        }
         $duration = $end - $start;
          error_log( "Annotation duration ; ".$duration." language : ".$lang );
         if ( ($duration<=30.0 ) && ($lang=="Guess") ) {
@@ -136,7 +147,7 @@ function detached_exec($cmd) {
      // generate the audio file 
      $duration = $end - $start;
      $dirname = '../../excerpts';
-     $cmd = "./create-excerpt.sh ".$start." ".$duration." \"".urldecode($source)."\" \"".$excerpt."\" \"".$dirname."\" 2>/dev/null";
+     $cmd = "./create-excerpt.sh ".$start." ".$duration." \"".urldecode($source)."\" \"".$excerpt."\" \"".$excerpt_title."\" 2>/dev/null";
      error_log($cmd);
      if ( strstr( $result=exec($cmd), "ERR:" ) )
      {

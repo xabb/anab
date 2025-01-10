@@ -1,6 +1,7 @@
 <?php
 
-include("config.php");
+require("config.php");
+require("html2text.php");
 
   if ( empty($_POST['user']) )
   {
@@ -43,7 +44,7 @@ include("config.php");
   } else {
      $link->query('SET NAMES utf8');
      error_log( 'Selecting annotation : '.urldecode($source).':'.$order);
-     $sql = "SELECT id, source, start, end FROM annotation WHERE source='".addslashes($source)."' AND norder=".$order.";";
+     $sql = "SELECT id, source, start, end, data FROM annotation WHERE source='".addslashes($source)."' AND norder=".$order.";";
      $result = $link->query($sql);
      if ( mysqli_num_rows($result) !== 1 )
      {
@@ -56,6 +57,16 @@ include("config.php");
         $source = $annrow[1];
         $start = $annrow[2];
         $end = $annrow[3];
+        $anntext = convert_html_to_text($annrow[4]);
+        $annlines = preg_split('/\r\n|\r|\n/', $anntext);
+        if ( $annlines[0] == ':' )
+        {
+          $excerpt_title= substr(substr($annlines[0],3),0,40)."...";
+        }
+        else
+        {
+          $excerpt_title= substr($annlines[0],0,40)."...";
+        }
         error_log( "extracting : ".$start." -- ".$end );
      }
      $border = 0;
@@ -80,7 +91,7 @@ include("config.php");
      // generate the audio file if necessary
      $duration = $end - $start;
      $dirname = urldecode($book);
-     $cmd = "./create-excerpt.sh ".$start." ".$duration." \"".urldecode($source)."\" \"".$excerpt."\" \"".$dirname."\" 2>/dev/null";
+     $cmd = "./create-excerpt.sh ".$start." ".$duration." \"".urldecode($source)."\" \"".$excerpt."\" \"".$excerpt_title."\" 2>/dev/null";
      error_log($cmd);
      if ( strstr( $result=exec($cmd), "ERR:" ) )
      {
