@@ -4,7 +4,7 @@
 var wavesurfer;
 var wzoom;
 var wspeed=1.0;
-var nbPeaks=32768;
+var nbPeaks=8192;
 var evid;
 var svid;
 var currentRegion = null;
@@ -16,7 +16,6 @@ var frozen=false;
 var maxFrozen = 200;
 var showFrozen = 0;
 var gotPeaks=false;
-var peaksSaved=false;
 var soundfile = 'https://giss.tv/dmmdb/contents/violent-dl.webm';
 
 var strstr = function (haystack, needle) {
@@ -179,10 +178,10 @@ var whisperStart = function(regid) {
 }
 
 var savePeaks = function() {
-        if ( !gotPeaks ) {
-           aPeaks = wavesurfer.backend.getPeaks(nbPeaks,0,nbPeaks-1);
-           console.log( "saving peaks : " + aPeaks.length );
-           if ( aPeaks.length > 0 ) {
+  if ( !gotPeaks ) {
+     aPeaks = wavesurfer.backend.getPeaks(nbPeaks,0,nbPeaks-1);
+     console.log( "saving peaks : " + aPeaks.length );
+     if ( aPeaks.length > 0 ) {
              var jqxhr = $.post( {
                  url: 'save-peaks.php',
                  data: {
@@ -199,10 +198,10 @@ var savePeaks = function() {
                   console.log( "saving peaks failed : status : " + error.status + " message : " + JSON.stringify(error));
                }
              });
-           } else {
+       } else {
              console.log( "i can't get no peaks!!" );
-           }
-        }
+       }
+    }
 }
 
 /**
@@ -265,16 +264,17 @@ document.addEventListener('DOMContentLoaded', (e) => {
         ]
     });
 
+    wavesurfer.on('redraw', function () {
+      console.log("free wavesurfer redraw");
+      savePeaks();
+    });
+
     wavesurfer.on('loading', function (percents) {
       // console.log( "free wavesurfer loading : " + percents + "%");
       $("#message-wait").html("Loading waveform : " + percents + "%");
       if ( percents == 100 ) {
           $("#message-wait").html("Loading waveform..");
           $("#modal-wait").modal("hide");
-          if ( !peaksSaved ) {
-             setTimeout( "savePeaks();", 5000 );
-             peaksSaved=true;
-          }
       }
     });
 
@@ -295,6 +295,11 @@ document.addEventListener('DOMContentLoaded', (e) => {
            wavesurfer.load( soundfile );
            gotPeaks=false;
         }
+    })
+    .fail(function(error) {
+       console.log( "could not load peaks, loading without");
+       wavesurfer.load( soundfile );
+       gotPeaks=false;
     });
 
     /* Regions */
@@ -995,7 +1000,6 @@ function loadRegions() {
       console.log("creationPending = false");
     }).fail(function(error) {
       console.log( "couldn't load annotations : " + JSON.stringify(error) );
-      $("#modal-wait").modal("hide");
     });
     wavesurfer.on('region-updated', drawAndSaveRegions);
     wavesurfer.on('region-removed', drawAndSaveRegions);

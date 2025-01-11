@@ -312,10 +312,6 @@ document.addEventListener('DOMContentLoaded', (e) => {
       if ( percents == 100 ) {
         $("#message-waitl").html("Loading waveform... ");
         $("#modal-waitl").modal("hide");
-        if ( !peaksSaved ) {
-          // setTimeout("savePeaks();", 5000);
-          peaksSaved=true;
-        }
       }
     });
 
