@@ -16,7 +16,7 @@ var frozen=false;
 var maxFrozen = 200;
 var showFrozen = 0;
 var gotPeaks=false;
-var soundfile = 'https://giss.tv/dmmdb/contents/violent-dl.webm';
+var soundfile = '__file_url_';
 
 var strstr = function (haystack, needle) {
   if (needle.length === 0) return 0;

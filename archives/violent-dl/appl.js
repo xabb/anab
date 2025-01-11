@@ -2,7 +2,7 @@
  * Create a WaveSurfer instance.
  */
 var wavesurfer;
-var nbPeaks=32768;
+var nbPeaks=8192;
 var wzoom=10;
 var wspeed=1.0;
 var languages = '--';
@@ -19,6 +19,7 @@ var currentRegion;
 var nbRegions=0;
 var peaksSaved=false;
 var gotPeaks=false;
+var gotRegions=false;
 var soundfile = 'https://giss.tv/dmmdb/contents/violent-dl.webm';
 
 var strstr = function (haystack, needle) {
@@ -158,7 +159,6 @@ function updateLanguages() {
 
 var loadRegions = function() {
     console.log('loading region linear');
-        $("#modal-waitl").modal("show");
         var jqxhr = $.post( {
                    responseType: 'json',
                    url: 'get-annotations-linear.php',
@@ -251,9 +251,6 @@ var savePeaks = function() {
  */
 document.addEventListener('DOMContentLoaded', (e) => {
 
-    // console.log( "ready state changed (linear): " + document.readyState );
-    // if ( document.readyState != "complete" ) return;
-
     $("#modal-waitl").modal("show");
 
     var jqxhr = $.post( {
@@ -334,8 +331,17 @@ document.addEventListener('DOMContentLoaded', (e) => {
         }
     });
 
-    /* Regions */
-    wavesurfer.on('wavesurfer-ready', function() {
+    /* redraw */
+    wavesurfer.on('redraw', function () {
+      console.log("linear wavesurfer redraw");
+      if ( !gotRegions ) {
+         loadRegions();
+         gotRegions = true;
+      }
+    });
+
+    /* ready */
+    wavesurfer.on('ready', function() {
 
         console.log( "wavesurfer ready" );
         // this function doesn't work
@@ -344,7 +350,6 @@ document.addEventListener('DOMContentLoaded', (e) => {
         wavey = wposition.y;
         wavey = 100;
 
-        loadRegions();
         var atrans = "<img src='../../img/translate.png' title='Translate Document' class='trans-header' id='tall' onclick='translateStartAlll()' />";
         $("#archive-header").append(atrans);
         var select = "<select id='set-languagel' class='select-language'></select>&nbsp;&nbsp;";
@@ -901,7 +906,7 @@ function drawAndSaveRegions() {
  */
 function drawRegions() {
     var counter=4095;
-    // redraw rons and markers
+    // redraw regions and markers
     wavesurfer.clearMarkers();
     console.log( "draw and store regions" );
     localStorage.regionsl = JSON.stringify(
