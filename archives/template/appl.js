@@ -334,7 +334,9 @@ document.addEventListener('DOMContentLoaded', (e) => {
     /* redraw */
     wavesurfer.on('redraw', function () {
       console.log("linear wavesurfer redraw");
-      if ( !gotRegions ) {
+      aPeaks = wavesurfer.backend.getPeaks(nbPeaks,0,nbPeaks-1);
+      console.log( "linear got peaks : " + aPeaks.length );
+      if ( !gotRegions && aPeaks.length > 0 ) {
          loadRegions();
          gotRegions = true;
       }
