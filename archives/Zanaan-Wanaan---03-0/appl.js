@@ -5,7 +5,6 @@ var wavesurfer;
 var nbPeaks=32768;
 var wzoom=10;
 var wspeed=1.0;
-var gotPeaks=false;
 var languages = '--';
 var language = '--';
 var peaks;
@@ -18,6 +17,8 @@ var maxFrozenl = 200;
 var showFrozenl = 0;
 var currentRegion;
 var nbRegions=0;
+var peaksSaved=false;
+var gotPeaks=false;
 var soundfile = 'https://stream.political-studies.net/~tgs1/audio/2021-03-04-zanaan-wanaan.mp3';
 
 var strstr = function (haystack, needle) {
@@ -212,11 +213,37 @@ var loadRegions = function() {
    
                    $("#ptime").html( toHHMMSS(wavesurfer.getCurrentTime()) + " / " + toHHMMSS(wavesurfer.getDuration()) );
 
-                   $("#modal-waitl").modal("hide");
 
          }).fail(function(error) {
                    console.log( "couldn't load annotations : " + JSON.stringify(error) );
          });
+}
+
+var savePeaks = function() {
+        if ( !gotPeaks ) {
+           aPeaks = wavesurfer.backend.getPeaks(nbPeaks,0,nbPeaks-1);
+           console.log( "saving peaks : " + aPeaks.length );
+           if ( aPeaks.length > 0 ) {
+             var jqxhr = $.post( {
+               url: 'save-peaks.php',
+               data: {
+	           'json': JSON.stringify(aPeaks)
+               },
+               dataType: 'application/json'
+             }, function() {
+               console.log( "saving peaks succeeded" );
+             }).fail(function(error) {
+               if ( error.status === 200 ) {
+                  console.log( "saving peaks success");
+                  // location.reload();
+               } else {
+                  console.log( "saving peaks failed : status : " + error.status + " message : " + JSON.stringify(error));
+               }
+             });
+          } else {
+            console.log( "I can't get no peaks !!" );
+          } 
+        } 
 }
 
 /**
@@ -279,30 +306,16 @@ document.addEventListener('DOMContentLoaded', (e) => {
        ]
     });
 
-    wavesurfer.on('loading', function (percents, evt) {
+    wavesurfer.on('loading', function (percents) {
       // console.log( "linear wavesurfer loading : " + percents + "%");
+      $("#message-waitl").html("Loading waveform : " + percents + "%");
       if ( percents == 100 ) {
+        $("#message-waitl").html("Loading waveform... ");
         $("#modal-waitl").modal("hide");
-        if ( !gotPeaks ) {
-           aPeaks = wavesurfer.backend.getPeaks(nbPeaks);
-           console.log( "saving peaks : " + aPeaks.length );
-           var jqxhr = $.post( {
-               url: 'save-peaks.php',
-               data: {
-	           'json': JSON.stringify(aPeaks)
-               },
-               dataType: 'application/json'
-           }, function() {
-               console.log( "saving peaks succeeded" );
-           }).fail(function(error) {
-               if ( error.status === 200 ) {
-                  console.log( "saving peaks success");
-                  // location.reload();
-               } else {
-                  console.log( "saving peaks failed : status : " + error.status + " message : " + JSON.stringify(error));
-               }
-           });
-        } 
+        if ( !peaksSaved ) {
+          // setTimeout("savePeaks();", 5000);
+          peaksSaved=true;
+        }
       }
     });
 
@@ -316,6 +329,7 @@ document.addEventListener('DOMContentLoaded', (e) => {
         if ( peaks.length == 2*nbPeaks ) {
            console.log( "free : loading with peaks : " + soundfile );
            wavesurfer.load( soundfile, data );
+           $("#modal-waitl").modal("hide");
            gotPeaks=true;
         } else {
            console.log( "loading no peaks : " + soundfile );
@@ -325,7 +339,7 @@ document.addEventListener('DOMContentLoaded', (e) => {
     });
 
     /* Regions */
-    wavesurfer.on('ready', function() {
+    wavesurfer.on('wavesurfer-ready', function() {
 
         console.log( "wavesurfer ready" );
         // this function doesn't work
@@ -341,7 +355,7 @@ document.addEventListener('DOMContentLoaded', (e) => {
         $("#archive-header").append(select);
         var header = "<span class='header-language'>Language&nbsp;&nbsp;</span>";
         $("#archive-header").append(header);
-    
+
     }); // ready
 
     wavesurfer.on('region-click', regionClick);

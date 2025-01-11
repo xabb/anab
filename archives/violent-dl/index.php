@@ -94,6 +94,7 @@ if ( !isset($_SESSION['schtroumpf']) || !isset($_SESSION['papa']) )
 <script type="text/javascript">
 
 var soundfile = 'https://giss.tv/dmmdb/contents/violent-dl.webm';
+var firstTime = true;
 
 var openTab = function(name) {
   $(".tabcontent").css("display","none");
@@ -101,12 +102,15 @@ var openTab = function(name) {
   $("#"+name).css("display","block");
   $("#"+name.toLowerCase()).addClass("active");
   if ( name == "Linear" ) {
-     $("#modal-wait").modal("hide");
-     $("#linear-frame").attr("src","linear-notes.php");
+     // $("#modal-wait").modal("hide");
+     if ( firstTime ) {
+        $("#linear-frame").attr("src","linear-notes.php");
+        firstTime = false;
+     }
   }
   if ( name == "Free" ) {
-     $("#modal-waitl").modal("hide");
-     $("#free-frame").attr("src","free-notes.php");
+     // $("#modal-waitl").modal("hide");
+     // $("#free-frame").attr("src","free-notes.php");
   }
 } 
 

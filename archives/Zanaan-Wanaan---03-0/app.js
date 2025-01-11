@@ -16,6 +16,7 @@ var frozen=false;
 var maxFrozen = 200;
 var showFrozen = 0;
 var gotPeaks=false;
+var peaksSaved=false;
 var soundfile = 'https://stream.political-studies.net/~tgs1/audio/2021-03-04-zanaan-wanaan.mp3';
 
 var strstr = function (haystack, needle) {
@@ -177,14 +178,37 @@ var whisperStart = function(regid) {
     $("#help-whisper").css("display", "block");
 }
 
+var savePeaks = function() {
+        if ( !gotPeaks ) {
+           aPeaks = wavesurfer.backend.getPeaks(nbPeaks,0,nbPeaks-1);
+           console.log( "saving peaks : " + aPeaks.length );
+           if ( aPeaks.length > 0 ) {
+             var jqxhr = $.post( {
+                 url: 'save-peaks.php',
+                 data: {
+                   'json': JSON.stringify(aPeaks)
+                 },
+                 dataType: 'application/json'
+             }, function() {
+               console.log( "saving peaks succeeded" );
+             }).fail(function(error) {
+               if ( error.status === 200 ) {
+                  console.log( "saving peaks success");
+                  // location.reload();
+               } else {
+                  console.log( "saving peaks failed : status : " + error.status + " message : " + JSON.stringify(error));
+               }
+             });
+           } else {
+             console.log( "i can't get no peaks!!" );
+           }
+        }
+}
 
 /**
  * Init & load.
  */
 document.addEventListener('DOMContentLoaded', (e) => {
-
-    // console.log( "ready state changed (free): " + document.readyState ); 
-    // if ( document.readyState != "complete" ) return;
 
     $("#modal-wait").modal("show");
 
@@ -210,6 +234,7 @@ document.addEventListener('DOMContentLoaded', (e) => {
     // Init wavesurfer
     wavesurfer = WaveSurfer.create({
         container: '#waveform',
+        backend: 'MediaElement',
         height: 200,
         pixelRatio: 1,
         scrollParent: true,
@@ -219,10 +244,9 @@ document.addEventListener('DOMContentLoaded', (e) => {
         fillParent: true,
         hideScrollbar: true,
         barRadius: 0,
-        forceDecode: false,
+        forceDecode: true,
         waveColor: waveColor,
         progressColor: progressColor,
-        backend: 'MediaElement',
         plugins: [
             WaveSurfer.regions.create(),
             WaveSurfer.markers.create(),
@@ -241,10 +265,17 @@ document.addEventListener('DOMContentLoaded', (e) => {
         ]
     });
 
-    wavesurfer.on('loading', function (percents, evt) {
+    wavesurfer.on('loading', function (percents) {
       // console.log( "free wavesurfer loading : " + percents + "%");
-      if ( percents >= 95 )
+      $("#message-wait").html("Loading waveform : " + percents + "%");
+      if ( percents == 100 ) {
+          $("#message-wait").html("Loading waveform..");
           $("#modal-wait").modal("hide");
+          if ( !peaksSaved ) {
+             setTimeout( "savePeaks();", 5000 );
+             peaksSaved=true;
+          }
+      }
     });
 
     console.log("loading peaks");
@@ -253,12 +284,12 @@ document.addEventListener('DOMContentLoaded', (e) => {
         url: 'peaks.json'
     }, function(data) {
         peaks = data;
-        console.log( "got peaks : " + peaks.length );
+        console.log( "got peaks : " + peaks.length + "/" + 2*nbPeaks);
         if ( peaks.length == 2*nbPeaks ) {
            console.log( "free : loading with peaks : " + soundfile );
            wavesurfer.load( soundfile, data );
+           $("#modal-wait").modal("hide");
            gotPeaks=true;
-
         } else {
            console.log( "loading no peaks : " + soundfile );
            wavesurfer.load( soundfile );
@@ -295,6 +326,7 @@ document.addEventListener('DOMContentLoaded', (e) => {
         var header = "<span class='header-language'>Language&nbsp;&nbsp;</span>";
         $("#archive-header").append(header);
         moveSpeech();
+
     });
 
     wavesurfer.on('region-click', regionClick);

@@ -53,7 +53,7 @@ fartist=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 artist | cut -f2 -d':'`
 echo "artist : $artist" 1>&2
 date=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 date | cut -f2 -d':' | xargs | sed 's/ //g' - | sed 's/\//-/g' -`
 echo "date : $date" 1>&2
-title=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 title | cut -f2 -d':' | awk '{print $1 " " $2 " " $3 " " $4 " " $5}'`
+title=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 title | cut -f2 -d':' | awk '{print $1 " " $2 " " $3 " " $4 " " $5 " " $6 " " $7}'`
 ftitle=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 title | cut -f2-3 -d':'`
 echo "title : $title" 1>&2
 collection=`/usr/bin/ffprobe $tmpfile 2>&1 | grep -iw -m1 album | grep -v replaygain | cut -f2 -d':' | awk '{print $1 " " $2 " " $3 " " $4 " " $5}'`
@@ -67,7 +67,7 @@ fi
 
 if [ -z "$date" ]
 then
-   date='xx:xx:xx'
+   date='xx-xx-xx'
    fdate='Unknown'
 else
    fdate=$date
@@ -75,9 +75,9 @@ fi
 
 if [ -n "$artist" ]
 then
-   dirname=$artist"-"$title"-"$date
+   dirname=`echo $artist"-"$title | xargs`
 else
-   dirname=`echo $1 | rev | cut -d'/' -f 1 | rev | sed 's/.mp3//g' - | sed 's/.ogg//g' - | sed 's/.wav//g' - | sed 's/.webm//g' - | sed 's/.aiff//g' - | sed 's/.mp4//g' -`
+   dirname=`echo $1 | rev | cut -d'/' -f 1 | rev | sed 's/.mp3//g' - | sed 's/.ogg//g' - | sed 's/.wav//g' - | sed 's/.webm//g' - | sed 's/.aiff//g' - | sed 's/.mp4//g' - | xargs`
 fi
 
 echo "New directory : $dirname"
