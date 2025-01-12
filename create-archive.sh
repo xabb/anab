@@ -12,7 +12,10 @@ if [ $# -ne 1 ]; then
    exit 1
 fi
 
-tmpfile=`tempfile`
+extension="${1##*.}"
+echo "extension : $extension"
+
+tmpfile=`tempfile`.$extension
 echo -n "Downloading to $tmpfile ..." 1>&2
 wget -O $tmpfile --no-check-certificate "$1" 2>/dev/null
 if [ $? -ne 0 ]

@@ -16,7 +16,7 @@ if (!$link) {
    exit(-1);
 } else {
    $link->query('SET NAMES utf8');
-   $sqls = "SELECT biography FROM archive WHERE url LIKE '%".addslashes($url)."';";
+   $sqls = "SELECT biography FROM archive WHERE url = '".addslashes($url)."';";
    // error_log( 'Getting biography : '.$sqls );
    $results = $link->query($sqls);
    if ( mysqli_num_rows($results) <= 0 ) {
