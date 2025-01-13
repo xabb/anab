@@ -33,16 +33,18 @@ pip3 install openai-whisper
 * clone the repository in your server's accesible contents
 
 > git clone https://github.com/chevil/anab.git
+
 > cd anab
 
-* create the database :
 > cd sql
-
-> mysqladmin create wavesurfer
 
 * edit wavesurfer.sql and set your admin password : <your-password>
 
-* create the wavesurfer database with :
+* create the database :
+
+> mysqladmin create wavesurfer
+
+* fill the wavesurfer database with :
 
 > mysql wavesurfer < wavesurfer.sql
 
