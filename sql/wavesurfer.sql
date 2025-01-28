@@ -53,6 +53,7 @@ CREATE TABLE `archive` (
   `creator` longtext COLLATE utf8mb4_bin,
   `biography` longtext COLLATE utf8mb4_bin,
   `description` longtext COLLATE utf8mb4_bin,
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=115 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
